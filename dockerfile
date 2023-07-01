@@ -28,4 +28,4 @@ COPY --from=build-env /app/out .
 EXPOSE 80
 
 # Start the app
-ENTRYPOINT ["dotnet", "SV2.dll"]
+ENTRYPOINT ["dotnet", "WUG.dll"]
