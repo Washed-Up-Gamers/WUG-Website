@@ -54,7 +54,7 @@ public class AddMoneyNode : EffectNode
 
 	public override void Execute(ExecutionState state)
 	{
-		var tran = new SVTransaction(BaseEntity.Find(100), BaseEntity.Find(state.District.GroupId), Amount.GetValue(state), TransactionType.FreeMoney, "From Effect Node");
+		var tran = new Transaction(BaseEntity.Find(100), BaseEntity.Find(state.Nation.GroupId), Amount.GetValue(state), TransactionType.FreeMoney, "From Effect Node");
 		tran.NonAsyncExecute();
 		Console.WriteLine("Executed AddMoneyNode!");
 	}
@@ -67,11 +67,11 @@ public class RemoveStaticModifierNode : EffectNode
 
     public override void Execute(ExecutionState state)
     {
-		if (state.ParentScopeType == ScriptScopeType.District)
+		if (state.ParentScopeType == ScriptScopeType.Nation)
 		{
-			var modifier = state.District.StaticModifiers.FirstOrDefault(x => x.LuaStaticModifierObjId == ModifierName);
+			var modifier = state.Nation.StaticModifiers.FirstOrDefault(x => x.LuaStaticModifierObjId == ModifierName);
 			if (modifier is not null)
-				state.District.StaticModifiers.Remove(modifier);
+				state.Nation.StaticModifiers.Remove(modifier);
 		}
 		else if (state.ParentScopeType == ScriptScopeType.Province)
 		{
@@ -109,8 +109,8 @@ public class AddStaticModifierNode : EffectNode
 			dbmodifier.ScaleBy = ScaleBy.GetValue(state);
 		else
 			dbmodifier.ScaleBy = 1.0m;
-		if (state.ParentScopeType == ScriptScopeType.District)
-			state.District.StaticModifiers.Add(dbmodifier);
+		if (state.ParentScopeType == ScriptScopeType.Nation)
+			state.Nation.StaticModifiers.Add(dbmodifier);
         else if (state.ParentScopeType == ScriptScopeType.Province)
             state.Province.StaticModifiers.Add(dbmodifier);
         else if (state.ParentScopeType == ScriptScopeType.Building)
@@ -121,8 +121,8 @@ public class AddStaticModifierNode : EffectNode
 public class AddStaticModifierIfNotAlreadyExistsNode : EffectNode {
 	public AddStaticModifierNode AddStaticModifierNode { get; set; }
     public override void Execute(ExecutionState state) {
-		if (state.ParentScopeType == ScriptScopeType.District) {
-			if (state.District.StaticModifiers.Any(x => x.LuaStaticModifierObjId == AddStaticModifierNode.ModifierName))
+		if (state.ParentScopeType == ScriptScopeType.Nation) {
+			if (state.Nation.StaticModifiers.Any(x => x.LuaStaticModifierObjId == AddStaticModifierNode.ModifierName))
 				return;
 		}
 		else if (state.ParentScopeType == ScriptScopeType.Province) {
@@ -145,11 +145,11 @@ public class EveryScopeBuildingNode : EffectNode
 	public List<SyntaxNode> Body = new();
 	public override void Execute(ExecutionState state)
 	{
-        if (state.ParentScopeType == ScriptScopeType.District)
+        if (state.ParentScopeType == ScriptScopeType.Nation)
         {
-            ExecutionState _state = new(state.District, null, null, ScriptScopeType.Building, null, null);
+            ExecutionState _state = new(state.Nation, null, null, ScriptScopeType.Building, null, null);
 			_state.Locals = state.Locals;
-            foreach (var province in state.District.Provinces)
+            foreach (var province in state.Nation.Provinces)
 			{
 				foreach (var building in DBCache.ProvincesBuildings[province.Id]) {
 					_state.Building = building;
@@ -174,7 +174,7 @@ public class EveryScopeBuildingNode : EffectNode
         {
             foreach (var building in DBCache.ProvincesBuildings[state.Province.Id])
             {
-                ExecutionState _state = new(state.District, state.Province, null, ScriptScopeType.Building, building, null);
+                ExecutionState _state = new(state.Nation, state.Province, null, ScriptScopeType.Building, building, null);
                 foreach (var node in Body)
                 {
                     if (node.NodeType == NodeType.EFFECTBODY)

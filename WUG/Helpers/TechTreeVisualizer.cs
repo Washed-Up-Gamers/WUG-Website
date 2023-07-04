@@ -4,7 +4,6 @@ using WUG.Database.Models.Districts;
 using System.Drawing;
 using WUG.Scripting;
 using WUG.Scripting.Parser;
-using Valour.Api.Models.Messages.Embeds.Styles;
 
 namespace WUG.Helpers;
 
@@ -55,8 +54,8 @@ public class TechTreeVisualizer
             state = new ExecutionState(null, null, parentscopetype: ScriptScopeType.Research, research: research);
             foreach (var item in research.LuaResearchPrototype!.Costs.Evaluate(state))
             {
-                var color = new Valour.Api.Models.Messages.Embeds.Styles.Color(LuaResearch.ResearchPointTypeToColor(item.Key));
-                var colorpart = true ? "#ffffff" : $"rgba({color.Red}, {color.Green}, {color.Blue}, 0.4)";
+                var color = new Managers.Color(255, 255, 255);//new Valour.Api.Models.Messages.Embeds.Styles.Color(LuaResearch.ResearchPointTypeToColor(item.Key));
+                var colorpart = true ? "#ffffff" : $"rgba({color.R}, {color.G}, {color.B}, 0.4)";
                 html += $@"<br/><span style='color: {colorpart};'>{item.Value:n0} {item.Key.ToTitleCase()}</span>";
             }
         }

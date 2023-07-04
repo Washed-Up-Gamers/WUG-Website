@@ -136,11 +136,8 @@ recipe_simple_components_factory_base = {
 recipe_advanced_components_factory_base = {
 	name = "Advanced Component Production"
 	inputs = {
-		-- was 3
-		simple_components = 2.25
-		-- was 3
-		steel = 2.25
-		crystallite = 1.25
+		simple_components = 3
+		steel = 4
 	}
 	outputs = {
 		-- was 1
@@ -149,6 +146,18 @@ recipe_advanced_components_factory_base = {
 	-- was 4 then 7
 	perhour = 14
     editable = false
+}
+
+recipe_concrete_base = {
+	name = "Concrete Production"
+	inputs = {
+		sand = 1
+	}
+	outputs = {
+		concrete = 1
+	}
+	perhour = 25
+	editable = false
 }
 
 recipe_computer_chips_factory_base = {
@@ -187,7 +196,6 @@ recipe_cars_factory_base = {
 		steel = 5
 		plastic = 40
 		aluminium = 80
-		crystallite = 6
 	}
 	outputs = {
 		cars = 1
@@ -210,16 +218,16 @@ recipe_normal_ammo_factory_base = {
 	editable = false
 }
 
-recipe_crystallite_infused_ammo_factory_base = {
-	name = "Crystallite Infused Ammo Production"
+recipe_pothium_infused_ammo_factory_base = {
+	name = "Pothium Infused Ammo Production"
 	inputs = {
 		lead = 0.75
 		steel = 0.25
 		copper = 0.25
-		crystallite = 0.25
+		pothium = 0.25
 	}
 	outputs = {
-		crystallite_infused_ammo = 1
+		pothium_infused_ammo = 1
 	}
 	perhour = 50
 	editable = false
@@ -256,7 +264,7 @@ recipe_155mm_artillery_shell_factory_base = {
 recipe_105mm_artillery_factory_base = {
 	name = "105mm Artillery Production"
 	inputs = {
-		
+		steel = 1
 	}
 	outputs = {
 		artillery_105mm = 1
@@ -276,53 +284,6 @@ recipe_105mm_artillery_factory_base = {
 					}
 				}
 			}
-			costs = {
-				steel = {
-					base = 1
-					factor = edit.level
-					factor = {
-						base = edit.level
-						factor = 0.25
-						add = 1
-					}
-				}
-			}
-		}
-	}
-}
-
-recipe_tank_factory_base = {
-	name = "Tank Production"
-	inputs = {
-		any_with_basetype = {
-			id = "tank_engine"
-			basetype = "tank_engine"
-			required = true
-			amount = 1
-		}
-	}
-	outputs = {
-		tank = 1
-	}
-	perhour = 1
-	editable = true
-	buildingtype = "factory"
-	edits = {
-		attack = {
-			name = "Attack"
-
-			-- these are NOT scaled to the edit's level
-			modifiers = {
-				item.attack = {
-					base = 1
-					add = {
-						base = 0.25
-						factor = edit.level
-					}
-				}
-			}
-
-			-- per level
 			costs = {
 				steel = {
 					base = 1

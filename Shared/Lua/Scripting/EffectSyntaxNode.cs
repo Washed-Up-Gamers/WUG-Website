@@ -67,8 +67,8 @@ public class AddStaticModifierNode : EffectNode
             dbmodifier.ScaleBy = ScaleBy.GetValue(state);
         else
             dbmodifier.ScaleBy = 1.0m;
-        if (state.ParentScopeType == ScriptScopeType.District)
-            state.District.StaticModifiers.Add(dbmodifier);
+        if (state.ParentScopeType == ScriptScopeType.Nation)
+            state.Nation.StaticModifiers.Add(dbmodifier);
         else if (state.ParentScopeType == ScriptScopeType.Province)
             state.Province.StaticModifiers.Add(dbmodifier);
     }
@@ -79,9 +79,9 @@ public class AddStaticModifierIfNotAlreadyExistsNode : EffectNode
     public AddStaticModifierNode AddStaticModifierNode { get; set; }
     public override void Execute(ExecutionState state)
     {
-        if (state.ParentScopeType == ScriptScopeType.District)
+        if (state.ParentScopeType == ScriptScopeType.Nation)
         {
-            if (state.District.StaticModifiers.Any(x => x.LuaStaticModifierObjId == AddStaticModifierNode.ModifierName))
+            if (state.Nation.StaticModifiers.Any(x => x.LuaStaticModifierObjId == AddStaticModifierNode.ModifierName))
                 return;
         }
         else if (state.ParentScopeType == ScriptScopeType.Province)
@@ -100,11 +100,11 @@ public class RemoveStaticModifierNode : EffectNode
 
     public override void Execute(ExecutionState state)
     {
-        if (state.ParentScopeType == ScriptScopeType.District)
+        if (state.ParentScopeType == ScriptScopeType.Nation)
         {
-            var modifier = state.District.StaticModifiers.FirstOrDefault(x => x.LuaStaticModifierObjId == ModifierName);
+            var modifier = state.Nation.StaticModifiers.FirstOrDefault(x => x.LuaStaticModifierObjId == ModifierName);
             if (modifier is not null)
-                state.District.StaticModifiers.Remove(modifier);
+                state.Nation.StaticModifiers.Remove(modifier);
         }
         else if (state.ParentScopeType == ScriptScopeType.Province)
         {

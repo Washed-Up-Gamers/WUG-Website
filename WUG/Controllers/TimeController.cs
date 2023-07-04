@@ -4,16 +4,10 @@ using WUG.Managers;
 using WUG.Database.Models.Users;
 using System.Diagnostics;
 using WUG.Models.Manage;
-using Valour.Shared.Models;
-using WUG.VoopAI;
-using Valour.Shared.Authorization;
-using Valour.Api.Client;
 using System.Web;
 using System.Text.Json;
 using WUG.Helpers;
-using Valour.Api.Nodes;
 using WUG.NonDBO;
-using Valour.Shared;
 
 namespace WUG.Controllers;
 

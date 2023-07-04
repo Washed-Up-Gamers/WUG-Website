@@ -15,7 +15,7 @@
 
     ViewData["Title"] = Model.Name;
 
-    SVUser user = UserManager.GetUser(Context)!;
+    User user = UserManager.GetUser(Context)!;
 
     // Add auth for roles later
     //if (user != null && Model.own == user.Id)
@@ -45,9 +45,9 @@
                 </div>
             </div>
 
-            @if (Model.DistrictId is not null)
+            @if (Model.NationId is not null)
             {
-                <p class="m-2" style="text-align:center; font-size:x-large">District: @Model.District.Name</p>
+                <p class="m-2" style="text-align:center; font-size:x-large">District: @Model.Nation.Name</p>
             }
             else
             {

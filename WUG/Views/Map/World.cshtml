@@ -16,8 +16,8 @@
     }
 
     #svg {
-        /*transform: scale(1.2);
-            position: absolute;*/
+        transform: scale(2);
+        /*position: absolute;*/
         top: 0px;
         left: 0px;
         height: 100%;
@@ -67,7 +67,7 @@
         {
             <img src="~/media/map/woketexture.png" id="background" />
         }
-        <svg id="svg" viewBox="0 0 2560 1280">
+        <svg id="svg" viewBox="0 0 5120 2560">
             <style>
                 path {
                     fill: white;
@@ -79,11 +79,26 @@
             </style>
             @if (resourcetomap is null)
             {
-                @foreach (var province in Model)
+                @if (false)
                 {
-                    <a href="/District/View/@province.District.Name">
-                        <path d="@province.D" id="@province.Id" style="fill:#@province.District.Color;stroke: #@province.District.Color !important" class="province"></path>
-                    </a>
+                    @foreach (var province in Model)
+                    {
+                        <a href="/District/View/@province.District?.Name">
+                            <path d="@province.D" id="@province.Id" style="fill:#@(province.District?.Color ?? "(255, 255, 255");stroke: #@(province.District?.Color ?? "(255, 255, 255") !important" class="province"></path>
+                        </a>
+                    }
+                }
+                else
+                {
+                    @foreach (var district in MapController.DistrictMaps)
+                    {
+                        @foreach (var province in district.Provinces)
+                        {
+                            <a href="/Province/View/@province.Id">
+                                <path d="@province.D" id="@province.Id" style="fill:# @(province.District?.Color ?? "(255, 255, 255");stroke: black;stroke-width: 0.5px;" class="province"></path>
+                            </a>
+                        }
+                    }
                 }
             }
             else 

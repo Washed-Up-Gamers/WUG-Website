@@ -62,14 +62,14 @@
     public string DistrictData { get; set; }
 
     public List<ProducingBuilding> Buildings { get; set; }
-    public List<District> Districts { get; set; }
+    public List<Nation> Districts { get; set; }
 
     public bool Show = false;
 
     protected override async Task OnInitializedAsync()
     {
         Buildings = JsonSerializer.Deserialize<List<ProducingBuilding>>(BuildingData);
-        Districts = JsonSerializer.Deserialize<List<District>>(DistrictData);
+        Districts = JsonSerializer.Deserialize<List<Nation>>(DistrictData);
 
         foreach (var district in Districts)
         {

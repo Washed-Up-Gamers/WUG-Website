@@ -1,0 +1,75 @@
+﻿@model IssueStockModal
+@using WUG.Database.Models.Economy.Stocks
+
+@{
+    ViewData["Title"] = "Issue Stock";
+
+    var user = UserManager.GetUser(Context);
+    Security security = DBCache.GetAll<Security>().FirstOrDefault(x => x.GroupId == Model.GroupId);
+    long maxShares = (long)Math.Floor(security.Balance * 5.0m);
+    long maxIssue = maxShares - security.Shares;
+}
+
+@{
+    <div class="container vw-100">
+        <div class="col-12">
+            @await Html.PartialAsync("_StatusMessage", TempData["StatusMessage"])
+            <h4>Issue Stock</h4>
+
+            <p>Issuing stock increases stock in the market but will decrease the value/price of each stock. If bought, these new stocks will still raise your stock's value & price.</p>
+                <p>
+                Stock price is simply the stock's balance divided by number of shares times 5. For example, if a stock has a balance of $1,000 with 100 shares, it will have a stock price of $50,
+                when they issue 100 more shares the price will drop to $25. However, when those issued stocks are bought, the stock price will reach $10 again and the
+                stock will be worth $2000 - doubled!
+            </p>
+            <br />
+            <hr />
+
+            <p>Your stock's balance: $@($"{security.Balance:n2}")</p>
+            <p>Your maximum Stock: @($"{maxShares:n0}")</p>
+            <p>Your Stock's Share Count: @($"{security.Shares:n0}")</p>
+            <p>@Model.Group.Name's Balance: $@($"{Model.Group.Money:n2}")</p>
+            <p>Your Personal Balance: $@($"{user.Money:n2}")</p>
+            <p>You can issue (without depositing more money into the stock): @maxIssue</p>
+        </div>
+
+        <form method="post">
+            <div class="row">
+                <div class="col-md-6">
+                    <div asp-validation-summary="All" class="text-danger"></div>
+                    @Html.HiddenFor(x => x.GroupId)
+                    <div class="form-group">
+                        <label asp-for="Amount"></label>
+                        <span asp-description-for="Amount" class="form-text" style="color:#888888" />
+                        <input asp-for="Amount" class="form-control" min="1" max="@maxIssue" />
+                        <span asp-validation-for="Amount" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="DepositAmount"></label>
+                        <span asp-description-for="DepositAmount" class="form-text" style="color:#888888" />
+                        <input asp-for="DepositAmount" class="form-control" min="1" max="@Model.Group.Money" />
+                        <span asp-validation-for="DepositAmount" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Purchase"></label>
+                        <span asp-description-for="Purchase" class="form-text" style="color:#888888" />
+                        <input asp-for="Purchase" class="form-control" min="0" max="@maxIssue" />
+                        <span asp-validation-for="Purchase" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+            <div class="container" style="align-content:flex-start">
+                    <div class="d-flex">
+                        <div class="flex-column" style="margin-right:5px; margin-left: -15px">
+                            <button type="submit" class="btn btn-outline-warning">Issue Stock</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+    @section Scripts {
+        @await Html.PartialAsync("_ValidationScriptsPartial")
+    }
+    </div>
+}

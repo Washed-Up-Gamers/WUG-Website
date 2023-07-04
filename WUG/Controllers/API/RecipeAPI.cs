@@ -5,7 +5,6 @@ using WUG.Database;
 using WUG.Database.Models.Entities;
 using Microsoft.AspNetCore.Cors;
 using System.Text.Json;
-using Valour.Shared;
 using WUG.Helpers;
 using WUG.Extensions;
 using System.Text.RegularExpressions;

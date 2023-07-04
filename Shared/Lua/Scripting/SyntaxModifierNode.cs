@@ -10,7 +10,7 @@ namespace Shared.Lua.Scripting;
 
 public class SyntaxModifierNode : SyntaxNode
 {
-    public DistrictModifierType? districtModifierType { get; set; }
+    public NationModifierType? districtModifierType { get; set; }
     public ProvinceModifierType? provinceModifierType { get; set; }
     public EntityModifierType? entityModifierType { get; set; }
     public BuildingModifierType? buildingModifierType { get; set; }
@@ -33,10 +33,10 @@ public class SyntaxModifierNode : SyntaxNode
         {
             return districtModifierType switch
             {
-                DistrictModifierType.AllProducingBuildingThroughputFactor => "Buildings' Throughput",
-                DistrictModifierType.BuildingSlotsExponent => "Exponent for Building Slots from Population",
-                DistrictModifierType.BuildingSlotsFactor => "Building Slots",
-                DistrictModifierType.OverPopulationModifierExponent => "Exponent for Overpopulation",
+                NationModifierType.AllProducingBuildingThroughputFactor => "Buildings' Throughput",
+                NationModifierType.BuildingSlotsExponent => "Exponent for Building Slots from Population",
+                NationModifierType.BuildingSlotsFactor => "Building Slots",
+                NationModifierType.OverPopulationModifierExponent => "Exponent for Overpopulation",
                 _ => "[No Loc]"
             };
         }
@@ -77,10 +77,10 @@ public class SyntaxModifierNode : SyntaxNode
         {
             return districtModifierType switch
             {
-                DistrictModifierType.AllProducingBuildingThroughputFactor => GetColorClass(false, value),
-                DistrictModifierType.BuildingSlotsExponent => GetColorClass(false, value),
-                DistrictModifierType.BuildingSlotsFactor => GetColorClass(false, value),
-                DistrictModifierType.OverPopulationModifierExponent => GetColorClass(true, value),
+                NationModifierType.AllProducingBuildingThroughputFactor => GetColorClass(false, value),
+                NationModifierType.BuildingSlotsExponent => GetColorClass(false, value),
+                NationModifierType.BuildingSlotsFactor => GetColorClass(false, value),
+                NationModifierType.OverPopulationModifierExponent => GetColorClass(true, value),
                 _ => "modifier-tooltip-modifier-listitem-neutral"
             };
         }

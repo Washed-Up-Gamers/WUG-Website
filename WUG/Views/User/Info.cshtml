@@ -1,6 +1,6 @@
 ﻿@using Microsoft.EntityFrameworkCore;
-@model SVUser
-@inject VooperDB dbctx;
+@model User
+@inject WashedUpDB dbctx;
 
 @if (Model != null)
 {
@@ -52,12 +52,12 @@ else
                 {
                     title = "Justice";
                 }
-                else if (Model.IsSenator())
+                else if (Model.IsCouncilMember())
                 {
                     title = "Senator";
                 }
 
-                SVUser user = UserManager.GetUser(Context)!;
+                User user = UserManager.GetUser(Context)!;
 
                 <h2 style="text-align:center" class="display-4">@title</h2>
                 <h1 style="text-align:center" class="display-4">@Model.Name</h1>
@@ -77,9 +77,9 @@ else
                     </div>
                 </div>
 
-                if (Model.DistrictId is not null)
+                if (Model.NationId is not null)
                 {
-                    <p class="m-2" style="text-align:center; font-size:x-large">District: @Model.District.Name</p>
+                    <p class="m-2" style="text-align:center; font-size:x-large">District: @Model.Nation.Name</p>
                 }
                 else
                 {

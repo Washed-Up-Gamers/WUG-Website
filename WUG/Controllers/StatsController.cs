@@ -4,21 +4,15 @@ using WUG.Managers;
 using WUG.Database.Models.Users;
 using System.Diagnostics;
 using WUG.Models.Manage;
-using Valour.Shared.Models;
-using WUG.VoopAI;
-using Valour.Shared.Authorization;
-using Valour.Api.Client;
-using System.Web;
 using System.Text.Json;
 using WUG.Helpers;
-using Valour.Api.Nodes;
 using WUG.NonDBO;
-using Valour.Shared;
 using ChartJSCore.Helpers;
 using ChartJSCore.Models;
 using Microsoft.EntityFrameworkCore;
 using WUG.Database.Models.Stats;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
+using TargetType = WUG.Database.Models.Stats.TargetType;
 
 namespace WUG.Controllers;
 
@@ -26,8 +20,8 @@ namespace WUG.Controllers;
 public class StatsController : SVController 
 {
     private readonly ILogger<StatsController> _logger;
-    private readonly VooperDB _dbctx;
-    public StatsController(ILogger<StatsController> logger, VooperDB dbctx)
+    private readonly WashedUpDB _dbctx;
+    public StatsController(ILogger<StatsController> logger, WashedUpDB dbctx)
     {
         _logger = logger;
         _dbctx = dbctx;
@@ -242,7 +236,7 @@ public class StatsController : SVController
         foreach (var districtdata in statsobjects)
         {
             var districtid = (long)districtdata.Key;
-            var district = DBCache.Get<District>(districtid);
+            var district = DBCache.Get<Nation>(districtid);
             DataTitles.Add($"{district.Name} Population");
             DistrictColors.Add($"#{district.Color}");
 
@@ -273,7 +267,7 @@ public class StatsController : SVController
         foreach (var districtdata in statsobjects)
         {
             var districtid = (long)districtdata.Key;
-            var district = DBCache.Get<District>(districtid);
+            var district = DBCache.Get<Nation>(districtid);
             DataTitles.Add($"{district.Name} Total Building Slots");
 
             List<double?> data = new();
@@ -302,7 +296,7 @@ public class StatsController : SVController
         foreach (var districtdata in statsobjects)
         {
             var districtid = (long)districtdata.Key;
-            var district = DBCache.Get<District>(districtid);
+            var district = DBCache.Get<Nation>(districtid);
             DataTitles.Add($"{district.Name} Used Building Slots");
 
             List<double?> data = new();

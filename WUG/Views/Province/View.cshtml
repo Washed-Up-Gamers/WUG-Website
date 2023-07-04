@@ -62,7 +62,7 @@
         @await Html.PartialAsync("_StatusMessage", TempData["StatusMessage"])
         @{
             if (Model is not null) {
-                SVUser? user = UserManager.GetUser(Context);
+                User? user = UserManager.GetUser(Context);
 
                 <div class="d-flex align-content-center align-items-center">
                     <div style="display:inline-block; margin:2em;margin-left: auto;margin-right: auto;">
@@ -215,7 +215,7 @@
 @{
     double buildingslots_exponent = Defines.NProvince["BUILDING_SLOTS_POPULATION_EXPONENT"];
     buildingslots_exponent += Model.GetModifierValue(ProvinceModifierType.BuildingSlotsExponent);
-    buildingslots_exponent += Model.District.GetModifierValue(DistrictModifierType.BuildingSlotsExponent);
+    buildingslots_exponent += Model.District.GetModifierValue(NationModifierType.BuildingSlotsExponent);
     double runningtotal = 0;
     double factorfrominfrastructures = 0;
     double slotsfrominfrastructures = 0;
@@ -265,7 +265,7 @@
                 <td>+@($"{frominfrastructures:n4}")</td>
                 <td>@($"{runningtotal:n4}")</td>
             </tr>
-            @foreach (var item in Model.GetStaticModifiersOfType(ProvinceModifierType.BuildingSlotsExponent, DistrictModifierType.BuildingSlotsExponent, true, IncludeDevStage: true)) {
+            @foreach (var item in Model.GetStaticModifiersOfType(ProvinceModifierType.BuildingSlotsExponent, NationModifierType.BuildingSlotsExponent, true, IncludeDevStage: true)) {
                 runningtotal += (double)item.value;
                 <tr>
                     <td>@item.modifiername</td>
@@ -355,7 +355,7 @@
             }
 
             runningtotal *= runningtotalforstacking;
-            items = Model.GetStaticModifiersOfType(null, DistrictModifierType.BuildingSlotsFactor, true, false);
+            items = Model.GetStaticModifiersOfType(null, NationModifierType.BuildingSlotsFactor, true, false);
             runningtotalforstacking = 1;
             @foreach (var item in items) {
                 runningtotalforstacking += item.value - 1;

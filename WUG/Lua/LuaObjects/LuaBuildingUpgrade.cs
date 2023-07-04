@@ -1,6 +1,6 @@
 ﻿using WUG.Database.Managers;
 using WUG.Scripting;
-using Valour.Shared;
+using Shared.Models;
 
 namespace WUG.Scripting.LuaObjects;
 
@@ -11,7 +11,7 @@ public class LuaBuildingUpgrade
     public DictNode Costs { get; set; }
     public List<SyntaxModifierNode> ModifierNodes { get; set; }
 
-    public Dictionary<string, double> GetConstructionCost(BaseEntity entity, District district, Province province, ProducingBuilding? building, BuildingUpgrade? upgrade, int levels, bool decreaseupgradelevel = false)
+    public Dictionary<string, double> GetConstructionCost(BaseEntity entity, Nation district, Province province, ProducingBuilding? building, BuildingUpgrade? upgrade, int levels, bool decreaseupgradelevel = false)
     {
         Dictionary<string, double> totalresources = new();
         Dictionary<string, decimal> changesystemvarsby = new Dictionary<string, decimal>() {
@@ -36,7 +36,7 @@ public class LuaBuildingUpgrade
         return totalresources;
     }
 
-    public async ValueTask<TaskResult> CanBuild(BaseEntity buildas, BaseEntity caller, District district, Province province, ProducingBuilding building, BuildingUpgrade? upgrade, int levels)
+    public async ValueTask<TaskResult> CanBuild(BaseEntity buildas, BaseEntity caller, Nation district, Province province, ProducingBuilding building, BuildingUpgrade? upgrade, int levels)
     {
         if (levels <= 0)
             return new(false, "The amount of levels you wish to upgrade must be greater than 0!");
@@ -53,7 +53,7 @@ public class LuaBuildingUpgrade
         return new(true, null);
     }
 
-    public async ValueTask<TaskResult<ProducingBuilding>> Build(BaseEntity buildas, BaseEntity caller, District district, Province province, int levels, ProducingBuilding building, BuildingUpgrade? upgrade)
+    public async ValueTask<TaskResult<ProducingBuilding>> Build(BaseEntity buildas, BaseEntity caller, Nation district, Province province, int levels, ProducingBuilding building, BuildingUpgrade? upgrade)
     {
         var canbuild = await CanBuild(buildas, caller, district, province, building, upgrade, levels);
         if (!canbuild.Success)

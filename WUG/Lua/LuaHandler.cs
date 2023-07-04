@@ -3,7 +3,6 @@ using System.ComponentModel;
 using WUG.Managers;
 using Decimal = WUG.Scripting.Decimal;
 using System.Xml.Linq;
-using Valour.Api.Nodes;
 using WUG.Database.Models.Buildings;
 using System.Data;
 using WUG.NonDBO;
@@ -241,10 +240,10 @@ public static class LuaHandler
                     {
                         "provinces" => levels[2] switch
                         {
-                            "buildingslotsfactor" => DistrictModifierType.BuildingSlotsFactor,
-                            "buildingslotsexponent" => DistrictModifierType.BuildingSlotsExponent,
-                            "overpopulationmodifierexponent" => DistrictModifierType.OverPopulationModifierExponent,
-                            "populationgrowthspeedfactor" => DistrictModifierType.PopulationGrowthSpeedFactor
+                            "buildingslotsfactor" => NationModifierType.BuildingSlotsFactor,
+                            "buildingslotsexponent" => NationModifierType.BuildingSlotsExponent,
+                            "overpopulationmodifierexponent" => NationModifierType.OverPopulationModifierExponent,
+                            "populationgrowthspeedfactor" => NationModifierType.PopulationGrowthSpeedFactor
                         }
                     }
                 };
@@ -446,7 +445,7 @@ public static class LuaHandler
                     LineNumber = obj.LineNumber
                 };
 
-                if (node.scopeType == ScriptScopeType.District)
+                if (node.scopeType == ScriptScopeType.Nation)
                 {
                     node.ChangeTo = DistrictNamesToIds[node.ChangeTo].ToString();
                 }

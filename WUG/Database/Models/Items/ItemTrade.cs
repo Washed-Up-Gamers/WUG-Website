@@ -79,7 +79,7 @@ public class ItemTrade
         ItemTradeManager.itemTradeQueue.Enqueue(this);
     }
 
-    public async Task<TaskResult> ExecuteFromManager(VooperDB dbctx, bool Force = false)
+    public async Task<TaskResult> ExecuteFromManager(WashedUpDB dbctx, bool Force = false)
     {
         if (!Force && Amount < 0)
         {
@@ -128,21 +128,21 @@ public class ItemTrade
 
         if (!(TradeType == ItemTradeType.Server) && GameDataManager.Resources.ContainsKey(toitem.Definition.Name) && toitem.Definition.IsSVItem)
         {
-            TaxPolicy? FromDistrictTaxPolicy = DBCache.GetAll<TaxPolicy>().FirstOrDefault(x => x.DistrictId == fromEntity.DistrictId && x.Target == toitem.Definition.Name && (x.taxType == TaxType.ImportTariff || x.taxType == TaxType.ExportTariff));
-            TaxPolicy? ToDistrictTaxPolicy = DBCache.GetAll<TaxPolicy>().FirstOrDefault(x => x.DistrictId == toEntity.DistrictId && x.Target == toitem.Definition.Name && (x.taxType == TaxType.ImportTariff || x.taxType == TaxType.ExportTariff));
+            TaxPolicy? FromDistrictTaxPolicy = DBCache.GetAll<TaxPolicy>().FirstOrDefault(x => x.NationId == fromEntity.NationId && x.Target == toitem.Definition.Name && (x.taxType == TaxType.ImportTariff || x.taxType == TaxType.ExportTariff));
+            TaxPolicy? ToDistrictTaxPolicy = DBCache.GetAll<TaxPolicy>().FirstOrDefault(x => x.NationId == toEntity.NationId && x.Target == toitem.Definition.Name && (x.taxType == TaxType.ImportTariff || x.taxType == TaxType.ExportTariff));
 
             // fun fact, the entity IRL that imports or exports pays the tariff
 
             if (FromDistrictTaxPolicy is not null) {
                 decimal taxamount = FromDistrictTaxPolicy.GetTaxAmountForResource((decimal)Amount);
                 string detail = $"Tax payment for item id: {Id}, Tax Id: {FromDistrictTaxPolicy.Id}, Tax Type: {FromDistrictTaxPolicy.taxType}";
-                var tran = new SVTransaction(fromEntity, BaseEntity.Find(FromDistrictTaxPolicy!.DistrictId!), taxamount, TransactionType.TaxPayment, detail);
+                var tran = new Transaction(fromEntity, BaseEntity.Find(FromDistrictTaxPolicy!.NationId!), taxamount, TransactionType.TaxPayment, detail);
                 tran.NonAsyncExecute(true);
             }
             if (ToDistrictTaxPolicy is not null) {
                 decimal taxamount = ToDistrictTaxPolicy.GetTaxAmountForResource((decimal)Amount);
                 string detail = $"Tax payment for item trade id: {Id}, Tax Id: {ToDistrictTaxPolicy.Id}, Tax Type: {ToDistrictTaxPolicy.taxType}";
-                var tran = new SVTransaction(toEntity, BaseEntity.Find(ToDistrictTaxPolicy!.DistrictId!), taxamount, TransactionType.TaxPayment, detail);
+                var tran = new Transaction(toEntity, BaseEntity.Find(ToDistrictTaxPolicy!.NationId!), taxamount, TransactionType.TaxPayment, detail);
                 tran.NonAsyncExecute(true);
             }
         }

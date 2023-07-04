@@ -3,10 +3,9 @@ using WUG.Scripting.LuaObjects;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using WUG.Scripting;
-using Valour.Shared;
-using Valour.Api.Models;
 using WUG.Database.Models.Districts;
 using System.Text.Json.Serialization;
+using Shared.Models;
 
 namespace WUG.Database.Models.Buildings;
 
@@ -30,7 +29,7 @@ public abstract class BuildingBase : IHasOwner, ITickable
     [Key]
     public long Id { get; set; }
     public string? Name { get; set; }
-    public long DistrictId { get; set; }
+    public long NationId { get; set; }
     public int Size { get; set; }
     public string RecipeId { get; set; }
     public abstract BuildingType BuildingType { get; }
@@ -54,7 +53,7 @@ public abstract class BuildingBase : IHasOwner, ITickable
 
     [NotMapped]
     [JsonIgnore]
-    public District District => DBCache.Get<District>(DistrictId)!;
+    public Nation District => DBCache.Get<Nation>(NationId)!;
 
     public static BuildingBase Find(long? id)
     {
@@ -101,7 +100,7 @@ public abstract class ProducingBuilding : BuildingBase
     public double Quantity { get; set; }
 
     [NotMapped]
-    public SVUser? Employee => DBCache.Get<SVUser>(EmployeeId);
+    public User? Employee => DBCache.Get<User>(EmployeeId);
 
     [NotMapped]
     public Dictionary<BuildingModifierType, double> Modifiers { get; set; }
@@ -132,8 +131,8 @@ public abstract class ProducingBuilding : BuildingBase
 
             if (BuildingType == BuildingType.Factory) {
                 eff -= (((Size - 1) * Defines.NProduction["FACTORY_INPUT_EFFICIENCY_LOSS_PER_SIZE"]) - Defines.NProduction["FACTORY_INPUT_EFFICIENCY_LOSS_PER_SIZE"]);
-                eff += District.GetModifierValue(DistrictModifierType.FactoryEfficiency);
-                eff *= 1 + District.GetModifierValue(DistrictModifierType.FactoryEfficiencyFactor);
+                eff += District.GetModifierValue(NationModifierType.FactoryEfficiency);
+                eff *= 1 + District.GetModifierValue(NationModifierType.FactoryEfficiencyFactor);
             }
             eff *= GetModifierValue(BuildingModifierType.EfficiencyFactor) + 1.00;
             return eff;
@@ -157,9 +156,9 @@ public abstract class ProducingBuilding : BuildingBase
         {
             var basevalue = BuildingType switch
             {
-                BuildingType.Farm => 1 + District.GetModifierValue(DistrictModifierType.FarmThroughputFactor),
-                BuildingType.Mine => 1 + District.GetModifierValue(DistrictModifierType.MineThroughputFactor),
-                BuildingType.Factory => 1 + District.GetModifierValue(DistrictModifierType.FactoryThroughputFactor),
+                BuildingType.Farm => 1 + District.GetModifierValue(NationModifierType.FarmThroughputFactor),
+                BuildingType.Mine => 1 + District.GetModifierValue(NationModifierType.MineThroughputFactor),
+                BuildingType.Factory => 1 + District.GetModifierValue(NationModifierType.FactoryThroughputFactor),
                 _ => 1
             };
             basevalue *= BuildingType switch
@@ -187,7 +186,7 @@ public abstract class ProducingBuilding : BuildingBase
 
             basevalue *= GetModifierValue(BuildingModifierType.ThroughputFactor) + 1.00;
             basevalue *= Province.GetModifierValue(ProvinceModifierType.AllProducingBuildingThroughputFactor) + 1.00;
-            basevalue *= District.GetModifierValue(DistrictModifierType.AllProducingBuildingThroughputFactor) + 1.00;
+            basevalue *= District.GetModifierValue(NationModifierType.AllProducingBuildingThroughputFactor) + 1.00;
 
             if (EmployeeId is not null)
                 basevalue *= 1.15;
@@ -204,9 +203,9 @@ public abstract class ProducingBuilding : BuildingBase
             string type = BuildingType.ToString().ToUpper();
             return Defines.NProduction[$"BASE_{type}_QUANTITY_CAP"] + BuildingType switch
             {
-                BuildingType.Farm => District.GetModifierValue(DistrictModifierType.FarmQuantityCap),
-                BuildingType.Mine => District.GetModifierValue(DistrictModifierType.MineQuantityCap),
-                BuildingType.Factory => District.GetModifierValue(DistrictModifierType.FactoryQuantityCap),
+                BuildingType.Farm => District.GetModifierValue(NationModifierType.FarmQuantityCap),
+                BuildingType.Mine => District.GetModifierValue(NationModifierType.MineQuantityCap),
+                BuildingType.Factory => District.GetModifierValue(NationModifierType.FactoryQuantityCap),
                 _ => 1
             };
         }
@@ -334,14 +333,14 @@ public abstract class ProducingBuilding : BuildingBase
             if (BuildingObj.MustHaveResource is not null)
             {
                 amount *= MiningOutputFactor();
-                var policies = DBCache.GetAll<TaxPolicy>().Where(x => (x.DistrictId == DistrictId || x.DistrictId == 100) && x.taxType == TaxType.ResourceMined && x.Target == BuildingObj.MustHaveResource);
+                var policies = DBCache.GetAll<TaxPolicy>().Where(x => (x.NationId == NationId || x.NationId == 100) && x.taxType == TaxType.ResourceMined && x.Target == BuildingObj.MustHaveResource);
                 foreach (var policy in policies)
                 {
                     if (policy is not null)
                     {
                         decimal due = policy.GetTaxAmountForResource((decimal)amount);
                         policy.Collected += due;
-                        var taxtrans = new SVTransaction(Owner, BaseEntity.Find(policy.DistrictId), due, TransactionType.TaxPayment, $"Tax payment for transaction id: {Id}, Tax Id: {policy.Id}, Tax Type: {policy.taxType}");
+                        var taxtrans = new Transaction(Owner, BaseEntity.Find(policy.NationId), due, TransactionType.TaxPayment, $"Tax payment for transaction id: {Id}, Tax Id: {policy.Id}, Tax Type: {policy.taxType}");
                         taxtrans.NonAsyncExecute(true);
                     }
                 }

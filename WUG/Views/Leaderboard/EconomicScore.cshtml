@@ -45,7 +45,7 @@
             <tbody>
                 @{
                     var models = new List<EconomicScoreReturnModel>();
-                    foreach (var district in DBCache.GetAll<District>())
+                    foreach (var district in DBCache.GetAll<Nation>())
                     {
                         models.Add(await district.GetEconomicScore());
                     }

@@ -1,7 +1,7 @@
 ﻿@model NewsPost
 
 @{
-    SVUser author = DBCache.Get<SVUser>(Model.AuthorId)!;
+    User author = DBCache.Get<User>(Model.AuthorId)!;
     Group group = DBCache.Get<Group>(Model.GroupId);
 
     if (group is null)

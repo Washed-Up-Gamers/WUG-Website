@@ -1,6 +1,4 @@
-﻿using Valour.Api.Models;
-
-namespace WUG.Models.Groups;
+﻿namespace WUG.Models.Groups;
 
 public class ViewMemberRolesModel
 {

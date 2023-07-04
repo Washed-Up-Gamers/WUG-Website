@@ -19,7 +19,7 @@ public enum TaxType
     GroupWealth = 10,
     ImportTariff = 11,
     ExportTariff = 12,
-    // only the imperial government can use this one
+    // only the UN government can use this one
     Inactivity = 12,
     PersonalIncome = 13,
     CorporateIncome = 14,
@@ -37,8 +37,8 @@ public class TaxPolicy
     public string? Name { get; set; }
     public decimal Rate { get; set; }
     
-    // should be 100 if this tax policy is by Vooperia
-    public long DistrictId { get; set; }
+    // should be 100 if this tax policy is by UN
+    public long NationId { get; set; }
     public TaxType taxType { get; set; }
 
     // the min amount after which the tax has effect

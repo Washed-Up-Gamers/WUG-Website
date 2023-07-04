@@ -7,9 +7,11 @@ building_simple_factory = {
 		recipe_tool_factory_base
 		recipe_simple_components_factory_base
 		recipe_plastic_factory_base
+		recipe_concrete_base
 	]
 	buildingcosts = {
-		steel = 10000
+		steel = 5000
+		concrete = 10000
 		simple_components = 7500
 		advanced_components = 1000
 	}
@@ -28,7 +30,8 @@ building_advanced_factory = {
 		recipe_televisions_factory_base
 	]
 	buildingcosts = {
-		steel = 35000
+		steel = 20000
+		concrete = 30000
 		simple_components = 20000
 		advanced_components = 5000
 	}

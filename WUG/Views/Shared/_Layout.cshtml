@@ -72,11 +72,9 @@
                         <li class="nav-item">
                             <a class="nav-link" asp-area="" asp-controller="News" asp-action="Index">News</a>
                         </li>
-                        <!--
                             <li class="nav-item">
                             <a class="nav-link" asp-area="" asp-controller="Exchange" asp-action="Index">Exchange</a>
                         </li>
-                        -->
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="CommunityDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">
                                 Community
@@ -98,7 +96,7 @@
                             </a>
                             <div class="dropdown-menu" aria-labelledby="SearchDropdown">
                                 @{
-                                    SVUser? user = UserManager.GetUser(Context);
+                                    User? user = UserManager.GetUser(Context);
                                     //if (User != null) { user = await userManager.GetUserAsync(User); }
 
                                     if (user is not null)

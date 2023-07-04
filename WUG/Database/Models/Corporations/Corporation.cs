@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Valour.Api.Models;
 
 namespace WUG.Database.Models.Corporations;
 
@@ -15,11 +14,11 @@ public class Corporation
     [NotMapped]
     public Group Group => DBCache.Get<Group>(GroupId)!;
 
-    public async Task ExecuteDividends(VooperDB dbctx)
+    public async Task ExecuteDividends(WashedUpDB dbctx)
     {
     }
 
-    public void CreateFromGroup(Group group, VooperDB dbctx)
+    public void CreateFromGroup(Group group, WashedUpDB dbctx)
     {
         group.GroupType = GroupTypes.Corporation;
         Id = IdManagers.GeneralIdGenerator.Generate();

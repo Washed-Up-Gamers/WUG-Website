@@ -11,9 +11,9 @@ public class DistrictPolicyModel
     public long DistrictId { get; set; }
 
     [NotMapped]
-    public District District {
+    public Nation District {
         get {
-            return DBCache.Get<District>(DistrictId)!;
+            return DBCache.Get<Nation>(DistrictId)!;
         }
     }
 
@@ -25,7 +25,7 @@ public class DistrictPolicyModel
     public void AddUBIPolicy(Rank? rank, long DistrictId)
     {
         UBIPolicy pol = new();
-        pol.DistrictId = DistrictId;
+        pol.NationId = DistrictId;
         if (rank is null) {
             pol.Anyone = true;
         }
@@ -34,7 +34,7 @@ public class DistrictPolicyModel
         }
         pol.Id = IdManagers.GeneralIdGenerator.Generate();
 
-        UBIPolicy? oldpol = DBCache.GetAll<UBIPolicy>().FirstOrDefault(x => x.DistrictId == DistrictId && x.ApplicableRank == rank);
+        UBIPolicy? oldpol = DBCache.GetAll<UBIPolicy>().FirstOrDefault(x => x.NationId == DistrictId && x.ApplicableRank == rank);
         if (oldpol is not null) {
             pol.Rate = oldpol.Rate;
         }
@@ -46,7 +46,7 @@ public class DistrictPolicyModel
     {
         TaxPolicy pol = new();
         pol.Id = IdManagers.GeneralIdGenerator.Generate();
-        pol.DistrictId = DistrictId;
+        pol.NationId = DistrictId;
         pol.Rate = 0.0m;
         pol.taxType = type;
         pol.Minimum = min;
@@ -55,21 +55,21 @@ public class DistrictPolicyModel
         TaxPolicies.Add(pol);
     }
 
-    public DistrictPolicyModel(District district)
+    public DistrictPolicyModel(Nation district)
     {
         DistrictId = district.Id;
         TaxPolicies = new();
         UBIPolicies = new();
         AddUBIPolicy(null, district.Id);
         AddUBIPolicy(Rank.Unranked, district.Id);
-        AddUBIPolicy(Rank.Oof, district.Id);
-        AddUBIPolicy(Rank.Corgi, district.Id);
-        AddUBIPolicy(Rank.Gaty, district.Id);
-        AddUBIPolicy(Rank.Crab, district.Id);
-        AddUBIPolicy(Rank.Spleen, district.Id);
+        AddUBIPolicy(Rank.Noob, district.Id);
+        AddUBIPolicy(Rank.Fan, district.Id);
+        AddUBIPolicy(Rank.Enjoyer, district.Id);
+        AddUBIPolicy(Rank.Expert, district.Id);
+        AddUBIPolicy(Rank.WashedUp, district.Id);
         UBIPolicies.Reverse();
 
-        IEnumerable<TaxPolicy> oldpols = DBCache.GetAll<TaxPolicy>().Where(x => x.DistrictId == district.Id).OrderBy(x => x.taxType);
+        IEnumerable<TaxPolicy> oldpols = DBCache.GetAll<TaxPolicy>().Where(x => x.NationId == district.Id).OrderBy(x => x.taxType);
         if (oldpols.Count() > 0) {
             foreach(TaxPolicy pol in oldpols) {
                 TaxPolicies.Add(pol);

@@ -3,7 +3,6 @@ using WUG.Extensions;
 using WUG.Helpers;
 using WUG.Models;
 using System.Diagnostics;
-using Valour.Api.Models;
 using WUG.Models.Global;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using WUG.Database.Models.Economy;
@@ -52,7 +51,7 @@ public class GlobalController : SVController {
         if (model.Amount <= 0)
             return RedirectBack($"Amount must be greater than 0!");
 
-        var tran = new SVTransaction(fromentity, toentity, model.Amount, TransactionType.Payment, "Payment from /Global/Pay");
+        var tran = new Transaction(fromentity, toentity, model.Amount, TransactionType.Payment, "Payment from /Global/Pay");
 
         TaskResult result = await tran.Execute();
 

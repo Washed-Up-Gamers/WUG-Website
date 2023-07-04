@@ -2,7 +2,7 @@
 
 public class LeaderboardIndexModel
 {
-    public List<SVUser> Users;
+    public List<User> Users;
     public int Page;
     public int Amount;
 }

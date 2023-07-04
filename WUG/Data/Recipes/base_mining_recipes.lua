@@ -46,15 +46,15 @@ recipe_zinc_mining_base = {
     editable = false
 }
 
-recipe_silicon_mining_base = {
-	name = "Silicon Mining"
+recipe_sand_mining_base = {
+	name = "Sand Mining"
     inputs = {
-        tools = 0.04
+        tools = 0.03
     }
 	outputs = {
-		silicon = 1
+		sand = 1
 	}
-	perhour = 15
+	perhour = 25
     editable = false
 }
 
@@ -94,15 +94,14 @@ recipe_gold_mining_base = {
     editable = false
 }
 
-recipe_crystallite_mining_base = {
-	name = "Crystallite Mining"
+recipe_pothium_mining_base = {
+	name = "Pothium Mining"
     inputs = {
         tools = 0.1
     }
 	outputs = {
-		crystallite = 1
+		pothium = 1
 	}
-	-- was 0.45
 	perhour = 0.9
     editable = false
 }

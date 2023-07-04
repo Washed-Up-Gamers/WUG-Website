@@ -4,8 +4,7 @@ using WUG.Managers;
 using WUG.Scripting;
 using WUG.Scripting.Parser;
 using System.Text.Json.Serialization;
-using Valour.Api.Models;
-using Valour.Shared;
+using Shared.Models;
 
 namespace WUG.Scripting.LuaObjects;
 
@@ -33,7 +32,7 @@ public class LuaBuilding
         return recipes;
     }
 
-    public Dictionary<string, double> GetConstructionCost(BaseEntity entity, District district, Province province, ProducingBuilding? building, int levels) {
+    public Dictionary<string, double> GetConstructionCost(BaseEntity entity, Nation district, Province province, ProducingBuilding? building, int levels) {
         Dictionary<string, double> totalresources = new();
         Dictionary<string, decimal> changesystemvarsby = new Dictionary<string, decimal>() {
             { @"province.buildings.totaloftype[""infrastructure""]", 0.0m },
@@ -70,7 +69,7 @@ public class LuaBuilding
         return totalresources;
     }
 
-    public async ValueTask<TaskResult> CanBuild(BaseEntity buildas, BaseEntity caller, District district, Province province, ProducingBuilding? building, int levels) {
+    public async ValueTask<TaskResult> CanBuild(BaseEntity buildas, BaseEntity caller, Nation district, Province province, ProducingBuilding? building, int levels) {
         if (levels <= 0)
             return new(false, "The amount of levels you wish to build must be greater than 0!");
 
@@ -94,7 +93,7 @@ public class LuaBuilding
         return new(true, null);
     }
 
-    public async ValueTask<TaskResult<ProducingBuilding>> Build(BaseEntity buildas, BaseEntity caller, District district, Province province, int levels, ProducingBuilding? building = null) {
+    public async ValueTask<TaskResult<ProducingBuilding>> Build(BaseEntity buildas, BaseEntity caller, Nation district, Province province, int levels, ProducingBuilding? building = null) {
         var canbuild = await CanBuild(buildas, caller, district, province, building, levels);
         if (!canbuild.Success)
             return new(false, canbuild.Message);
@@ -115,7 +114,7 @@ public class LuaBuilding
             building.Modifiers = new();
             building.Id = IdManagers.GeneralIdGenerator.Generate();
             building.OwnerId = buildas.Id;
-            building.DistrictId = district.Id;
+            building.NationId = district.Id;
             building.ProvinceId = province.Id;
             building.RecipeId = Recipes.First().Id;
             building.LuaBuildingObjId = Name;

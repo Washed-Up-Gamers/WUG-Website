@@ -1,14 +1,14 @@
 @using WUG.Database;
 @using WUG.Database.Models.Districts;
 @using WUG.Blazor.Components;
-@model WUG.Database.Models.Districts.District
+@model WUG.Database.Models.Districts.Nation
 
 @{ 
     if (Model != null)
     {
         ViewData["Title"] = Model.Name;
     }
-    SVUser? user = UserManager.GetUser(Context);
+    User? user = UserManager.GetUser(Context);
 }
 
 <head>
@@ -104,7 +104,7 @@
 
                 <br />
 
-                int population = DBCache.GetAll<SVUser>().Count(x => x.DistrictId == Model.Id);
+                int population = DBCache.GetAll<User>().Count(x => x.NationId == Model.Id);
 
                 <div class="p-2 align-self-center" style="text-align:center">
                     <h3>User Population: @population</h3>
@@ -123,7 +123,7 @@
 
                 if (user != null)
                 {
-                    if (user.DistrictId != null && user.DistrictId == Model.Id)
+                    if (user.NationId != null && user.NationId == Model.Id)
                     {
                         <div class="p-2 align-self-center" style="text-align:center">
                             <h3>You live here.</h3>

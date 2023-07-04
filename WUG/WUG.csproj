@@ -4,7 +4,7 @@
     <TargetFramework>net7.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <RootNamespace>SV2</RootNamespace>
+    <RootNamespace>WUG</RootNamespace>
     <EnablePreviewFeatures>True</EnablePreviewFeatures>
     <Version>0.0.1</Version>
 	<AssemblyName>SV2</AssemblyName>
@@ -12,9 +12,14 @@
 
   <ItemGroup>
     <PackageReference Include="ChartJSCore" Version="3.10.0" />
+    <PackageReference Include="DisCatSharp" Version="10.4.0" />
+    <PackageReference Include="DisCatSharp.CommandsNext" Version="10.4.0" />
+    <PackageReference Include="DisCatSharp.Common" Version="10.4.0" />
     <PackageReference Include="EFCore.NamingConventions" Version="7.0.2" />
     <PackageReference Include="Humanizer.Core" Version="2.14.1" />
+    <PackageReference Include="IdGen" Version="3.0.3" />
     <PackageReference Include="Markdig" Version="0.31.0" />
+    <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="5.2.9" />
     <PackageReference Include="Microsoft.AspNet.WebApi.Core" Version="5.2.9" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="7.0.5" />
     <PackageReference Include="Microsoft.AspNetCore.DataProtection.EntityFrameworkCore" Version="7.0.5" />
@@ -29,11 +34,6 @@
 	<PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="6.5.0" />
 	<PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="6.5.0" />
   </ItemGroup>
-
-	<ItemGroup Condition="true">
-		<PackageReference Include="Valour.Net" Version="0.6.9.4" />
-		<PackageReference Include="Valour.Api" Version="0.2.0.1" />
-	</ItemGroup>
 	
 	<ItemGroup Condition="false">
 		<ProjectReference Include="..\..\..\Valour\Valour\API\Valour.Api.csproj" />

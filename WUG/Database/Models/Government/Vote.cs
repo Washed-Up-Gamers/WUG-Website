@@ -33,9 +33,9 @@ public class Vote
 
     [NotMapped]
 
-    public SVUser User {
+    public User User {
         get {
-            return DBCache.Get<SVUser>(UserId)!;
+            return DBCache.Get<User>(UserId)!;
         }
     }
 }

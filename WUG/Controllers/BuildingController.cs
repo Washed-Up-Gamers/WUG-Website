@@ -4,14 +4,12 @@ using WUG.Managers;
 using System.Diagnostics;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
-using Valour.Api.Models;
 using WUG.Helpers;
 using WUG.Extensions;
 using WUG.Database.Managers;
 using WUG.Models.Provinces;
 using WUG.Models.Building;
 using WUG.Scripting.LuaObjects;
-using Valour.Shared;
 using WUG.Database.Models.Districts;
 using WUG.Database.Models.Buildings;
 using WUG.Models.Groups;
@@ -19,6 +17,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using ChartJSCore.Models;
 using System.Linq;
+using Shared.Models;
 
 namespace WUG.Controllers;
 
@@ -26,10 +25,10 @@ namespace WUG.Controllers;
 public class BuildingController : SVController
 {
     private readonly ILogger<BuildingController> _logger;
-    private readonly VooperDB _dbctx;
+    private readonly WashedUpDB _dbctx;
 
     public BuildingController(ILogger<BuildingController> logger,
-        VooperDB dbctx)
+        WashedUpDB dbctx)
     {
         _logger = logger;
         _dbctx = dbctx;
@@ -46,7 +45,7 @@ public class BuildingController : SVController
         var buildings = DBCache.ProducingBuildingsById.Values.Where(x => canbuildasids.Contains(x.OwnerId));
 
         // filiter for jacob
-        if (user.ValourId == 12201879245422592)
+        if (user.DiscordUserId == 259004891148582914)
         {
             var jacobsjoinedgroups = (await user.GetJoinedGroupsAsync()).ToList();
             var newbuildings = new List<ProducingBuilding>();
@@ -56,7 +55,7 @@ public class BuildingController : SVController
                 if (owner.EntityType == EntityType.Group)
                 {
                     var groupowner = (Group)owner;
-                    var district = DBCache.Get<District>(groupowner.Id);
+                    var district = DBCache.Get<Nation>(groupowner.Id);
                     if (district is not null)
                     {
                         if (district.Name != "New Vooperis")
@@ -392,7 +391,7 @@ public class BuildingController : SVController
     [UserRequired]
     public async Task<IActionResult> BuildingUpgrade(long buildingid, string upgradeid)
     {
-        SVUser user = HttpContext.GetUser();
+        User user = HttpContext.GetUser();
 
         ProducingBuilding building = DBCache.GetAllProducingBuildings().FirstOrDefault(x => x.Id == buildingid);
 
@@ -419,7 +418,7 @@ public class BuildingController : SVController
     [UserRequired]
     public IActionResult FireEmployee(long buildingid)
     {
-        SVUser user = HttpContext.GetUser();
+        User user = HttpContext.GetUser();
 
         ProducingBuilding building = DBCache.ProducingBuildingsById.Values.FirstOrDefault(x => x.Id == buildingid);
 
@@ -445,7 +444,7 @@ public class BuildingController : SVController
     [UserRequired]
     public IActionResult TransferBuilding(long buildingid)
     {
-        SVUser user = HttpContext.GetUser();
+        User user = HttpContext.GetUser();
 
         ProducingBuilding building = DBCache.GetAllProducingBuildings().FirstOrDefault(x => x.Id == buildingid);
 

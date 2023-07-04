@@ -2,8 +2,10 @@
 
 public static class HttpContextExtensions
 {
-    public static SVUser GetUser(this HttpContext context)
+    public static User GetUser(this HttpContext context)
     {
-        return (SVUser)context.Items["user"]!;
+        if (!context.Items.ContainsKey("user"))
+            return null;
+        return (User)context.Items["user"]!;
     }
 }

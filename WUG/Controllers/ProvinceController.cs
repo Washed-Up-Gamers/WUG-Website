@@ -4,7 +4,6 @@ using WUG.Managers;
 using System.Diagnostics;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
-using Valour.Api.Models;
 using WUG.Helpers;
 using WUG.Extensions;
 using WUG.Database.Managers;
@@ -20,10 +19,10 @@ namespace WUG.Controllers;
 public class ProvinceController : SVController
 {
     private readonly ILogger<ProvinceController> _logger;
-    private readonly VooperDB _dbctx;
+    private readonly WashedUpDB _dbctx;
 
     public ProvinceController(ILogger<ProvinceController> logger,
-        VooperDB dbctx)
+        WashedUpDB dbctx)
     {
         _logger = logger;
         _dbctx = dbctx;
@@ -165,7 +164,7 @@ public class ProvinceController : SVController
         if (!DBCache.HCache[typeof(Province)].TryGetValue(id, out object _obj))
             return Redirect("/");
         Province province = (Province)_obj;
-        SVUser? user = UserManager.GetUser(HttpContext);
+        User? user = UserManager.GetUser(HttpContext);
 
         if (user is null)
             return Redirect("/account/login");
@@ -257,7 +256,7 @@ public class ProvinceController : SVController
         if (province is null)
             return Redirect("/");
 
-        SVUser? user = UserManager.GetUser(HttpContext);
+        User? user = UserManager.GetUser(HttpContext);
 
         if (user is null)
             return Redirect("/account/login");

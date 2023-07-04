@@ -19,7 +19,7 @@ public class UserAPI : BaseAPI
 
     private static async Task<IResult> GetAsync(HttpContext ctx, long id)
     {
-        SVUser? user = SVUser.Find(id);
+        User? user = User.Find(id);
         if (user is null)
             return ValourResult.NotFound($"Could not find user with id {id}");
 
@@ -28,7 +28,7 @@ public class UserAPI : BaseAPI
 
     private static async Task<IResult> GetSelfAsync(HttpContext ctx)
     {
-        SVUser? user = ctx.GetUser();
+        User? user = ctx.GetUser();
         if (user is null)
             return ValourResult.NotFound($"Could not find your account! Try logging in or relogging in.");
 

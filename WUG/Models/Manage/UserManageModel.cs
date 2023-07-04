@@ -10,5 +10,5 @@ public class UserManageModel
 
     [NotMapped]
     [JsonIgnore]
-    public SVUser user { get; set; }
+    public User user { get; set; }
 }

@@ -4,7 +4,7 @@
 @{
     ViewData["Title"] = "Building Admin";
 
-    SVUser user = UserManager.GetUser(Context)!;
+    User user = UserManager.GetUser(Context)!;
 }
 
 <style>
@@ -461,13 +461,13 @@
                     runningtotal *= runningtotalforstacking;
 
                     runningtotalforstacking = 1;
-                    var districttypestoget = new List<DistrictModifierType?>() { DistrictModifierType.AllProducingBuildingThroughputFactor };
+                    var districttypestoget = new List<NationModifierType?>() { NationModifierType.AllProducingBuildingThroughputFactor };
                     districttypestoget.Add(Model.Building.BuildingType switch
                     {
-                        BuildingType.Mine => DistrictModifierType.MineThroughputFactor,
-                        BuildingType.Factory => DistrictModifierType.FactoryThroughputFactor,
-                        BuildingType.Farm => DistrictModifierType.FarmThroughputFactor,
-                        BuildingType.Infrastructure => DistrictModifierType.InfrastructureThroughputFactor
+                        BuildingType.Mine => NationModifierType.MineThroughputFactor,
+                        BuildingType.Factory => NationModifierType.FactoryThroughputFactor,
+                        BuildingType.Farm => NationModifierType.FarmThroughputFactor,
+                        BuildingType.Infrastructure => NationModifierType.InfrastructureThroughputFactor
                     });
 
                     @foreach (var item in Model.Building.Province.GetStaticModifiersOfTypes(null, districttypestoget, true, false))

@@ -3,7 +3,6 @@ using WUG.Models;
 using WUG.Managers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
-using Valour.Api.Models;
 using WUG.Helpers;
 using WUG.Extensions;
 using WUG.Database.Models.Districts;
@@ -18,10 +17,10 @@ namespace WUG.Controllers;
 public class DistrictController : SVController
 {
     private readonly ILogger<DistrictController> _logger;
-    private readonly VooperDB _dbctx;
+    private readonly WashedUpDB _dbctx;
 
     public DistrictController(ILogger<DistrictController> logger,
-        VooperDB dbctx)
+        WashedUpDB dbctx)
     {
         _logger = logger;
         _dbctx = dbctx;
@@ -30,7 +29,7 @@ public class DistrictController : SVController
     [HttpGet("/District/View/{name}")]
     public IActionResult View(string name)
     {
-        District district = DBCache.GetAll<District>().FirstOrDefault(x => x.Name == name);
+        Nation district = DBCache.GetAll<Nation>().FirstOrDefault(x => x.Name == name);
 
         return View(district);
     }
@@ -39,9 +38,9 @@ public class DistrictController : SVController
     [UserRequired]
     public IActionResult Manage(long id)
     {
-        SVUser user = HttpContext.GetUser();
+        User user = HttpContext.GetUser();
 
-        District district = DBCache.Get<District>(id);
+        Nation district = DBCache.Get<Nation>(id);
         if (district is null)
             return Redirect("/");
 
@@ -67,7 +66,7 @@ public class DistrictController : SVController
     [UserRequired]
     public IActionResult Manage(ManageDistrictModel model)
     {
-        District district = DBCache.Get<District>(model.Id);
+        Nation district = DBCache.Get<Nation>(model.Id);
         if (district is null)
             return Redirect("/");
 
@@ -96,7 +95,7 @@ public class DistrictController : SVController
     [UserRequired]
     public IActionResult SetAsCapital(long districtid, long provinceid)
     {
-        District district = DBCache.Get<District>(districtid);
+        Nation district = DBCache.Get<Nation>(districtid);
         if (district is null)
             return Redirect("/");
 
@@ -127,7 +126,7 @@ public class DistrictController : SVController
     [ValidateAntiForgeryToken]
     [UserRequired]
     public async Task<IActionResult> ChangeGovernor(long id, long GovernorId) {
-        District? district = DBCache.Get<District>(id);
+        Nation? district = DBCache.Get<Nation>(id);
         if (district is null)
             return Redirect("/");
 
@@ -135,8 +134,8 @@ public class DistrictController : SVController
         if (!(await user.IsGovernmentAdmin()))
             return RedirectBack("You must be a government admin to change the governor of a district!");
 
-        var oldgovernor = DBCache.Get<SVUser>(district.GovernorId);
-        var newgovernor = DBCache.Get<SVUser>(GovernorId);
+        var oldgovernor = DBCache.Get<User>(district.GovernorId);
+        var newgovernor = DBCache.Get<User>(GovernorId);
         if (newgovernor is null)
             return RedirectBack("User not found!");
 
@@ -161,7 +160,7 @@ public class DistrictController : SVController
     [UserRequired]
     public async Task<IActionResult> ChangeSenator(long id, long SenatorId)
     {
-        District? district = DBCache.Get<District>(id);
+        Nation? district = DBCache.Get<Nation>(id);
         if (district is null)
             return Redirect("/");
 
@@ -169,13 +168,13 @@ public class DistrictController : SVController
         if (!(await user.IsGovernmentAdmin()))
             return RedirectBack("You must be a government admin to change the senator of a district!");
 
-        if (DBCache.Get<SVUser>(SenatorId) is null)
+        if (DBCache.Get<User>(SenatorId) is null)
             return RedirectBack("User not found!");
 
-        var senobj = DBCache.GetAll<Senator>().FirstOrDefault(x => x.DistrictId == district.Id);
+        var senobj = DBCache.GetAll<CouncilMember>().FirstOrDefault(x => x.DistrictId == district.Id);
         if (senobj is null)
         {
-            DBCache.AddNew(district.Id, new Senator()
+            DBCache.AddNew(district.Id, new CouncilMember()
             {
                 DistrictId = district.Id,
                 UserId = SenatorId
@@ -191,8 +190,8 @@ public class DistrictController : SVController
 
     [UserRequired]
     public IActionResult ManageStates(long Id) {
-        District district = DBCache.Get<District>(Id);
-        SVUser user = HttpContext.GetUser();
+        Nation district = DBCache.Get<Nation>(Id);
+        User user = HttpContext.GetUser();
 
         if (district is null)
             return Redirect("/");
@@ -213,9 +212,9 @@ public class DistrictController : SVController
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> CreateState(CreateStateModel model) {
-        SVUser user = HttpContext.GetUser();
+        User user = HttpContext.GetUser();
 
-        District district = DBCache.Get<District>(model.DistrictId);
+        Nation district = DBCache.Get<Nation>(model.DistrictId);
         if (district is null)
             return Redirect("/");
         if (user.Id != district.GovernorId)
@@ -261,8 +260,8 @@ public class DistrictController : SVController
     [UserRequired]
     public IActionResult TaxPolicies(long Id)
     {
-        District district = DBCache.Get<District>(Id);
-        SVUser user = HttpContext.GetUser();
+        Nation district = DBCache.Get<Nation>(Id);
+        User user = HttpContext.GetUser();
 
         if (district is null) {
             return Redirect("/");
@@ -279,9 +278,9 @@ public class DistrictController : SVController
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> EditPolicies(DistrictPolicyModel model)
     {
-        SVUser user = HttpContext.GetUser();
+        User user = HttpContext.GetUser();
 
-        District district = DBCache.Get<District>(model.DistrictId);
+        Nation district = DBCache.Get<Nation>(model.DistrictId);
         if (district is null) {
             return Redirect("/");
         }
@@ -294,14 +293,14 @@ public class DistrictController : SVController
         // update or create ubi policies
         foreach(UBIPolicy pol in model.UBIPolicies)
         {
-            UBIPolicy? oldpol = DBCache.GetAll<UBIPolicy>().FirstOrDefault(x => x.DistrictId == district.Id && x.ApplicableRank == pol.ApplicableRank);
+            UBIPolicy? oldpol = DBCache.GetAll<UBIPolicy>().FirstOrDefault(x => x.NationId == district.Id && x.ApplicableRank == pol.ApplicableRank);
             if (oldpol is not null) 
             {
                 oldpol.Rate = pol.Rate;
             }
             else {
                 pol.Id = IdManagers.GeneralIdGenerator.Generate();
-                pol.DistrictId = model.DistrictId;
+                pol.NationId = model.DistrictId;
                 DBCache.Put(pol.Id, pol);
                 DBCache.dbctx.UBIPolicies.Add(pol);
             }
@@ -313,7 +312,7 @@ public class DistrictController : SVController
             TaxPolicy? oldpol = DBCache.Get<TaxPolicy>(pol.Id);
             if (oldpol is not null) 
             {
-                if (oldpol.DistrictId != district.Id) {
+                if (oldpol.NationId != district.Id) {
                     continue;
                 }
                 oldpol.Rate = pol.Rate;
@@ -322,7 +321,7 @@ public class DistrictController : SVController
             }
             else {
                 pol.Id = IdManagers.GeneralIdGenerator.Generate();
-                pol.DistrictId = model.DistrictId;
+                pol.NationId = model.DistrictId;
                 DBCache.Put(pol.Id, pol);
                 DBCache.dbctx.TaxPolicies.Add(pol);
             }
@@ -338,12 +337,12 @@ public class DistrictController : SVController
     [HttpGet]
     public IActionResult MoveDistrict(long id)
     {
-        District district = DBCache.Get<District>(id);
+        Nation district = DBCache.Get<Nation>(id);
 
         if (district is null)
             return RedirectBack($"Error: Could not find {district.Name}!");
 
-        SVUser user = HttpContext.GetUser();
+        User user = HttpContext.GetUser();
 
         if (false)
         {
@@ -353,9 +352,9 @@ public class DistrictController : SVController
                 return RedirectBack($"Error: You must wait another {60 - daysWaited} days to move again!");
         }
 
-        user.DistrictId = district.Id;
+        user.NationId = district.Id;
 
-        if (user.DistrictId is not null)
+        if (user.NationId is not null)
             user.LastMoved = DateTime.UtcNow;
 
         return RedirectBack($"You have moved to {district.Name}!");

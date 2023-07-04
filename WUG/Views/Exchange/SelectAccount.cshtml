@@ -1,0 +1,52 @@
+﻿@model long
+
+@{
+    ViewData["Title"] = "WUGSE Select Account";
+    var user = UserManager.GetUser(Context);
+    BaseEntity currentAccount = null;
+
+    if (Model != 0)
+    {
+        currentAccount = BaseEntity.Find(Model);
+    }
+
+    List<BaseEntity> accounts = new();
+
+    accounts.Add(user);
+
+    foreach (Group group in await user.GetJoinedGroupsAsync())
+    {
+        if (group.HasPermission(user, GroupPermissions.Eco))
+        {
+            accounts.Add(group);
+        }
+    }
+}
+
+
+<body style="background-color:#040d14">
+    <!-- Main row for page -->
+    <div class="d-flex flex-row align-content-center" style="width:100%;">
+        <!-- Leftmost column -->
+        <div class="p-4 flex-shrink-1 ml-auto"></div>
+        <!-- Center column -->
+        <div class="p-4" style="width:80em">
+            <h4>Choose an Account:</h4>
+
+            <!-- Account boxes -->
+            <div class="d-flex flex-column">
+                @foreach (var account in accounts)
+                {
+                    <a asp-controller="Exchange" asp-action="Index" asp-route-accountid="@account.Id">
+                        <div class="account-box">
+                            <img class="account-image" src="@account.ImageUrl" />
+                            <h3 class="account-name">@account.Name</h3>
+                        </div>
+                    </a>
+                }
+            </div>
+        </div>
+        <!-- Rightmost column -->
+        <div class="p-4 flex-shrink-1 mr-auto"></div>
+    </div>
+</body>

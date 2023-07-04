@@ -22,7 +22,7 @@ public class VoopAIWorker : BackgroundService
                 {
                     try
                     {
-                        await VoopAI.VoopAI.UpdateRanks();
+                        await VoopAI.UpdateRanks();
 
                         await Task.Delay(1000 * 60 * 5);
                     }

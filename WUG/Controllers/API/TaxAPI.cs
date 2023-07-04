@@ -5,7 +5,6 @@ using WUG.Database;
 using WUG.Database.Models.Entities;
 using Microsoft.AspNetCore.Cors;
 using System.Text.Json;
-using Valour.Shared;
 using WUG.Helpers;
 using WUG.Extensions;
 using System.Text.RegularExpressions;
@@ -23,7 +22,7 @@ public class TaxAPI : BaseAPI
 
     private static async Task GetAllForDistrictAsync(HttpContext ctx, long districtid)
     {
-        await ctx.Response.WriteAsync(JsonSerializer.Serialize(DBCache.GetAll<TaxPolicy>().Where(x => x.DistrictId == districtid).ToList()));
+        await ctx.Response.WriteAsync(JsonSerializer.Serialize(DBCache.GetAll<TaxPolicy>().Where(x => x.NationId == districtid).ToList()));
     }
 
     public static Regex rg = new Regex(@"^[a-zA-Z0-9\s,.-]*$");
@@ -31,7 +30,7 @@ public class TaxAPI : BaseAPI
     private static async Task<IResult> CreateOrUpdateAsync(HttpContext ctx, [FromBody] TaxPolicy policy)
     {
         var user = ctx.GetUser();
-        var district = DBCache.Get<District>(policy.DistrictId);
+        var district = DBCache.Get<Nation>(policy.NationId);
         if (district.GovernorId != user.Id)
             return ValourResult.Forbid("Only the Governor can create/edit tax policies!");
 
@@ -50,7 +49,7 @@ public class TaxAPI : BaseAPI
                 Collected = 0.00m,
                 taxType = policy.taxType,
                 Target = policy.taxType == TaxType.ResourceMined ? policy.Target : null,
-                DistrictId = district.Id
+                NationId = district.Id
             };
         }
 

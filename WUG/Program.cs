@@ -13,22 +13,25 @@ global using WUG.Database.Models.Users;
 global using WUG.Database.Models.OAuth2;
 global using WUG.Models.Districts;
 global using WUG.Managers;
+global using WUG.WUGVAI;
 global using System.Net.Http.Json;
-global using Valour.Net.Client;
-global using Valour.Api.Models.Economy;
 global using WUG.Http;
 global using Shared.Models.TradeDeals;
 global using ProvinceModifierType = Shared.Models.Districts.ProvinceModifierType;
-global using DistrictModifierType = Shared.Models.Districts.Modifiers.DistrictModifierType;
+global using NationModifierType = Shared.Models.Districts.Modifiers.NationModifierType;
 global using DivisionModifierType = Shared.Models.Military.DivisionModifierType;
 global using ProvinceMetadata = Shared.Models.Districts.ProvinceMetadata;
+global using DisCatSharp.Enums;
+global using DisCatSharp;
+global using DisCatSharp.Entities;
+global using DisCatSharp.CommandsNext;
+global using DisCatSharp.CommandsNext.Attributes;
 using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json;
 using WUG.API;
 using WUG.Workers;
 using WUG.Managers;
-using WUG.VoopAI;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Builder;
@@ -70,7 +73,7 @@ var config = new ConfigurationBuilder()
                 .AddEnvironmentVariables()
                 .Build();
 
-builder.Configuration.GetSection("Valour").Get<ValourConfig>();
+builder.Configuration.GetSection("Discord").Get<DiscordConfig>();
 builder.Configuration.GetSection("Database").Get<DBConfig>();
 
 
@@ -137,11 +140,11 @@ if (false)
 
 }
 
-VooperDB.DbFactory = VooperDB.GetDbFactory();
+WashedUpDB.DbFactory = WashedUpDB.GetDbFactory();
 
-using var dbctx = VooperDB.DbFactory.CreateDbContext();
+using var dbctx = WashedUpDB.DbFactory.CreateDbContext();
 
-string sql = VooperDB.GenerateSQL();
+string sql = WashedUpDB.GenerateSQL();
 
 try
 {
@@ -152,15 +155,15 @@ catch (Exception e)
 
 }
 
-VooperDB.RawSqlQuery<string>(sql, null, true);
+WashedUpDB.RawSqlQuery<string>(sql, null, true);
 
 await DBCache.LoadAsync();
 
 await VoopAI.Main();
 
-builder.Services.AddDbContextPool<VooperDB>(options =>
+builder.Services.AddDbContextPool<WashedUpDB>(options =>
 {
-    options.UseNpgsql(VooperDB.ConnectionString, options => options.EnableRetryOnFailure());
+    options.UseNpgsql(WashedUpDB.ConnectionString, options => options.EnableRetryOnFailure());
 });
 
 builder.Services.AddEndpointsApiExplorer();
@@ -183,8 +186,9 @@ builder.Services.AddHostedService<TimeWorker>();
 builder.Services.AddHostedService<DistrictUpdateWorker>();
 builder.Services.AddHostedService<VoopAIWorker>();
 builder.Services.AddHostedService<StatWorker>();
+builder.Services.AddHostedService<SecurityHistoryWorker>();
 
-builder.Services.AddDataProtection().PersistKeysToDbContext<VooperDB>();
+builder.Services.AddDataProtection().PersistKeysToDbContext<WashedUpDB>();
 
 builder.Services.AddAuthentication()
     .AddCookie(options =>
@@ -251,6 +255,7 @@ DistrictAPI.AddRoutes(app);
 UserAPI.AddRoutes(app);
 TaxAPI.AddRoutes(app);
 GroupAPI.AddRoutes(app);
+SecurityAPI.AddRoutes(app);
 
 app.MapControllerRoute(
     name: "default",
@@ -262,7 +267,7 @@ app.UseSwaggerUI(c =>
 });
 
 // ensure districts & Vooperia are created
-await VooperDB.Startup();
+await WashedUpDB.Startup();
 //await ResourceManager.Load();
 
 await GameDataManager.Load();
@@ -277,37 +282,6 @@ foreach (var onaction in GameDataManager.LuaOnActions[WUG.Scripting.LuaObjects.O
 List<BaseEntity> entities = new();
 //entities.AddRange(DBCache.GetAll<SVUser>());
 //entities.AddRange(DBCache.GetAll<Group>());
-
-// Migration district & province populations to be user based
-if (true)
-{
-    foreach (var district in DBCache.GetAll<District>())
-    {
-        district.BasePopulationFromUsers = 2_500_000.0 * district.Citizens.Count;
-
-        // handle provinces (this is the real fun part)
-        var totalPrevProvincePopulation = district.Provinces.Sum(x => x.Population);
-        var ratio = totalPrevProvincePopulation / district.BasePopulationFromUsers;
-        foreach (var province in district.Provinces)
-        {
-            province.PopulationMultiplier = province.Population / district.BaseProvincePopulation / ratio;
-        }
-    }
-}
-
-Console.WriteLine("Migrating Eco");
-Console.WriteLine($"Total Entites to migrate: {entities.Count}");
-int i = 0;
-foreach (var entity in entities)
-{
-    i += 1;
-    if (entity.EcoAccountId == 0)
-    {
-        await entity.Create();
-        await Task.Delay(210);
-    }
-    Console.WriteLine($"Migrated {i}/{entities.Count}");
-}
 
 foreach (var state in DBCache.GetAll<State>())
 {

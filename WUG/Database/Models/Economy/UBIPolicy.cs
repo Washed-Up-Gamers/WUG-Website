@@ -15,8 +15,8 @@ public class UBIPolicy
     // users with this rank will get paid Rate daily
     public Rank? ApplicableRank { get; set;}
 
-    // should be 100 if this is the Vooperian UBI
-    public long DistrictId { get; set;}
+    // should be 100 if this is the UN UBI
+    public long NationId { get; set;}
 
     public UBIPolicy()
     {

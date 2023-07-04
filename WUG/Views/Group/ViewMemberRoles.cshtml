@@ -3,7 +3,7 @@
 @{
     ViewData["Title"] = $"{Model.Target.Name}'s Roles in {Model.Group.Name}";
 
-    SVUser user = UserManager.GetUser(Context)!;
+    User user = UserManager.GetUser(Context)!;
 }
 
 <div class="container vw-100">

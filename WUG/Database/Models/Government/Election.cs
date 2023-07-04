@@ -12,10 +12,10 @@ public enum ElectionType
 
 public class ResultData
 {
-    public SVUser Candidate { get; set; }
+    public User Candidate { get; set; }
     public int Votes { get; set; }
 
-    public ResultData(SVUser cand, int votes)
+    public ResultData(User cand, int votes)
     {
         this.Candidate = cand;
         this.Votes = votes;
@@ -30,9 +30,9 @@ public class Election
     public long DistrictId { get; set; }
 
     [NotMapped]
-    public District District {
+    public Nation District {
         get {
-            return DBCache.Get<District>(DistrictId);
+            return DBCache.Get<Nation>(DistrictId);
         }
     }
 
@@ -46,9 +46,9 @@ public class Election
     public long WinnerId { get; set; }
 
     [NotMapped]
-    public SVUser Winner { 
+    public User Winner { 
         get {
-            return DBCache.Get<SVUser>(WinnerId)!;
+            return DBCache.Get<User>(WinnerId)!;
         }
     }
 

@@ -39,9 +39,9 @@ raw = {
 	}
 	lead_ore = {
 	}
-	crystallite = {
+	pothium = {
 	}
-	silicon = {
+	sand = {
 	}
 	oil = {
 	}
@@ -84,12 +84,16 @@ products = {
 	}
 	brass = {
 	}
+	silicon = {
+	}
+	concrete = {
+	}
 }
 
 military = {
 	normal_ammo = {
 	}
-	crystallite_infused_ammo = {
+	pothium_infused_ammo = {
 	}
 	artillery_shell_105mm = {
 	}

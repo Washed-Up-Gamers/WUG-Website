@@ -1,0 +1,383 @@
+﻿@model WUG.Models.Exchange.ExchangeIndexModel
+@using WUG.Database.Models.Economy.Stocks
+@using WUG
+@using Microsoft.EntityFrameworkCore
+@inject WashedUpDB dbctx
+
+@{
+    ViewData["Title"] = "Exchange Home";
+
+    var user = UserManager.GetUser(Context);
+    BaseEntity current = Model.ChosenAccount;
+    List<SecurityOwnership> owned = null;
+}
+
+@if (current is not null)
+{
+    owned = await dbctx.SecurityOwnerships.Where(x => x.OwnerId == current.Id).ToListAsync();
+}
+
+<div id="backboard">
+    <div class="stockbox-v2">
+    @await Html.PartialAsync("_StatusMessage", TempData["StatusMessage"])
+
+    @if (owned != null)
+    {
+        @if (Model.ChosenAccount is not null) {
+            <div style="margin-bottom:1em;display:inline-block">
+                <h2>Welcome back, @Model.ChosenAccount.Name</h2>
+                    <a asp-controller="Exchange" asp-action="SelectAccount" asp-route-accountid="@Model.ChosenAccount.Id">Select an Account</a>
+            </div>
+        }
+        <h2>Owned</h2>
+
+        <div class="d-flex flex-wrap justify-content-start" style="margin-top:20px">
+
+            @foreach (var ownership in owned)
+            {
+                Security security = DBCache.Get<Security>(ownership.SecurityId);
+                long own = ownership.Amount;
+                decimal price = security.Price;
+
+                <div class="forumlistcard">
+                    <div class="d-flex flex-wrap flex-row justify-content-between" style="min-width:250px; min-height:50px">
+                        <div class="p-2">
+                            @if (Model.ChosenAccount is null) {
+                                <a href="/Exchange/Trade?ticker=@security.Ticker">
+                                    <h4>$@security.Ticker</h4>
+                                </a>
+                            }
+                            else {
+                                <a href="/Exchange/Trade?ticker=@security.Ticker&accountid=@Model.ChosenAccount.Id">
+                                    <h4>$@security.Ticker</h4>
+                                </a>
+                            }
+                        </div>
+                        <div class="p-2">
+                            <h4> </h4>
+                        </div>
+                        <div class="p-2">
+                            <h4 style="color:lightblue">@own</h4>
+                        </div>
+                    </div>
+                    <div class="d-flex flex-wrap flex-row justify-content-between" style="min-width:250px; min-height:50px">
+                        <h4 class="p-2" style="color:lightgreen">($@Math.Round(own * price, 2))</h4>
+                        <h4 class="p-2" style="color:lightblue">@Math.Round(((double)own / security.Shares) * 100f, 2)%</h4>
+                    </div>
+
+                </div>
+            }
+
+        </div>
+
+        <br />
+    }
+
+    <div class="d-flex flex-wrap flex-row justify-content-between" style="min-width:250px; min-height:50px">
+        <h2>All: Sorted by @Model.Sort</h2>
+        <div>
+            @if (Model.Page != 0)
+            {
+                <a asp-action="Index" asp-controller="Exchange" asp-route-page="@(Model.Page - 1)" asp-route-sort="@Model.Sort" class="btn btn-outline-primary m-2">Last</a>
+            }
+            <a asp-action="Index" asp-controller="Exchange" asp-route-page="@(Model.Page + 1)" asp-route-sort="@Model.Sort" class="btn btn-outline-primary m-2">Next</a>
+        </div>
+    </div>
+
+    <div class="d-flex flex-wrap justify-content-start" style="margin-top:20px">
+
+        @foreach (var security in DBCache.GetAll<Security>())
+        {
+            <div class="stockbox">
+                <div class="d-flex flex-wrap flex-row justify-content-between" id="otherthingdumb">
+                    <div class="p-2">
+                        @if (Model.ChosenAccount is null) {
+                            <a href="/Exchange/Trade?ticker=@security.Ticker">
+                                <h4>$@security.Ticker</h4>
+                            </a>
+                        }
+                        else {
+                            <a href="/Exchange/Trade?ticker=@security.Ticker&accountid=@Model.ChosenAccount.Id">
+                                <h4>$@security.Ticker</h4>
+                            </a>
+                        }
+                    </div>
+                    <div class="p-2">
+                        <h4></h4>
+                    </div>
+                    <div class="p-2">
+                        <h4 style="color:lightgreen">$@Math.Round(security.Price,2)</h4>
+                    </div>
+                </div>
+                <div class="d-flex flex-wrap flex-row justify-content-between" id="otherthingdumb">
+                    <div class="p-2">
+                
+                    </div>
+                    <div class="p-2">
+                        <h5></h5>
+                    </div>
+                    @if (Model.Sort != "WeekChange")
+                    {
+                        var percent = Math.Round((await security.GetChangeFrom24h(dbctx)) * 100.0m, 2);
+                        @if (percent > 0.01m)
+                        {
+                            <h5 class="p-2" style="color:lightgreen">(+@percent%)</h5>
+                        }
+                        else if (percent < -0.01m)
+                        {
+                            <h5 class="p-2" style="color:lightcoral">(@percent%)</h5>
+                        }
+                        else
+                        {
+                            <h5 class="p-2" style="color:white">(@percent%)</h5>
+                        }
+                    }
+                    else {
+                        var percent = Math.Round((await security.GetChangeFrom7d(dbctx)) * 100.0m, 2);
+                        @if (percent > 1)
+                        {
+                            <h5 class="p-2" style="color:lightgreen">(+@percent%)</h5>
+                        }
+                        else if (percent < -1)
+                        {
+                            <h5 class="p-2" style="color:lightcoral">(@percent%)</h5>
+                        }
+                        else
+                        {
+                            <h5 class="p-2" style="color:white">(@percent%)</h5>
+                        }
+                    }
+                </div>
+            </div>
+        }
+    </div>
+
+    @if (Model.ChosenAccount is null) {
+        <a asp-action="Index" asp-controller="Exchange" asp-route-page="@Model.Page" asp-route-sort="Ticker" class="btn btn-outline-primary m-2">Sort by Ticker</a>
+        <a asp-action="Index" asp-controller="Exchange" asp-route-page="@Model.Page" asp-route-sort="Stock Balance" class="btn btn-outline-primary m-2">Sort by Stock Balance</a>
+        <a asp-action="Index" asp-controller="Exchange" asp-route-page="@Model.Page" asp-route-sort="Price" class="btn btn-outline-primary m-2">Sort by Price</a>
+    }
+    else
+    {
+        <a asp-action="Index" asp-controller="Exchange" asp-route-page="@Model.Page" asp-route-accountid="@Model.ChosenAccount.Id" asp-route-sort="Ticker" class="btn btn-outline-primary m-2">Sort by Ticker</a>
+        <a asp-action="Index" asp-controller="Exchange" asp-route-page="@Model.Page" asp-route-accountid="@Model.ChosenAccount.Id" asp-route-sort="Stock Balance" class="btn btn-outline-primary m-2">Sort by Stock Balance</a>
+        <a asp-action="Index" asp-controller="Exchange" asp-route-page="@Model.Page" asp-route-accountid="@Model.ChosenAccount.Id" asp-route-sort="Price" class="btn btn-outline-primary m-2">Sort by Price</a>
+    }
+
+    <br />
+    <br />
+    <hr />
+    <br />
+
+    @{
+        decimal sum = 0.0m;
+
+        //sum = Math.Round(context.Groups.AsQueryable().Where(g => g.Name != "Vooperia").AsEnumerable().Sum(g => g.Credits), 2);
+
+        decimal perSum = 0.0m;
+
+        //perSum = Math.Round(ucontext.Users.AsEnumerable().Sum(u => u.Credits), 2);
+
+        decimal govSum = 0.0m;//Math.Round(context.Groups.FirstOrDefault(g => g.Name == "Vooperia").Credits, 2);
+    }
+
+    @if (false) {
+        <h4 style="text-align:center">Companies hold </h4>
+        <h4 style="color:lightgreen;text-align:center">$@($"{sum:n0}")</h4>
+        <br />
+        <h4 style="text-align:center">Citizens hold </h4>
+        <h4 style="color:lightgreen;text-align:center">$@($"{perSum:n0}")</h4>
+        <br />
+        <h4 style="text-align:center">The Government holds</h4>
+        <h4 style="color:lightgreen;text-align:center">$@($"{govSum:n0}")</h4>
+    }
+    <br />
+</div>
+    <center>
+        <h2>Stock Market Worth: $@($"{await dbctx.SecurityOwnerships.Include(x => x.Security).SumAsync(x => x.Security.Price * x.Amount):n0}")</h2>
+        <div class="divforchart">
+            <canvas id="piechart" width="500px" height="500px"></canvas>
+        </div>
+    </center>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+@{
+    var worthdata = await Functions.GetWorthGraphData(dbctx);
+    var keys = worthdata.Worth.Keys.Select(x => '"' + x + '"');
+    var values = worthdata.Worth.Values.Select(x => x.ToString());
+}
+<script>
+    google.charts.load('current', { 'packages': ['corechart'] });
+    google.charts.setOnLoadCallback(drawChart);
+    function drawChart() {
+
+        ownerdata = {
+            datasets: [{
+                data: [@String.Join(", ", values)],
+                borderColor: "rgba(0,0,0,0.3)",
+                backgroundColor: "rgba(60,255,100,1)"
+            }],
+
+            // These labels appear in the legend and in the tooltips when hovering different arcs
+            labels: [@Html.Raw(String.Join(", ", keys))],
+        };
+
+    owneroptions = {
+        legend: {
+            display: false
+
+        },
+        cutoutPercentage: 70
+    }
+
+    var own = document.getElementById("piechart")
+    var ownership = new Chart(own, {
+        type: 'doughnut',
+        data: ownerdata,
+        options: owneroptions
+    });
+            }
+</script>
+<style>
+        .divforchart {
+            width: 500px;
+            height: 600px;
+        }
+        body {
+            margin: 0px;
+            overflow-x:hidden;
+            background-color: var(--bg-color);
+        }
+
+        .yellow {
+            color: yellow !important;
+        }
+
+        .green {
+            color: green !important;
+        }
+
+        .red {
+            color: red !important;
+        }
+
+        .white {
+            color: white !important;
+        }
+
+        .ticker {
+            font-size: 300%;
+            color: #f5f5f5;
+            text-align: center;
+            margin-top: 0px;
+            margin-bottom: 0px;
+        }
+
+        .value {
+            font-size: 300%;
+            color: #f5f5f5;
+            text-align: center;
+            margin-top: 0px;
+            margin-bottom: 0px;
+        }
+
+        .ad {
+            width: 720px;
+            height: 90px;
+            opacity: 0.9;
+        }
+
+        .container-fluid {
+          background-color: var(--bg-color);
+        }
+
+        #backboard {
+            background-color: var(--bg-color);
+            background-size: cover;
+            flex-direction: column;
+            align-items: center;
+            width:1100px;
+            justify-content: center;
+            margin-left:auto;
+            margin-right:auto;
+        }
+        .p-2 {
+            padding: 8px !important;
+        }
+        h4 {
+            color: white;
+            font-size: 1.5rem;
+            margin-bottom: 8px;
+            margin-block-end: 8px;
+            margin-block-start: 0px;
+            font-size:24px;
+        }
+        h4, h5 {
+            margin-bottom: .5rem;
+            font-weight: 500;
+            line-height: 1.2;
+            font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji"
+        }
+        h5 {
+            font-size: 1.25rem;
+            margin-bottom: 8px;
+            margin-block-end: 8px;
+            margin-block-start: 0px;
+            font-size:20px;
+        }
+        a {
+            text-decoration: none;
+        }
+        .stockboxv2 {
+            padding-top: 10px;
+            padding-bottom: 10px;
+        }
+        .stockbox {
+            border: 1px solid #303030;
+            padding-top: 10px;
+            padding-bottom: 10px;
+        }
+        #otherthingdumb {
+          min-width:250px;
+          min-height:50px;
+        }
+            .justify-content-end     { justify-content: flex-end !important; }
+            .justify-content-center  { justify-content: center !important; }
+            .justify-content-between { justify-content: space-between !important; }
+        .flex-wrap {
+            -ms-flex-wrap: wrap!important;
+            flex-wrap: wrap!important;
+        }
+        .flex-row {
+            -ms-flex-direction: row!important;
+            flex-direction: row!important;
+        }
+        .d-flex {
+            display: -ms-flexbox!important;
+            display: flex!important;
+        }
+
+        @@media (max-width: 1366px) {
+            p {
+                font-size: 213% !important
+            }
+
+            .text {
+                bottom: 0%;
+                height: 71px;
+            }
+        }
+
+        @@media (max-width: 1024px) {
+            .text {
+                height: 53px;
+            }
+
+
+            .stockbox {
+                width: 13vw;
+            }
+        }
+</style>

@@ -25,18 +25,18 @@ public class GovernmentController : SVController {
     {
         GovernmentIndexModel model = new GovernmentIndexModel();
 
-        using var dbctx = VooperDB.DbFactory.CreateDbContext();
-        model.Emperor = DBCache.GetAll<SVUser>().FirstOrDefault(x => x.ValourId == 12200448886571008);
+        using var dbctx = WashedUpDB.DbFactory.CreateDbContext();
+        model.Emperor = DBCache.GetAll<User>().FirstOrDefault(x => x.DiscordUserId == 259004891148582914);
         model.Justices = new();
-        foreach (SVUser user in DBCache.GetAll<SVUser>())
+        foreach (User user in DBCache.GetAll<User>())
         {
             if (await user.IsPrimeMinister())
                 model.PrimeMinister = user;
             if (await user.IsSupremeCourtJustice())
                 model.Justices.Add(user);
         }
-        model.CFV = DBCache.GetAll<SVUser>().FirstOrDefault(x => x.ValourId == 12201879245422592);
-        model.Senators = DBCache.GetAll<Senator>().ToList();
+        model.CFV = DBCache.GetAll<User>().FirstOrDefault(x => x.DiscordUserId == 259004891148582914);
+        model.Senators = DBCache.GetAll<CouncilMember>().ToList();
 
         return View(model);
     }
