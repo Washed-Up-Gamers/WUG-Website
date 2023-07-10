@@ -1,5 +1,6 @@
 ﻿simple_factory_throughput_upgrade = {
     name = "Increase Throughput"
+    numid = 0
     costs = {
         add_locals = {
 			cost_increase = 1.3^upgrade.level
@@ -16,6 +17,7 @@
 
 simple_factory_efficiency_upgrade = {
     name = "Increase Efficiency"
+    numid = 1
     costs = {
         add_locals = {
 			cost_increase = 1.4^upgrade.level
@@ -30,6 +32,7 @@ simple_factory_efficiency_upgrade = {
 
 advanced_factory_throughput_upgrade = {
     name = "Increase Throughput"
+    numid = 2
     costs = {
         add_locals = {
 			cost_increase = 1.3^upgrade.level
@@ -46,6 +49,7 @@ advanced_factory_throughput_upgrade = {
 
 advanced_factory_efficiency_upgrade = {
     name = "Increase Efficiency"
+    numid = 3
     costs = {
         add_locals = {
 			cost_increase = 1.4^upgrade.level

@@ -4,10 +4,10 @@
     <TargetFramework>net7.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <RootNamespace>SV2</RootNamespace>
+    <RootNamespace>WUG</RootNamespace>
     <EnablePreviewFeatures>True</EnablePreviewFeatures>
     <Version>0.0.1</Version>
-	<AssemblyName>SV2</AssemblyName>
+	<AssemblyName>WUG</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>
@@ -43,7 +43,7 @@
 	
 	<ItemGroup>
 	  <ProjectReference Include="..\Shared\Shared.csproj" />
-	  <ProjectReference Include="..\WUG.Blazor\WUG.Blazor.csproj" />
+	  <ProjectReference Include="..\Wug.Blazor\WUG.Blazor.csproj" />
 	</ItemGroup>
 
   <ItemGroup>

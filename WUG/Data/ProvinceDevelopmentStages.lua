@@ -19,6 +19,7 @@ village = {
 	development_value_required = 20 -- ~100k population required
 	modifiers = {
 		province.buildingslotsfactor = 0.1
+		province.factories.throughputfactor = 0.025
 	}
 }
 
@@ -27,6 +28,7 @@ town = {
 	development_value_required = 35 -- ~300k population required
 	modifiers = {
 		province.buildingslotsfactor = 0.2
+		province.factories.throughputfactor = 0.05
 	}
 }
 
@@ -35,6 +37,7 @@ hub = {
 	development_value_required = 70 -- ~1m population required
 	modifiers = {
 		province.buildingslotsfactor = 0.35
+		province.factories.throughputfactor = 0.075
 	}
 }
 
@@ -44,6 +47,7 @@ city = {
 	modifiers = {
 		province.buildingslotsfactor = 0.6
 		province.migrationattractionfactor = 0.05
+		province.factories.throughputfactor = 0.1
 	}
 }
 
@@ -55,5 +59,6 @@ megacity = {
 		-- give a small bonus
 		province.buildingslotsexponent = 0.005
 		province.migrationattractionfactor = 0.1
+		province.factories.throughputfactor = 0.15
 	}
 }

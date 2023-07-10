@@ -512,7 +512,7 @@ public class Province
             var adj_province = DBCache.Get<Province>(id);
             if (adj_province is null || BaseDevelopmentValue > adj_province.BaseDevelopmentValue) continue;
 
-            DevelopmentValue += (int)(adj_province.LastTickDevelopmentValue * 0.1);
+            DevelopmentValue += (int)(adj_province.LastTickDevelopmentValue * 0.2);
         }
 
         LastTickDevelopmentValue = DevelopmentValue;

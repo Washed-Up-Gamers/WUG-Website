@@ -66,9 +66,10 @@ namespace WUG.Workers
                             // do district funding
                             foreach(var district in DBCache.GetAll<District>())
                             {
-                                decimal amount = (decimal)Defines.NDistrict[NDistrict.DISTRICT_FUNDING_BASE];
-                                amount += (decimal)((double)district.Citizens.Count * Defines.NDistrict[NDistrict.DISTRICT_FUNDING_PER_CITIZEN]);
-                                var tran = new SVTransaction(BaseEntity.Find(100), BaseEntity.Find(district.GroupId), amount/30/24, TransactionType.FreeMoney, $"Imperial District Funding for {district.Name}");
+                                decimal amount = 50_000.0m;
+                                amount += 40_000.0m * district.Citizens.Count;
+                                amount += 1_500.0m * district.Provinces.Count;
+                                var tran = new SVTransaction(BaseEntity.Find(100), BaseEntity.Find(district.GroupId), amount/30/24, TransactionType.FreeMoney, $"Intrnational Nation Funding for {district.Name}");
                                 TaskResult result = await tran.Execute();
                             }
                             List<GroupRole>? roles = DBCache.GetAll<GroupRole>().ToList();
@@ -143,8 +144,10 @@ namespace WUG.Workers
                                         EntityId = entity.Id,
                                         Time = DateTime.UtcNow,
                                         Balance = await entity.GetCreditsAsync(),
-                                        TaxableBalance = entity.TaxAbleBalance
+                                        TaxableBalance = entity.TaxAbleBalance,
+                                        IncomeToday = entity.IncomeToday
                                     });
+                                    entity.IncomeToday = 0.0m;
                                 }
                                 _dbctx.AddRange(records);
                                 await _dbctx.SaveChangesAsync();

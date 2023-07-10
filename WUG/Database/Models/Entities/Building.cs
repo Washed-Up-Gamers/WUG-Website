@@ -173,12 +173,23 @@ public abstract class ProducingBuilding : BuildingBase
             if (BuildingObj.ApplyStackingBonus)
                 basevalue *= 1+Math.Min(Defines.NProduction["STACKING_THROUGHPUT_BONUS"] * Size, Defines.NProduction["MAX_STACKING_THROUGHPUT_BONUS"]);
 
-            if (BuildingType == BuildingType.Factory || BuildingType == BuildingType.Mine)
+            if (BuildingType == BuildingType.Factory)
             {
-                var start = 10.0;
-                var end = 2;
+                var start = 6.0;
+                var end = 1;
                 var diff = start - end;
-                var startdate = new DateTime(2023, 7, 7);
+                var startdate = new DateTime(2023, 7, 16);
+                var hourstotal = 24 * 7 * 6;
+                var progress = Math.Max(0, (DateTime.UtcNow - startdate).TotalHours);
+                var muit = end + (diff * (1 - (progress / hourstotal)));
+                basevalue *= Math.Max(end, muit);
+            }
+
+            else if (BuildingType == BuildingType.Mine) {
+                var start = 3.0;
+                var end = 1;
+                var diff = start - end;
+                var startdate = new DateTime(2023, 7, 16);
                 var hourstotal = 24 * 7 * 6;
                 var progress = Math.Max(0, (DateTime.UtcNow - startdate).TotalHours);
                 var muit = end + (diff * (1 - (progress / hourstotal)));

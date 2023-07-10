@@ -787,6 +787,7 @@ public static class LuaHandler
             var upgrade = new LuaBuildingUpgrade()
             {
                 Id = name,
+                IdAsLong = Convert.ToInt32(table.GetValue("numid")),
                 Name = table.GetValue("name"),
                 Costs = HandleDictExpression((LuaTable)table["costs"]),
                 ModifierNodes = HandleModifierNodes((LuaTable)table["modifiers"])

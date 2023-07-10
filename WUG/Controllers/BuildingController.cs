@@ -19,6 +19,8 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using ChartJSCore.Models;
 using System.Linq;
+using System.Collections.Concurrent;
+using WUG.Workers;
 
 namespace WUG.Controllers;
 
@@ -308,6 +310,13 @@ public class BuildingController : SVController
             if (buildingrequest.BuildingName is not null)
                 result.Data.Name = buildingrequest.BuildingName;
             await _dbctx.SaveChangesAsync();
+            BuildingRecordWorker.recordQueue.Enqueue(new BuildingRecord() {
+                BuildingId = result.Data.Id,
+                OwnerId = result.Data.OwnerId,
+                Time = DateTime.UtcNow,
+                LevelsChanged = result.Data.Size,
+                RecordType = BuildingRecordType.NewlyBuilt
+            });
             message += $"Click <a target='_blank' href='/Building/Manage/{result.Data.Id}'>here</a> to view the building.";
         }
         return Json(new TaskResult<long>(result.Success, message + (buildingrequest.LevelsBuilt == buildingrequest.LevelsRequested ? "|REACHEDLIMIT" : ""), buildingrequestid));
