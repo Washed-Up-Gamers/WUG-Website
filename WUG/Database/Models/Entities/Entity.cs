@@ -37,6 +37,9 @@ public abstract class BaseEntity
 
     [DecimalType]
     public decimal TaxAbleBalance { get; set;}
+
+    [DecimalType(2)]
+    public decimal IncomeToday { get; set; }
     
     [JsonIgnore]
     [VarChar(36)]

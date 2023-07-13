@@ -198,6 +198,7 @@ builder.Services.AddHostedService<DistrictUpdateWorker>();
 builder.Services.AddHostedService<VoopAIWorker>();
 builder.Services.AddHostedService<StatWorker>();
 builder.Services.AddHostedService<SecurityHistoryWorker>();
+builder.Services.AddHostedService<BuildingRecordWorker>();
 
 builder.Services.AddDataProtection().PersistKeysToDbContext<WashedUpDB>();
 

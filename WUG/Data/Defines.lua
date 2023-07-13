@@ -8,8 +8,7 @@ NMilitary = {
 }
 
 NDistrict = {
-    DISTRICT_FUNDING_BASE = 35000
-    DISTRICT_FUNDING_PER_CITIZEN = 4000 
+
 }
 
 NProduction = {

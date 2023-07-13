@@ -162,6 +162,8 @@ public class WashedUpDB : DbContext, IDataProtectionKeyContext
     public DbSet<Recipe> Recipes { get; set; }
     public DbSet<ItemTrade> ItemTrades { get; set; }
 
+    public DbSet<BuildingRecord> BuildingRecords { get; set; }
+
     public DbSet<UpdateTimeStuff> UpdateTimeStuffs { get; set; }
     public DbSet<CurrentTime> CurrentTimes { get; set; }
 

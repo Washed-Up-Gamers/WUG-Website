@@ -11,6 +11,9 @@ public class EntityBalanceRecord
     public DateTime Time { get; set; }
 
     [DecimalType(2)]
+    public decimal IncomeToday { get; set; }
+
+    [DecimalType(2)]
     public decimal Balance { get; set; }
 
     [DecimalType(2)]
