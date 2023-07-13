@@ -214,6 +214,7 @@ public class Transaction
         {
             FromEntity.TaxAbleBalance -= Amount;
             ToEntity.TaxAbleBalance += Amount;
+            ToEntity.IncomeToday += Amount;
         }
 
         if (transactionType is TransactionType.DividendPayment
@@ -225,6 +226,7 @@ public class Transaction
             if (IsAnExpense is not null and true)
                 FromEntity.TaxAbleBalance -= Amount;
             ToEntity.TaxAbleBalance += Amount;
+            ToEntity.IncomeToday += Amount;
         }
 
         else if (transactionType == TransactionType.ResourceBrought)
@@ -232,6 +234,7 @@ public class Transaction
             if (IsAnExpense is not null and true)
                 FromEntity.TaxAbleBalance -= Amount;
             ToEntity.TaxAbleBalance += Amount;
+            ToEntity.IncomeToday += Amount;
         }
 
         else if (transactionType == TransactionType.StockBrought)
@@ -242,6 +245,7 @@ public class Transaction
         else if (transactionType == TransactionType.TaxPayment) {
             // we do this so that districts, states, and province groups can have a "profit" for banks and loan brokers to use.
             ToEntity.TaxAbleBalance += Amount;
+            ToEntity.IncomeToday += Amount;
         }
 
         dbctx.Transactions.Add(this);
