@@ -641,13 +641,9 @@ public class GroupController : SVController
             {
                 return RedirectBack("You cannot keep more stock than you issue!");
             }
-            if (amount < 1)
+            if (amount < 100)
             {
-                return RedirectBack("You cannot issue zero or negative stock!");
-            }
-            if (amount < 0)
-            {
-                return RedirectBack("You cannot keep negative stock!");
+                return RedirectBack("You cannot issue less than 100 shares!");
             }
 
             var tran = new Transaction(group, BaseEntity.Find(99), model.StartingBalance, TransactionType.IPO, "IPO");
@@ -686,7 +682,8 @@ public class GroupController : SVController
             StatusMessage = $"Successfully issued {amount} ${model.Ticker}";
 
             await VoopAI.EcoChannel.SendMessageAsync($":new: Welcome new company {model.Ticker}'s ({group.Name}) IPO with {model.Amount} stock added to the market!");
-            return RedirectToAction("Index", controllerName: "Home");
+            TempData.Remove("form");
+            return RedirectToAction("Index", controllerName: "Exchange");
         }
         else
         {
@@ -706,8 +703,16 @@ public class GroupController : SVController
 
         if (group.HasPermission(user, GroupPermissions.Eco))
         {
-            if (DBCache.GetAll<Security>().FirstOrDefault(x => x.GroupId == groupid) is not null)
+            if (DBCache.GetAll<Security>().FirstOrDefault(x => x.GroupId == groupid) is null)
                 return RedirectToAction("DoIPO", new { groupid = groupid });
+
+            if (TempData["form"] != null)
+            {
+                var model = JsonSerializer.Deserialize<IssueStockModal>((string)TempData["form"]);
+                model.Group = group;
+                model.GroupId = group.Id;
+                return View(model);
+            }
 
             return View(new IssueStockModal() { Group = group, GroupId = groupid});
         }
@@ -724,6 +729,8 @@ public class GroupController : SVController
 
         User user = HttpContext.GetUser();
 
+        TempData["form"] = JsonSerializer.Serialize(model);
+
         if (group is null)
             return RedirectBack($"Could not find the group with id {model.GroupId}");
 
@@ -734,7 +741,7 @@ public class GroupController : SVController
             if (security is null)
                 return RedirectToAction("DoIPO", new { groupid = model.GroupId });
 
-            if (model.DepositAmount <= 0.0m)
+            if (model.DepositAmount < 0.0m)
                 return RedirectBack("The amount of money you wish to deposit upon issuance must be 0 or higher!");
             if (model.DepositAmount > group.Money)
                 return RedirectBack("You can not deposit more money than your group has!");
@@ -756,8 +763,8 @@ public class GroupController : SVController
                 return RedirectBack("You can't buy more stock than you issue!");
 
             long total = 0;
-            long price = (long)(newprice*100);
-            long balance = (long)(newbalance * 100);
+            long price = (long)(newprice* 1_000_000);
+            long balance = (long)(newbalance * 1_000_000);
             for (int i = 0; i < model.Purchase; i++)
             {
                 balance += price;
@@ -765,29 +772,36 @@ public class GroupController : SVController
                 price = balance / newtotalshares * 5; // apply 5x to make prices move more
             }
 
-            var totalinDecimalForm = total / 100.0m;
+            var totalinDecimalForm = total / 1_000_000.0m;
             if (user.Money < totalinDecimalForm)
                 return RedirectBack($"You lack enough money to buy {model.Purchase} shares upon issuance.");
 
-            var tran = new Transaction(group, DBCache.FindEntity(99), model.DepositAmount, TransactionType.NonTaxedOther, $"Deposit into ${security.Ticker} stock");
-            var tranresult = await tran.Execute(true);
+            if (model.DepositAmount > 0.00m)
+            {
+                var tran = new Transaction(group, DBCache.FindEntity(99), model.DepositAmount, TransactionType.NonTaxedOther, $"Deposit into ${security.Ticker} stock");
+                var tranresult = await tran.Execute(true);
 
-            if (!tranresult.Succeeded)
-                return RedirectBack($"Error depositing money: {tranresult.Info}");
+                if (!tranresult.Succeeded)
+                    return RedirectBack($"Error depositing money: {tranresult.Info}");
+            }
 
             security.OpenShares += model.Amount;
             security.Shares += model.Amount;
             security.Balance += model.DepositAmount;
             security.Price = security.Balance / security.Shares * 5.0m;
 
-            var trade = new StockTrade(security.Ticker, security.Id, model.Purchase, StockTradeType.Buy, group);
-            var result = await trade.Execute(true);
-            if (!result.Succeeded)
-                return RedirectBack($"Error buying shares upon issuance: {result.Info}");
+            if (model.Purchase > 0)
+            {
+                var trade = new StockTrade(security.Ticker, security.Id, model.Purchase, StockTradeType.Buy, group);
+                var result = await trade.Execute(true);
+                if (!result.Succeeded)
+                    return RedirectBack($"Error buying shares upon issuance: {result.Info}");
+            }
 
             await VoopAI.EcoChannel.SendMessageAsync($":moneybag: {security.Ticker} ({group.Name}) has issued {model.Amount} new stock!");
             StatusMessage = $"Successfully issued {model.Amount} stock!";
-            return RedirectToAction("Index", controllerName: "Home");
+            TempData.Remove("form");
+            return RedirectToAction("Index", controllerName: "Exchange");
         }
         else
         {

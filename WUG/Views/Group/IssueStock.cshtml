@@ -13,7 +13,6 @@
 @{
     <div class="container vw-100">
         <div class="col-12">
-            @await Html.PartialAsync("_StatusMessage", TempData["StatusMessage"])
             <h4>Issue Stock</h4>
 
             <p>Issuing stock increases stock in the market but will decrease the value/price of each stock. If bought, these new stocks will still raise your stock's value & price.</p>
@@ -23,6 +22,7 @@
                 stock will be worth $2000 - doubled!
             </p>
             <br />
+            @await Html.PartialAsync("_StatusMessage", TempData["StatusMessage"])
             <hr />
 
             <p>Your stock's balance: $@($"{security.Balance:n2}")</p>
@@ -47,7 +47,7 @@
                     <div class="form-group">
                         <label asp-for="DepositAmount"></label>
                         <span asp-description-for="DepositAmount" class="form-text" style="color:#888888" />
-                        <input asp-for="DepositAmount" class="form-control" min="1" max="@Model.Group.Money" />
+                        <input asp-for="DepositAmount" class="form-control" min="0" max="@Model.Group.Money" />
                         <span asp-validation-for="DepositAmount" class="text-danger"></span>
                     </div>
                     <div class="form-group">

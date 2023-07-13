@@ -72,6 +72,46 @@ public class ExchangeController : SVController
         return View(accountid);
     }
 
+    [HttpPost("/Exchange/Buy")]
+    [UserRequired]
+    [ValidateAntiForgeryToken]
+    public async Task<TaskResult> Buy(string ticker, long accountid, long amount)
+    {
+        var caller = HttpContext.GetUser();
+
+        BaseEntity entity = BaseEntity.Find(accountid);
+
+        if (!entity.HasPermission(caller, GroupPermissions.Eco))
+            return new TaskResult(false, $"You lack eco group permission!");
+
+        if (!DBCache.SecuritiesByTicker.ContainsKey(ticker))
+            return new TaskResult(false, $"Could not find security with ticker {ticker}");
+
+        var security = DBCache.SecuritiesByTicker[ticker];
+        var traderesult = await security.BuyAsync(amount, entity, _dbctx);
+        return traderesult;
+    }
+
+    [HttpPost("/Exchange/Sell")]
+    [UserRequired]
+    [ValidateAntiForgeryToken]
+    public async Task<TaskResult> Sell(string ticker, long accountid, long amount)
+    {
+        var caller = HttpContext.GetUser();
+
+        BaseEntity entity = BaseEntity.Find(accountid);
+
+        if (!entity.HasPermission(caller, GroupPermissions.Eco))
+            return new TaskResult(false, $"You lack eco group permission!");
+
+        if (!DBCache.SecuritiesByTicker.ContainsKey(ticker))
+            return new TaskResult(false, $"Could not find security with ticker {ticker}");
+
+        var security = DBCache.SecuritiesByTicker[ticker];
+        var traderesult = await security.SellAsync(amount, entity, _dbctx);
+        return traderesult;
+    }
+
     public async Task<IActionResult> Trade(string ticker, long? accountid = null)
     {
         if (ticker != null) ticker = ticker.ToUpper();

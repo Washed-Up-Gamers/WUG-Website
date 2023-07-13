@@ -41,3 +41,23 @@ building_advanced_factory = {
 	]
 	type = "Factory"
 }
+
+building_pothium_factory = {
+	recipes = [
+		recipe_pothium_components_factory_base
+	]
+	buildingcosts = {
+		gold = 2000
+		computer_chips = 750
+		pothium_components = 5000
+		advanced_components = 2500
+		simple_components = 15000
+		concrete = 50000
+		steel = 30000
+	}
+	upgrades = [
+		pothium_factory_throughput_upgrade
+		pothium_factory_efficiency_upgrade
+	]
+	type = "Factory"
+}

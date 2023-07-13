@@ -16,11 +16,12 @@
     }
 
     #svg {
-        transform: scale(2);
+        transform: scale(0.97);
         /*position: absolute;*/
         top: 0px;
         left: 0px;
         height: 100%;
+        margin-top: -25px;
         /*opacity: 0.5;*/
     }
 
@@ -79,7 +80,7 @@
             </style>
             @if (resourcetomap is null)
             {
-                @if (false)
+                @if (true)
                 {
                     @foreach (var province in Model)
                     {
@@ -94,6 +95,8 @@
                     {
                         @foreach (var province in district.Provinces)
                         {
+                            @if (province.DistrictId == 100)
+                                continue;
                             <a href="/Province/View/@province.Id">
                                 <path d="@province.D" id="@province.Id" style="fill:# @(province.District?.Color ?? "(255, 255, 255");stroke: black;stroke-width: 0.5px;" class="province"></path>
                             </a>
@@ -105,12 +108,16 @@
             {
                 @foreach (var province in Model)
                 {
-                    <path d="@province.D" id="@province.Id" style="fill:#@province.District.Color;stroke: #@province.District.Color !important" class="province"></path>
+                    @if (province.DistrictId == 100)
+                        continue;
+                    <path d="@province.D" id="@province.Id" style="fill:#@(province.District?.Color ?? "(255, 255, 255");stroke: #@(province.District?.Color ?? "(255, 255, 255") !important" class="province"></path>
                 }
                 @foreach(var district in MapController.DistrictMaps)
                 {
                     @foreach (var province in district.Provinces)
                     {
+                        @if (province.DistrictId == 100)
+                            continue;
                         var dbprovince = DBCache.Get<Province>(province.Id);
                         var buildingobj = GameDataManager.BaseBuildingObjs.Values.First(x => x.MustHaveResource == resourcetomap);
                         var production = $"{dbprovince.GetMiningResourceProduction(resourcetomap) / 10550.0 * buildingobj.Recipes.First().PerHour * buildingobj.Recipes.First().Outputs.First().Value:n2}";

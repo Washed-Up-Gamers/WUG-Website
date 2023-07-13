@@ -10,6 +10,12 @@ public class StockTradeModel
     [JsonProperty("Amount")]
     public long Amount { get; set; }
 
+    [JsonProperty("TotalShares")]
+    public long TotalShares { get; set; }
+
+    [JsonProperty("SharesAvailable")]
+    public long SharesAvailable { get; set; }
+
     [JsonProperty("Price")]
     public decimal Price { get; set; }
 

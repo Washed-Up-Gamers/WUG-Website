@@ -299,7 +299,7 @@ public class BuildingController : SVController
         ProducingBuilding? building = null;
         if (buildingrequest.BuildingId is not null)
             building = DBCache.ProvincesBuildings[buildingrequest.ProvinceId].FirstOrDefault(x => x.Id == (long)buildingrequest.BuildingId);
-        TaskResult<ProducingBuilding> result = await luabuildingobj.Build(buildas, user, buildingrequest.Province.District, buildingrequest.Province, levelstobuild, building);
+        TaskResult<ProducingBuilding> result = await luabuildingobj.Build(buildas, user, buildingrequest.Province.Nation, buildingrequest.Province, levelstobuild, building);
         string message = result.Message;
         if (result.Success) {
             buildingrequest.LevelsBuilt += levelstobuild;
@@ -354,7 +354,7 @@ public class BuildingController : SVController
                 building = DBCache.GetAllProducingBuildings().FirstOrDefault(x => x.Id == model.AlreadyExistingBuildingId);
             }
             
-            TaskResult<ProducingBuilding> result = await luabuildingobj.Build(buildas, user, province.District, province, model.levelsToBuild, building);
+            TaskResult<ProducingBuilding> result = await luabuildingobj.Build(buildas, user, province.Nation, province, model.levelsToBuild, building);
             if (!result.Success)
                 return Json(new TaskResult(result.Success, result.Message));
             if (model.AlreadyExistingBuildingId is null)

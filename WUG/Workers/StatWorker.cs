@@ -64,7 +64,7 @@ public class StatWorker : BackgroundService
                             Id = IdManagers.StatIdGenerator.Generate(), 
                             TargetType = TargetType.Global, 
                             StatType = StatType.Population,
-                            Value = DBCache.GetAll<Province>().Where(x => x.DistrictId != 100).Sum(x => x.Population)});
+                            Value = DBCache.GetAll<Province>().Where(x => x.NationId != 100).Sum(x => x.Population)});
 
                         _dbctx.Stats.Add(new Stat()
                         {
@@ -72,7 +72,7 @@ public class StatWorker : BackgroundService
                             Id = IdManagers.StatIdGenerator.Generate(),
                             TargetType = TargetType.Global,
                             StatType = StatType.UsedBuildingSlots,
-                            Value = DBCache.GetAll<Province>().Where(x => x.DistrictId != 100).Sum(x => x.BuildingSlotsUsed)
+                            Value = DBCache.GetAll<Province>().Where(x => x.NationId != 100).Sum(x => x.BuildingSlotsUsed)
                         });
 
                         _dbctx.Stats.Add(new Stat()
@@ -81,7 +81,7 @@ public class StatWorker : BackgroundService
                             Id = IdManagers.StatIdGenerator.Generate(),
                             TargetType = TargetType.Global,
                             StatType = StatType.TotalBuildingSlots,
-                            Value = DBCache.GetAll<Province>().Where(x => x.DistrictId != 100).Sum(x => x.BuildingSlots)
+                            Value = DBCache.GetAll<Province>().Where(x => x.NationId != 100).Sum(x => x.BuildingSlots)
                         });
 
                         foreach (var district in DBCache.GetAll<Nation>())

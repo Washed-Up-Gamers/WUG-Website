@@ -200,8 +200,11 @@
             <h5 style="text-align:center">Credits: ¢@Math.Round(Model.Group.Money, 2)</h5>
             <br />
 
-            <p>This does not work right now</p>
-            <a asp-action="Pay" asp-controller="Group" asp-route-groupid="@Model.Id" class="btn btn-outline-primary m-2">Send Payment</a>
+            
+            @if (false)
+            {
+                <a asp-action="Pay" asp-controller="Group" asp-route-groupid="@Model.Id" class="btn btn-outline-primary m-2">Send Payment</a>
+            }
             @if (Model.GroupType == GroupTypes.Company && DBCache.GetAll<Security>().FirstOrDefault(x => x.GroupId == Model.Id) is null)
             {
                 <a asp-action="DoIPO" asp-controller="Group" asp-route-groupid="@Model.Id" class="btn btn-outline-primary m-2">IPO</a>

@@ -66,7 +66,7 @@
 
                 <div class="d-flex align-content-center align-items-center">
                     <div style="display:inline-block; margin:2em;margin-left: auto;margin-right: auto;">
-                        <h2 style="text-align:center" class="display-4">The @Model.District.NameForProvince of</h2>
+                        <h2 style="text-align:center" class="display-4">The @Model.Nation.NameForProvince of</h2>
                         <h1 style="text-align:center" class="display-3">@Model.Name</h1>
                     </div>
                 </div>
@@ -78,7 +78,7 @@
                             if (!staticmodififer.BaseStaticModifiersObj.IsGood)
                                 spanclass = "modifier-icon-bad";
                         }
-                        <span class="@spanclass" data-bs-toggle="tooltip" data-bs-html="true" data-bs-custom-class="modifier-tooltip-div" data-bs-sanitize="false" data-bs-title="@Html.Raw(staticmodififer.GenerateHtmlForTooltip(Model.District, Model))">@staticmodififer.BaseStaticModifiersObj.Icon</span>
+                        <span class="@spanclass" data-bs-toggle="tooltip" data-bs-html="true" data-bs-custom-class="modifier-tooltip-div" data-bs-sanitize="false" data-bs-title="@Html.Raw(staticmodififer.GenerateHtmlForTooltip(Model.Nation, Model))">@staticmodififer.BaseStaticModifiersObj.Icon</span>
                     </div>
                 }
 
@@ -109,20 +109,20 @@
             <tbody>
                 <tr>
                     <th colspan="2" class="infobox-header">
-                        <div>@Model.Name, @Model.District.Name</div>
+                        <div>@Model.Name, @Model.Nation.Name</div>
                     </th>
                 </tr>
                 <tr>
                     <td colspan="2" class="infobox-subheader">
-                        <div>@Model.District.NameForProvince</div>
+                        <div>@Model.Nation.NameForProvince</div>
                     </td>
                 </tr>
                 <tr class="mergedrow dividertop">
-                    <th class="infobox-row-name">District</th>
-                    <td class="infobox-row-value"><a href="/District/View/@Model.District.Name">@Model.District.Name</a></td>
+                    <th class="infobox-row-name">Nation</th>
+                    <td class="infobox-row-value"><a href="/District/View/@Model.Nation.Name">@Model.Nation.Name</a></td>
                 </tr>
                 <tr class="mergedrow">
-                    <th class="infobox-row-name">@Model.District.NameForState</th>
+                    <th class="infobox-row-name">@Model.Nation.NameForState</th>
                     <td class="infobox-row-value">
                         @if (Model.StateId is null) {
                             @("None")
@@ -133,7 +133,7 @@
                     </td>
                 </tr>
                 <tr class="mergedrow">
-                    <th class="infobox-row-name">@Model.District.NameForGovernorOfAProvince</th>
+                    <th class="infobox-row-name">@Model.Nation.NameForGovernorOfAProvince</th>
                     @if (Model.Governor is null) {
                         <td class="infobox-row-value">None</td>
                     }
@@ -192,16 +192,16 @@
                     <td class="infobox-row-value">@($"{Model.MigrationAttraction:n0}") (@Model.RankByMigrationAttraction.ToStringWithOrdinal() in District)</td>
                 </tr>
                 @{
-                    var totalbase = (Model.BasePropertyTax ?? 0) + (Model.State is not null ? Model.State.BasePropertyTax ?? 0 : 0) + (Model.District.BasePropertyTax ?? 0);
-                    var totalpersize = (Model.PropertyTaxPerSize ?? 0) + (Model.State is not null ? Model.State.PropertyTaxPerSize ?? 0: 0) + (Model.District.PropertyTaxPerSize ?? 0);
+                    var totalbase = (Model.BasePropertyTax ?? 0) + (Model.State is not null ? Model.State.BasePropertyTax ?? 0 : 0) + (Model.Nation.BasePropertyTax ?? 0);
+                    var totalpersize = (Model.PropertyTaxPerSize ?? 0) + (Model.State is not null ? Model.State.PropertyTaxPerSize ?? 0: 0) + (Model.Nation.PropertyTaxPerSize ?? 0);
                 }
                 <tr class="mergedrow dividertop">
                     <th class="infobox-row-name">Base Property Tax</th>
-                    <td class="infobox-row-value">@($"¢{totalbase:n0}") @($"(¢{Model.BasePropertyTax ?? 0:n0} + ¢{Model.State?.BasePropertyTax ?? 0:n0} + ¢{Model.District.BasePropertyTax ?? 0:n0})")</td>
+                    <td class="infobox-row-value">@($"¢{totalbase:n0}") @($"(¢{Model.BasePropertyTax ?? 0:n0} + ¢{Model.State?.BasePropertyTax ?? 0:n0} + ¢{Model.Nation.BasePropertyTax ?? 0:n0})")</td>
                 </tr>
                 <tr class="mergedrow">
                     <th class="infobox-row-name">Property Tax per Building Size</th>
-                    <td class="infobox-row-value">@($"¢{totalpersize:n0}") @($"(¢{Model.PropertyTaxPerSize ?? 0:n0} + ¢{Model.State?.PropertyTaxPerSize ?? 0:n0} + ¢{Model.District.PropertyTaxPerSize ?? 0:n0})")</td>
+                    <td class="infobox-row-value">@($"¢{totalpersize:n0}") @($"(¢{Model.PropertyTaxPerSize ?? 0:n0} + ¢{Model.State?.PropertyTaxPerSize ?? 0:n0} + ¢{Model.Nation.PropertyTaxPerSize ?? 0:n0})")</td>
                 </tr>
             </tbody>
         </table>
@@ -215,7 +215,7 @@
 @{
     double buildingslots_exponent = Defines.NProvince["BUILDING_SLOTS_POPULATION_EXPONENT"];
     buildingslots_exponent += Model.GetModifierValue(ProvinceModifierType.BuildingSlotsExponent);
-    buildingslots_exponent += Model.District.GetModifierValue(NationModifierType.BuildingSlotsExponent);
+    buildingslots_exponent += Model.Nation.GetModifierValue(NationModifierType.BuildingSlotsExponent);
     double runningtotal = 0;
     double factorfrominfrastructures = 0;
     double slotsfrominfrastructures = 0;
@@ -239,7 +239,7 @@
                     var Infrastructures = Model.GetBuildings().Where(x => x.BuildingType == BuildingType.Infrastructure && x.RecipeId == "recipe_infrastructure_roads").ToList();
                     double frominfrastructures = 0;
                     factorfrominfrastructures = 1;
-                    var buildingtick_executionstate = new ExecutionState(Model.District, Model);
+                    var buildingtick_executionstate = new ExecutionState(Model.Nation, Model);
                     foreach (Infrastructure building in Infrastructures) {
                         foreach (var modifiernode in building.Recipe.BaseRecipe.ModifierNodes) {
                             if (modifiernode.provinceModifierType == ProvinceModifierType.BuildingSlotsExponent) {
@@ -297,7 +297,7 @@
                 <td>@($"{runningtotal:n0}")</td>
             </tr>
             
-            @if (Model.Id == Model.District.CapitalProvinceId)
+            @if (Model.Id == Model.Nation.CapitalProvinceId)
             {
                 runningtotal += 10;
                 <tr>
@@ -325,7 +325,7 @@
                 </tr>
             }
 
-            @if (Model.Id == Model.District.CapitalProvinceId)
+            @if (Model.Id == Model.Nation.CapitalProvinceId)
             {
                 runningtotal *= 1.2;
                 <tr>

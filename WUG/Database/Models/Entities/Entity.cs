@@ -59,6 +59,8 @@ public abstract class BaseEntity
     public string? _ImageUrl { get; set; }
 
     public long? NationId { get; set; }
+
+    [DecimalType(3)]
     public decimal Money { get; set; }
 
     [NotMapped]

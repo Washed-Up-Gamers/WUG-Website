@@ -217,7 +217,8 @@ public class WashedUpDB : DbContext, IDataProtectionKeyContext
 
         Dictionary<string, long> Nations = new()
         {
-            { "United States of Qortos", 101 }
+            { "United States of Qortos", 101 },
+            { "Azurite Empire", 102 }
         };
 
         foreach(var pair in Nations) {

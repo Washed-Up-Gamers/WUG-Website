@@ -15,10 +15,10 @@ class EconomyCommandsModule : BaseCommandModule
         User? user = DBCache.GetAll<User>().FirstOrDefault(x => x.DiscordUserId == ctx.User.Id);
         if (user is null)
         {
-            await ctx.RespondAsync("You do not have a SV account!");
+            await ctx.RespondAsync("You do not have a WUG account!");
             return;
         }
-        await ctx.RespondAsync($"{ctx.Member.Nickname}'s balance: ¢{Math.Round(user.Money, 2)}");
+        await ctx.RespondAsync($"{ctx.Member.Nickname}'s balance: ${Math.Round(user.Money, 2)}");
     }
 
     [Command("balance")]
@@ -32,7 +32,7 @@ class EconomyCommandsModule : BaseCommandModule
             await ctx.RespondAsync($"Could not find entity (group or user) with name: {entityname}");
             return;
         }
-        await ctx.RespondAsync($"{entityname}'s balance: ¢{Math.Round(entity.Money, 2)}");
+        await ctx.RespondAsync($"{entityname}'s balance: ${Math.Round(entity.Money, 2)}");
     }
 
     [Command("budget")]
@@ -54,8 +54,8 @@ class EconomyCommandsModule : BaseCommandModule
         };
         embed.AddField("Buildings", $"{buildings.Count():n0}", true);
         embed.AddField("Total Building Levels", $"{buildings.Sum(x => x.Size):n0}", true);
-        embed.AddField("Base Property Taxes", $"¢{buildings.Sum(x => nation.BasePropertyTax ?? 0):n0}", false);
-        embed.AddField("Per Level Property Taxes", $"¢{buildings.Sum(x => nation.PropertyTaxPerSize * x.Size * x.GetThroughputFromUpgrades() ?? 0):n0}", false);
+        embed.AddField("Base Property Taxes", $"${buildings.Sum(x => nation.BasePropertyTax ?? 0):n0}", false);
+        embed.AddField("Per Level Property Taxes", $"${buildings.Sum(x => nation.PropertyTaxPerSize * x.Size * x.GetThroughputFromUpgrades() ?? 0):n0}", false);
 
         await ctx.RespondAsync(embed);
     }
@@ -71,7 +71,7 @@ class EconomyCommandsModule : BaseCommandModule
         User? user = DBCache.GetAll<User>().FirstOrDefault(x => x.DiscordUserId == ctx.User.Id);
         if (user is not null)
             user.Money += amount;
-        await ctx.RespondAsync($"Added ¢{amount} to Jacob's balance.");
+        await ctx.RespondAsync($"Added ${amount} to Jacob's balance.");
     }
 
     [Command("pay")]
@@ -80,14 +80,14 @@ class EconomyCommandsModule : BaseCommandModule
         User? from = DBCache.GetAll<User>().FirstOrDefault(x => x.DiscordUserId == ctx.User.Id);
         if (from is null)
         {
-            await ctx.RespondAsync("You do not have a SV account! Login into SV to create one, https://spookvooper.com");
+            await ctx.RespondAsync("You do not have a WUG account!");
             return;
         }
 
         User? to = DBCache.GetAll<User>().FirstOrDefault(x => x.DiscordUserId == member.Id);
         if (from is null)
         {
-            await ctx.RespondAsync("The user you are trying to send credits to lacks a SV account!");
+            await ctx.RespondAsync("The user you are trying to send credits to lacks a WUG account!");
             return;
         }
         var tran = new Transaction(from, to, amount, TransactionType.Payment, "Payment from Valour");
@@ -100,7 +100,7 @@ class EconomyCommandsModule : BaseCommandModule
         User? fromuser = DBCache.GetAll<User>().FirstOrDefault(x => x.DiscordUserId == ctx.User.Id);
         if (fromuser is null)
         {
-            await ctx.RespondAsync("You do not have a SV account! Create one by doing /create account");
+            await ctx.RespondAsync("You do not have a WUG account!");
             return;
         }
 
@@ -120,7 +120,7 @@ class EconomyCommandsModule : BaseCommandModule
         User? to = DBCache.GetAll<User>().FirstOrDefault(x => x.DiscordUserId == member.Id);
         if (to is null)
         {
-            await ctx.RespondAsync("The user you are trying to send credits to lacks a SV account!");
+            await ctx.RespondAsync("The user you are trying to send credits to lacks a WUG account!");
             return;
         }
         var tran = new Transaction(from, to, amount, TransactionType.Payment, "Payment from Valour");
@@ -133,7 +133,7 @@ class EconomyCommandsModule : BaseCommandModule
         User? fromuser = DBCache.GetAll<User>().FirstOrDefault(x => x.DiscordUserId == ctx.User.Id);
         if (fromuser is null)
         {
-            await ctx.RespondAsync("You do not have a SV account! Create one by doing /create account");
+            await ctx.RespondAsync("You do not have a WUG account! Create one by doing /create account");
             return;
         }
 

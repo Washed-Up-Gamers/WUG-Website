@@ -24,10 +24,7 @@ public enum GroupTypes
 public enum ReadableGroupTypes {
     Company = 0,
     NonProfit = 2,
-    PoliticalParty = 3,
-    District = 4,
-    State = 5,
-    Province = 6
+    PoliticalParty = 3
 }
 
 public enum GroupFlag

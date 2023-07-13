@@ -25,8 +25,8 @@ public class Province : Item
 {
     public long Id { get; set; }
     public string? Name { get; set; }
-    public long? DistrictId { get; set; }
-    public Nation District { get; set; }
+    public long? NationId { get; set; }
+    public Nation Nation { get; set; }
     public long? CityId { get; set; }
     public int BuildingSlots { get; set; }
     public long Population { get; set; }

@@ -118,17 +118,12 @@ public class Nation
     [NotMapped]
     public string Color => Name switch
     {
-        "Lanatia" => "F4B7FD",
-        "New Vooperis" => "FEEAB7",
-        "Elysian Katonia" => "B8B7FD",
-        "Ardenti Terra" => "B7BCFC",
-        "Landing Cove" => "FDB7B7",
-        "New Avalon" => "D3FCB6",
-        "Novastella" => "B7FDE5",
-        "Old King" => "C0FDB7",
-        "San Vooperisco" => "FAFDB8",
-        "Thesonica" => "FDD9B7",
-        "Voopmont" => "FFFFFF",
+        "Northern Parthenian Republic" => "F4B7FD",
+        "United States of Qortos" => "FEEAB7",
+        "Republic of Caelestis" => "D3FCB6",
+        "Azurite Empire" => "B7FDE5",
+        "Paunas United Provinces" => "FAFDB8",
+        "United Corporations of Adramat" => "FDD9B7",
     };
 
     public static Nation Find(long id)
@@ -152,6 +147,8 @@ public class Nation
     public void HourlyTick()
     {
         var populationtarget = Citizens.Count() * 2_500_000.0;
+        populationtarget += 500_000.0;
+        populationtarget += Provinces.Count() * 10_000;
         var diff = populationtarget - BasePopulationFromUsers;
 
         // 150,000/24 = 6250

@@ -130,7 +130,7 @@ namespace WUG.Workers
                                 }
                             }
 
-                            var lastrecord = await _dbctx.EntityBalanceRecords.OrderByDescending(x => x.Time).LastOrDefaultAsync();
+                            var lastrecord = await _dbctx.EntityBalanceRecords.OrderByDescending(x => x.Time).FirstOrDefaultAsync();
                             if (lastrecord is null || DateTime.UtcNow.Subtract(lastrecord.Time).TotalHours >= 24) {
                                 // every day, update credit snapchats
                                 List<BaseEntity> entities = DBCache.GetAll<User>().ToList<BaseEntity>();

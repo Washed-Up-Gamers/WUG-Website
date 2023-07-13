@@ -3,7 +3,6 @@ async function ConnectSignalR() {
     try {
         await connection.start();
         console.log("Connected to Exchange SignalR Hub");
-        GetMessageHistory();
     } catch (err) {
         console.log("Failed to connect to SignalR> Retrying in 5 seconds...");
         console.log(err);
@@ -15,7 +14,6 @@ function PrepSignalR() {
     // SIGNALR HOOKS //
     connection = new signalR.HubConnectionBuilder()
         .withUrl("/ExchangeHub")
-        .configureLogging(signalR.LogLevel.Information)
         .build();
 
     // Retry connection if failed
@@ -29,7 +27,7 @@ function PrepSignalR() {
         console.log(tradeObj)
 
         if (tradeObj.Ticker == ticker) {
-
+            UpdateScreen(tradeObj);
         }
     })
 }
@@ -45,11 +43,12 @@ function updategraph2() {
 function updategraph(price) {
     if (price != 999999) {
         chart.data.datasets[0].data.pop(0)
-        chart.data.datasets[0].data.push(data['Price'])
+        chart.data.datasets[0].data.push(price)
         chart.update();
 
-        prevprice = chart.data.datasets[0].data[chart.data.datasets[0].data.length - 1]
-        var percent = Round(((chart.data.datasets[0].data[0] - prevprice) / prevprice) * 100.0);
+        nowprice = chart.data.datasets[0].data[chart.data.datasets[0].data.length - 1]
+        prevprice = chart.data.datasets[0].data[0]
+        var percent = Round(((nowprice - prevprice) / prevprice) * 100.0);
         if (percent > 0) {
             document.getElementById("percText").style.color = "lightgreen";
             $('#percText').html("(+" + percent + "%)");
@@ -77,19 +76,20 @@ function updategraph(price) {
         e = document.getElementById("priceChart")
         data = []
         labels = []
-        prevprice = 0
+        nowprice = 0
         for (var i = 0; i < history.length; i++)
         {
             item = history[i]
             data.push(item[1])
             labels.push(`${item[0]}`)
-            prevprice = item[1]
+            nowprice = item[1]
         }
         chart.data.datasets[0].data = data
         chart.data.labels = labels
         chart.update();
 
-        var percent = Round(((history[0][1] - prevprice) / prevprice) * 100.0);
+        prevprice = history[0][1];
+        var percent = Round(((nowprice - prevprice) / prevprice) * 100.0);
 
         if (percent > 0) {
             document.getElementById("percText").style.color = "lightgreen";
@@ -113,29 +113,29 @@ function UpdateScreen(data) {
     e = document.getElementById("openshares")
     e.innerHTML = `Available: ${data['SharesAvailable']} ${ticker}`
     e = document.getElementById("stockissued")
-    e.innerHTML = `Stock Issued: ${data['TotalShares']}`
+    e.innerHTML = `Stock Issued: ${data['TotalShares'].toLocaleString(undefined, { maximumFractionDigits: 0 }) }`
     e = document.getElementById("stockbalance")
-    e.innerHTML = `Stock Balance: ¢${data['StockBalance']}`
+    e.innerHTML = `Stock Balance: $${data['StockBalance'].toLocaleString(undefined, { maximumFractionDigits: 0 }) }`
     e = document.getElementById("stockprice")
-    e.innerHTML = `$${data['Price']}`
+    e.innerHTML = `$${data['Price'].toFixed(2)}`
 
     UpdateSellTotal(document.getElementById("amount-input-sell"))
     UpdateBuyTotal(document.getElementById("amount-input-buy"))
-    if (data["TraderSVID"] != accountid) {
+    if (data['EntityId'] != accountid) {
         return
     }
 
     var url = `/api/securities/${ticker}/ownership?accountid=${accountid}`
-    GetHtml(url).then(data => {
+    GetHtmlNonJson(url).then(data => {
         e = document.getElementById("owned-text")
         e.innerHTML = `You Own: ${data.toLocaleString(undefined, { maximumFractionDigits: 0} )} ${ticker}`
     })
 
     var url = `/api/entity/${accountid}/credits`
-    GetHtml(url).then(data => {
+    GetHtmlNonJson(url).then(data => {
         e = document.getElementById("balance-text")
         data = parseFloat(data)
-        e.innerHTML = `Your Balance: $${data.toLocaleString(undefined, { maximumFractionDigits: 2 }) }`
+        e.innerHTML = `You have: $${data.toLocaleString(undefined, { maximumFractionDigits: 2 }) }`
     })
 }
 
@@ -152,9 +152,12 @@ async function GetHtml(url) {
     return await response.json();
 }
 function Submitted(element) {
-    var text = element.contentDocument.body.innerHTML
+    var text = element.contentDocument.body
     var e = document.getElementById("Output for buy/sell")
-    e.innerHTML = text
+    for (const child of text.children) {
+        data = JSON.parse(child.innerHTML)
+    }
+    e.innerHTML = data["info"]
 }
 function UpdateBuyTotal(element) {
     e = document.getElementById("buytotal")
@@ -162,7 +165,7 @@ function UpdateBuyTotal(element) {
         return
     }
     e.innerHTML = `Total: Calculating`
-    var url = `/api/security/calcbuytotal?ticker=${ticker}&amount=${element.value}`
+    var url = `/api/securities/calcbuytotal?ticker=${ticker}&amount=${element.value}`
     GetHtml(url).then(data => {
         e = document.getElementById("buytotal")
         e.innerHTML = `Total: $${data}`
@@ -174,7 +177,7 @@ function UpdateSellTotal(element) {
         return
     }
     e.innerHTML = `Total: Calculating`
-    var url = `/api/security/calcselltotal?ticker=${ticker}&amount=${element.value}`
+    var url = `/api/securities/calcselltotal?ticker=${ticker}&amount=${element.value}`
     GetHtml(url).then(data => {
         e = document.getElementById("selltotal")
         e.innerHTML = `Total: $${data}`

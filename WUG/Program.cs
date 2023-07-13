@@ -41,6 +41,9 @@ using WUG.Helpers;
 using WUG.Scripting.Parser;
 using Microsoft.OpenApi.Models;
 using WUG.Web;
+using SV2.Hubs;
+using Microsoft.AspNetCore.SignalR;
+using Microsoft.Extensions.Options;
 
 //LuaParser parser = new();
 
@@ -86,7 +89,7 @@ builder.WebHost.ConfigureKestrel((context, options) =>
         listenOptions.UseHttps();
     });
 #else
-    options.Listen(IPAddress.Any, 5000, listenOptions =>
+    options.Listen(IPAddress.Any, 5002, listenOptions =>
     {
         listenOptions.Protocols = Microsoft.AspNetCore.Server.Kestrel.Core.HttpProtocols.Http1AndHttp2AndHttp3;
     });
@@ -179,6 +182,14 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
+// ensure districts & Vooperia are created
+await WashedUpDB.Startup();
+//await ResourceManager.Load();
+
+await GameDataManager.Load();
+
+ProvinceManager.LoadMap();
+
 builder.Services.AddHostedService<EconomyWorker>();
 builder.Services.AddHostedService<TransactionWorker>();
 builder.Services.AddHostedService<ItemTradeWorker>();
@@ -210,6 +221,8 @@ builder.Services.AddSession(options =>
     options.Cookie.MaxAge = TimeSpan.FromDays(90);
     options.Cookie.IsEssential = true;
 });
+
+builder.Services.AddSignalR();
 
 builder.Services.AddMvc().AddSessionStateTempDataProvider().AddRazorRuntimeCompilation();
 
@@ -266,13 +279,12 @@ app.UseSwaggerUI(c =>
     c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
 });
 
-// ensure districts & Vooperia are created
-await WashedUpDB.Startup();
-//await ResourceManager.Load();
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapHub<ExchangeHub>("/ExchangeHub");
+});
 
-await GameDataManager.Load();
-
-ProvinceManager.LoadMap();
+ExchangeHub.Current = app.Services.GetRequiredService<IHubContext<ExchangeHub>>();
 
 foreach (var onaction in GameDataManager.LuaOnActions[WUG.Scripting.LuaObjects.OnActionType.OnServerStart]) {
     // OnServerStart actions MUST change scope

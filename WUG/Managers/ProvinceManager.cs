@@ -4,6 +4,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Xml;
 using System.Text;
+using WUG.Database.Managers;
 
 namespace WUG.Managers;
 
@@ -112,6 +113,7 @@ public class ProvinceManager
         Console.WriteLine("Loaded SVG Paths into memory");
 
         Random rnd = new Random();
+        bool createdNewProvinces = false;
         var _mapStates = new Dictionary<long, MapState>();
         foreach (var state in mapStates.Values)
         {
@@ -128,6 +130,11 @@ public class ProvinceManager
                 var posinfo = state.D.Split(" ");
                 int xpos = (int)double.Parse(posinfo[1]);
                 int ypos = (int)double.Parse(posinfo[2]);
+                //var posinfo = state.D.Split(" ");
+                //int xpos = (int)double.Parse(posinfo[0].Split("m")[1]);
+                //var firstpart = posinfo[1].Split("h")[0];
+                //firstpart = firstpart.Split("v")[0];
+                //int ypos = (int)double.Parse(firstpart);
                 state.XPos = xpos;
                 state.YPos = ypos;
 
@@ -174,18 +181,19 @@ public class ProvinceManager
                 var district = DBCache.Get<Nation>(state.DistrictId);
                 dbprovince = new(rnd)
                 {
-                    DistrictId = state.DistrictId,
+                    NationId = state.DistrictId,
                     Id = state.Id,
                     Name = $"Province {state.Id}"
                 };
+                createdNewProvinces = true;
                 DBCache.AddNew(dbprovince.Id, dbprovince);
                 //dbctx.Provinces.Add(dbprovince);
                 //district.Provinces.Add(dbprovince);
             }
             else
             {
-                dbprovince.DistrictId = districtstate.DistrictId;
-                dbprovince.District = districtstate.District;
+                dbprovince.NationId = districtstate.DistrictId;
+                dbprovince.Nation = districtstate.District;
             }
         }
         //dbctx.SaveChanges();
@@ -199,5 +207,29 @@ public class ProvinceManager
             value.DStringBuilder = null;
         }
         MapController.MapStates = _mapStates.Values.ToList();
+
+        if (createdNewProvinces)
+        {
+            foreach (var nation in DBCache.GetAll<Nation>())
+            {
+                nation.Provinces = DBCache.GetAll<Province>().Where(x => x.NationId == nation.Id).ToList();
+                var populationtarget = nation.Citizens.Count() * 2_500_000.0;
+                populationtarget += 500_000.0;
+                populationtarget += nation.Provinces.Count() * 10_000;
+                var baseProvincePopulation = populationtarget / nation.Provinces.Count;
+                var totalPrevProvincePopulation = nation.Provinces.Sum(x => x.Population);
+                var ratio = totalPrevProvincePopulation / populationtarget;
+                foreach (var province in nation.Provinces)
+                {
+                    province.Nation = nation;
+                    province.PopulationMultiplier = province.Population / baseProvincePopulation / ratio;
+                    province.DevelopmentValue = (int)(Math.Floor(Math.Pow(province.Population, Defines.NProvince[NProvince.DEVELOPMENT_POPULATION_EXPONENT])) * Defines.NProvince[NProvince.DEVELOPMENT_POPULATION_FACTOR]);
+                    province.MigrationAttraction = 1;
+                }
+                nation.ProvincesByDevelopmnet = nation.Provinces.OrderByDescending(x => x.DevelopmentValue).ToList();
+                nation.ProvincesByMigrationAttraction = nation.Provinces.OrderByDescending(x => x.MigrationAttraction).ToList();
+                nation.HourlyTick();
+            }
+        }
     }
 }

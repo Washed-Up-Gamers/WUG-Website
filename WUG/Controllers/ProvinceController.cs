@@ -211,7 +211,7 @@ public class ProvinceController : SVController
             return Redirect("/");
 
         var user = HttpContext.GetUser();
-        if (province.District.GovernorId != user.Id)
+        if (province.Nation.GovernorId != user.Id)
             return RedirectBack("You must be governor of the district to change the governor of a province!");
 
         province.GovernorId = GovernorId;
@@ -230,23 +230,23 @@ public class ProvinceController : SVController
         if (province is null) return Redirect("/");
 
         var user = HttpContext.GetUser();
-        if (province.District.GovernorId != user.Id)
+        if (province.Nation.GovernorId != user.Id)
             return RedirectBack("You must be governor of the district to change the state of a province!");
         if (model.StateId is null) {
             province.StateId = null;
             StatusMessage = $"Successfully changed the state of this province to none";
-            return Redirect($"/District/View/{province.District.Name}");
+            return Redirect($"/District/View/{province.Nation.Name}");
         }
         else {
             State? state = DBCache.Get<State>(model.StateId);
             if (state is null) return Redirect("/");
 
-            if (state.DistrictId != province.DistrictId)
+            if (state.DistrictId != province.NationId)
                 return RedirectBack("You can not assign a state to a province that is not in the same district!");
 
             province.StateId = model.StateId;
             StatusMessage = $"Successfully changed the state of this province to {state.Name}";
-            return Redirect($"/District/View/{province.District.Name}");
+            return Redirect($"/District/View/{province.Nation.Name}");
         }
     }
 

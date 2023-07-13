@@ -172,17 +172,32 @@ public abstract class ProducingBuilding : BuildingBase
             if (BuildingObj.ApplyStackingBonus)
                 basevalue *= 1+Math.Min(Defines.NProduction["STACKING_THROUGHPUT_BONUS"] * Size, Defines.NProduction["MAX_STACKING_THROUGHPUT_BONUS"]);
 
-            if (BuildingType == BuildingType.Factory || BuildingType == BuildingType.Mine)
+            if (BuildingType == BuildingType.Factory)
             {
                 var start = 10.0;
                 var end = 2;
                 var diff = start - end;
-                var startdate = new DateTime(2023, 7, 7);
+                var startdate = new DateTime(2023, 7, 10);
                 var hourstotal = 24 * 7 * 6;
                 var progress = Math.Max(0, (DateTime.UtcNow - startdate).TotalHours);
                 var muit = end + (diff * (1 - (progress / hourstotal)));
                 basevalue *= Math.Max(end, muit);
             }
+
+            if (BuildingType == BuildingType.Mine)
+            {
+                var start = 5.0;
+                var end = 2;
+                var diff = start - end;
+                var startdate = new DateTime(2023, 7, 10);
+                var hourstotal = 24 * 7 * 6;
+                var progress = Math.Max(0, (DateTime.UtcNow - startdate).TotalHours);
+                var muit = end + (diff * (1 - (progress / hourstotal)));
+                basevalue *= Math.Max(end, muit);
+            }
+
+            if (LuaBuildingObjId == "building_pothium_factory")
+                basevalue *= 0.1;
 
             basevalue *= GetModifierValue(BuildingModifierType.ThroughputFactor) + 1.00;
             basevalue *= Province.GetModifierValue(ProvinceModifierType.AllProducingBuildingThroughputFactor) + 1.00;
@@ -220,7 +235,7 @@ public abstract class ProducingBuilding : BuildingBase
             {
                 if (node.buildingModifierType == BuildingModifierType.ThroughputFactor)
                 {
-                    total += (double)node.GetValue(new(null, null)) * upgrade.Level;
+                    total *= ((double)node.GetValue(new(null, null, building: this, buildingUpgrade: upgrade)) * upgrade.Level) + 1.0;
                 }
             }
         }
@@ -271,12 +286,22 @@ public abstract class ProducingBuilding : BuildingBase
         return Province.Metadata.Resources[BuildingObj.MustHaveResource]/10550.0;
     }
 
-    public void UpdateOrAddModifier(BuildingModifierType type, double value)
+    public void UpdateOrAddModifier(BuildingModifierType type, double value, bool multiplier = false)
     {
-        if (!Modifiers.ContainsKey(type))
-            Modifiers[type] = value;
+        if (multiplier)
+        {
+            if (!Modifiers.ContainsKey(type))
+                Modifiers[type] = value;
+            else
+                Modifiers[type] *= value + 1;
+        }
         else
-            Modifiers[type] += value;
+        {
+            if (!Modifiers.ContainsKey(type))
+                Modifiers[type] = value;
+            else
+                Modifiers[type] += value;
+        }
     }
 
     public void UpdateModifiers()
@@ -304,7 +329,7 @@ public abstract class ProducingBuilding : BuildingBase
             foreach (var modifiernode in upgrade.LuaBuildingUpgradeObj.ModifierNodes)
             {
                 var value = (double)modifiernode.GetValue(value_executionstate, upgrade.Level);
-                UpdateOrAddModifier((BuildingModifierType)modifiernode.buildingModifierType!, value);
+                UpdateOrAddModifier((BuildingModifierType)modifiernode.buildingModifierType!, value, true);
             }
         }
     }

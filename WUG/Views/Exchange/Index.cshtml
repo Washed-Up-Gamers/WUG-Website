@@ -62,7 +62,7 @@
                     </div>
                     <div class="d-flex flex-wrap flex-row justify-content-between" style="min-width:250px; min-height:50px">
                         <h4 class="p-2" style="color:lightgreen">($@Math.Round(own * price, 2))</h4>
-                        <h4 class="p-2" style="color:lightblue">@Math.Round(((double)own / security.Shares) * 100f, 2)%</h4>
+                        <h4 class="p-2" style="color:lightblue">@Math.Round(((decimal)own / (security.Shares - security.OpenShares)) * 100.0m, 2)%</h4>
                     </div>
 
                 </div>

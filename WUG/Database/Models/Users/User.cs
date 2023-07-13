@@ -60,7 +60,7 @@ public class User : BaseEntity
     }
 
     public async ValueTask<bool> IsGovernmentAdmin() {
-        return (await GetValourRolesAsync()).Any(x => x.Name == "Government Admin");
+        return (await GetValourRolesAsync()).Any(x => x.Name == "Site Admin");
     }
 
     public int GetNumberOfJobSlotsFilled()

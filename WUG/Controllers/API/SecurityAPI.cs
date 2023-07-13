@@ -12,6 +12,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Http;
 using WUG.Database.Models.Economy.Stocks;
 using System.Text;
+using WUG.Web;
 
 namespace WUG.API;
 
@@ -22,6 +23,82 @@ public class SecurityAPI : BaseAPI
     {
         app.MapGet   ("api/securities/{ticker}/ownership", GetOwnershipAsync).RequireCors("ApiPolicy");
         app.MapGet   ("api/securities/{ticker}/history", GetHistoryAsync).RequireCors("ApiPolicy");
+        app.MapGet   ("api/securities/buy", BuyAsync).RequireCors("ApiPolicy");
+        app.MapGet   ("api/securities/sell", SellAsync).RequireCors("ApiPolicy");
+        app.MapGet   ("api/securities/calcbuytotal", CalcBuyTotalAsync).RequireCors("ApiPolicy");
+        app.MapGet   ("api/securities/calcselltotal", CalcSellTotalAsync).RequireCors("ApiPolicy");
+    }
+
+    private static async Task CalcBuyTotalAsync(HttpContext ctx, string ticker, long amount)
+    {
+        if (!DBCache.SecuritiesByTicker.ContainsKey(ticker))
+        {
+            ctx.Response.StatusCode = 401;
+            await ctx.Response.WriteAsJsonAsync(new TaskResult(false, $"Could not find security with ticker {ticker}"));
+            return;
+        }
+        var security = DBCache.SecuritiesByTicker[ticker];
+        await ctx.Response.WriteAsync(Math.Round(security.GetBuyPrice(amount).total, 2).ToString());
+    }
+
+    private static async Task CalcSellTotalAsync(HttpContext ctx, string ticker, long amount)
+    {
+        if (!DBCache.SecuritiesByTicker.ContainsKey(ticker))
+        {
+            ctx.Response.StatusCode = 401;
+            await ctx.Response.WriteAsJsonAsync(new TaskResult(false, $"Could not find security with ticker {ticker}"));
+            return;
+        }
+        var security = DBCache.SecuritiesByTicker[ticker];
+        await ctx.Response.WriteAsync(Math.Round(security.GetSellPrice(amount).total, 2).ToString());
+    }
+
+    private static async Task BuyAsync(HttpContext ctx, WashedUpDB dbctx, string ticker, long accountid, long amount, string apikey)
+    {
+        BaseEntity caller = await BaseEntity.FindByApiKey(apikey, dbctx);
+
+        BaseEntity entity = BaseEntity.Find(accountid);
+
+        if (!entity.HasPermission(caller, GroupPermissions.Eco))
+        {
+            ctx.Response.StatusCode = 401;
+            await ctx.Response.WriteAsJsonAsync(new TaskResult(false, $"You lack eco group permission!"));
+            return;
+        }
+
+        if (!DBCache.SecuritiesByTicker.ContainsKey(ticker))
+        {
+            ctx.Response.StatusCode = 401;
+            await ctx.Response.WriteAsJsonAsync(new TaskResult(false, $"Could not find security with ticker {ticker}"));
+            return;
+        }
+        var security = DBCache.SecuritiesByTicker[ticker];
+        var traderesult = await security.BuyAsync(amount, entity, dbctx);
+        await ctx.Response.WriteAsJsonAsync(traderesult);
+    }
+
+    private static async Task SellAsync(HttpContext ctx, WashedUpDB dbctx, string ticker, long accountid, long amount, string apikey)
+    {
+        BaseEntity caller = await BaseEntity.FindByApiKey(apikey, dbctx);
+
+        BaseEntity entity = BaseEntity.Find(accountid);
+
+        if (!entity.HasPermission(caller, GroupPermissions.Eco))
+        {
+            ctx.Response.StatusCode = 401;
+            await ctx.Response.WriteAsJsonAsync(new TaskResult(false, $"You lack eco group permission!"));
+            return;
+        }
+
+        if (!DBCache.SecuritiesByTicker.ContainsKey(ticker))
+        {
+            ctx.Response.StatusCode = 401;
+            await ctx.Response.WriteAsJsonAsync(new TaskResult(false, $"Could not find security with ticker {ticker}"));
+            return;
+        }
+        var security = DBCache.SecuritiesByTicker[ticker];
+        var traderesult = await security.SellAsync(amount, entity, dbctx);
+        await ctx.Response.WriteAsJsonAsync(traderesult);
     }
 
     private static async Task GetOwnershipAsync(HttpContext ctx, WashedUpDB dbctx, string ticker, long accountid)
@@ -70,73 +147,10 @@ public class SecurityAPI : BaseAPI
         }
 
         data.Reverse();
-
         data.Add(new() { 0, Math.Round(security.Price, 4) });
 
         JsonSerializerOptions options = new() { IncludeFields = true };
         await ctx.Response.WriteAsync(JsonSerializer.Serialize(data, options: options));
     }
 
-    private static async Task GetAllRecipesAsync(HttpContext ctx)
-    {
-        await ctx.Response.WriteAsync(JsonSerializer.Serialize(GameDataManager.BaseRecipeObjs.Values.ToList()));
-    }
-
-    private static async Task<IResult> GetAsync(HttpContext ctx, string id)
-    {
-        if (!GameDataManager.BaseRecipeObjs.ContainsKey(id))
-            return ValourResult.NotFound($"Could not find baserecipe with id {id}");
-
-        var obj = GameDataManager.BaseRecipeObjs[id];
-        return Results.Json(obj);
-    }
-
-    public static Regex rg = new Regex(@"^[a-zA-Z0-9\s,.-]*$");
-
-    private static async Task<IResult> CreateAsync(HttpContext ctx, [FromBody] Recipe recipe)
-    {
-        var user = ctx.GetUser();
-        var owner = BaseEntity.Find(recipe.OwnerId);
-        if (!owner.HasPermission(user, GroupPermissions.Recipes))
-            return ValourResult.Forbid("");
-
-        if (recipe.Name.Length < 4) return ValourResult.BadRequest("Recipe name must be 4 chars or longer!");
-        if (recipe.OutputItemName.Length < 4) return ValourResult.BadRequest("Output item name must be 4 chars or longer!");
-
-        if (!rg.IsMatch(recipe.Name))
-            return ValourResult.BadRequest("Recipe name can only contain letters and numbers!");
-
-        if (!rg.IsMatch(recipe.OutputItemName))
-            return ValourResult.BadRequest("Output item name can only contain letters and numbers!");
-
-        if (DBCache.GetAll<ItemDefinition>().Any(x => x.Name == recipe.Name))
-            return ValourResult.BadRequest("This output item name has already been taken!");
-
-        if (DBCache.Recipes.ContainsKey(recipe.StringId) || DBCache.Recipes.Values.Any(x => x.Name == recipe.Name))
-            return ValourResult.BadRequest("This recipe name has already been taken!");
-
-        recipe.UpdateInputs();
-        recipe.UpdateModifiers();
-        recipe.Id = IdManagers.GeneralIdGenerator.Generate();
-        recipe.StringId = recipe.Name.ToLower().Replace(" ", "_");
-        recipe.EntityIdsThatCanUseThisRecipe = new();
-        recipe.PerHour = recipe.BaseRecipe.PerHour;
-        recipe.HasBeenUsed = false;
-
-        var itemdef = new ItemDefinition(recipe.OwnerId, recipe.OutputItemName);
-        itemdef.Transferable = true;
-        DBCache.AddNew(itemdef.Id, itemdef);
-
-        recipe.CustomOutputItemDefinitionId = itemdef.Id;
-        recipe.UpdateOutputs();
-        recipe.Created = DateTime.UtcNow;
-        itemdef.Modifiers = recipe.Modifiers;
-
-        DBCache.AddNew(recipe.Id, recipe);
-        DBCache.Recipes[recipe.StringId] = recipe;
-
-        await itemdef.UpdateModifiers();
-
-        return Results.Json(recipe);
-    }
 }

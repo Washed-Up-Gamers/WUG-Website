@@ -338,8 +338,8 @@
                 }
                 @{
                     var province = Model.Building.Province;
-                    var totalbase = (province.BasePropertyTax ?? 0) + (province.State is not null ? province.State.BasePropertyTax ?? 0 : 0) + (province.District.BasePropertyTax ?? 0);
-                    var totalpersize = (province.PropertyTaxPerSize ?? 0) + (province.State is not null ? province.State.PropertyTaxPerSize ?? 0 : 0) + (province.District.PropertyTaxPerSize ?? 0);
+                    var totalbase = (province.BasePropertyTax ?? 0) + (province.State is not null ? province.State.BasePropertyTax ?? 0 : 0) + (province.Nation.BasePropertyTax ?? 0);
+                    var totalpersize = (province.PropertyTaxPerSize ?? 0) + (province.State is not null ? province.State.PropertyTaxPerSize ?? 0 : 0) + (province.Nation.PropertyTaxPerSize ?? 0);
                     totalpersize *= Model.Building.Size * Model.Building.GetThroughputFromUpgrades();
                 }
                 <tr class="mergedrow dividertop">

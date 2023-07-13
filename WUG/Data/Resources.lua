@@ -54,6 +54,8 @@ building_materials = {
 	}
 	advanced_components = {
 	}
+	pothium_components = {
+	}
 	steel = {
 	}
 }

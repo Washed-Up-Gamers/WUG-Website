@@ -19,6 +19,8 @@ public class Security
     public decimal Balance { get; set; }
     public long Shares { get; set; }
     public long OpenShares { get; set; }
+
+    [DecimalType(8)]
     public decimal Price { get; set; }
     public string? Resource { get; set; }
 
@@ -96,6 +98,8 @@ public class Security
         {
             Ticker = Ticker,
             Amount = amount,
+            TotalShares = Shares,
+            SharesAvailable = OpenShares,
             Price = Price,
             StockBalance = Balance,
             EntityId = entity.Id.ToString(),
@@ -153,6 +157,8 @@ public class Security
         {
             Ticker = Ticker,
             Amount = amount,
+            SharesAvailable = OpenShares,
+            TotalShares = Shares,
             Price = Price,
             StockBalance = Balance,
             EntityId = entity.Id.ToString(),
@@ -168,7 +174,6 @@ public class Security
 
     public (decimal price, decimal total) GetSellPrice(long amount)
     {
-        decimal balancingrate = 0.991081261000265m;
         decimal p1 = GetBuyPrice(1).price;
         decimal p2 = GetBuyPrice(2).price;
         decimal price = Price;
@@ -176,18 +181,18 @@ public class Security
         decimal muit = (Shares * p1) / ((Shares * p2) - p2);
         for (int i = 0; i < amount; i++)
         {
-            balance -= (price + (price * (1 - muit))) * balancingrate;
+            balance -= (price + (price * (1 - muit)));
             price = balance / Shares * 5;
         }
-        return (price, Balance - balance);
+        return (price, (Balance - balance)*0.9985m);
     }
 
     public (decimal price, decimal total) GetBuyPrice(long amount)
     {
         // convert to long because decimal is slow as a snail
-        long price = (long)(Price * 100);
+        long price = (long)(Price * 1_000_000);
         long total = 0;
-        long balance = (long)(Balance * 100);
+        long balance = (long)(Balance * 1_000_000);
         for (int i = 0; i < amount; i++)
         {
             balance += price;
@@ -195,6 +200,6 @@ public class Security
             price = balance / Shares * 5; // apply 5x to make prices move more
         }
 
-        return (((decimal)price) / 100, ((decimal)total) / 100);
+        return (((decimal)price) / 1_000_000.0m, (((decimal)total) / 1_000_000.0m) * 1.0015m);
     }
 }

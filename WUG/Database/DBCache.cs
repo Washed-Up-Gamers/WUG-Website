@@ -248,7 +248,7 @@ public static class DBCache
             Put(nation.Id, nation);
         }
         foreach(Province province in dbctx.Provinces) {
-            province.District = Get<Nation>(province.DistrictId);
+            province.Nation = Get<Nation>(province.NationId);
             ProvincesBuildings[province.Id] = new();
             Put(province.Id, province);
         }
@@ -308,7 +308,7 @@ public static class DBCache
 
         foreach (Nation district in GetAll<Nation>())
         {
-            district.Provinces = GetAll<Province>().Where(x => x.DistrictId == district.Id).ToList();
+            district.Provinces = GetAll<Province>().Where(x => x.NationId == district.Id).ToList();
         }
 
         foreach (SVItemOwnership item in dbctx.SVItemOwnerships) 

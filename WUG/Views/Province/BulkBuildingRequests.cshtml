@@ -85,10 +85,10 @@
                     Province prevprovince = null;
                     foreach (var request in Model.Where(x => x.LevelsBuilt != x.LevelsRequested))
                     {
-                        if (prevprovince is null || prevprovince.DistrictId != request.Province.DistrictId)
+                        if (prevprovince is null || prevprovince.NationId != request.Province.NationId)
                         {
                             <row class="text-center">
-                                <h4>@request.Province.District.Name</h4>
+                                <h4>@request.Province.Nation.Name</h4>
                             </row>
                         }
                         prevprovince = request.Province;

@@ -365,7 +365,7 @@ public class SystemVar : SyntaxNode
             "province" => levels[1].ToLower() switch
             {
                 "population" => state.Province.Population,
-                "owner" => state.Province.District.Id,
+                "owner" => state.Province.Nation.Id,
                 "buildings" => levels[2].ToLower() switch
                 {
                     "totaloftype" => (decimal)(await state.Province.GetLevelsOfBuildingsOfTypeAsync(levels[3]))
