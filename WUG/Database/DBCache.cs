@@ -93,7 +93,15 @@ public static class DBCache
 
     public static ConcurrentDictionary<long, ProducingBuilding> ProducingBuildingsById = new();
 
-    public static List<ProducingBuilding> GetAllProducingBuildings() 
+    public static IEnumerable<ProducingBuilding> GetAllProducingBuildings()
+    {
+        foreach (var pair in ProvincesBuildings) {
+            foreach (var item in pair.Value)
+                yield return item;
+        }
+    }
+
+    public static List<ProducingBuilding> GetAllProducingBuildings_Old() 
     {
         return ProvincesBuildings.SelectMany(x => x.Value).ToList();
     }

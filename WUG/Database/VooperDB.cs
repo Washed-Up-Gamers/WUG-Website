@@ -174,6 +174,8 @@ public class VooperDB : DbContext, IDataProtectionKeyContext
 
     public DbSet<JobApplication> JobApplications { get; set; }
 
+    public DbSet<PriceStat> PriceStats { get; set; }
+
     public VooperDB(DbContextOptions options)
     {
             
