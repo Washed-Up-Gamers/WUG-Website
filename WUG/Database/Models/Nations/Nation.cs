@@ -40,6 +40,9 @@ public class Nation
     public List<State> States => DBCache.GetAll<State>().Where(x => x.DistrictId == Id).ToList();
 
     [NotMapped]
+    public decimal GDP = 0.0m;
+
+    [NotMapped]
     public long TotalPopulation
     {
         get

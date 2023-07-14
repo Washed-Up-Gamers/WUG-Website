@@ -56,6 +56,8 @@ building_materials = {
 	}
 	pothium_components = {
 	}
+	pothium_collector = {
+	}
 	steel = {
 	}
 }

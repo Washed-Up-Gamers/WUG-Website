@@ -62,13 +62,13 @@ namespace WUG.Workers
                                 tran.NonAsyncExecute(true);
                             }
 
-                            // do district funding
-                            foreach(var district in DBCache.GetAll<Nation>())
+                            // do nation funding
+                            foreach(var nation in DBCache.GetAll<Nation>())
                             {
                                 decimal amount = 50_000.0m;
-                                amount += 40_000.0m * district.Citizens.Count;
-                                amount += 1_500.0m * district.Provinces.Count;
-                                var tran = new SVTransaction(BaseEntity.Find(100), BaseEntity.Find(district.GroupId), amount/30/24, TransactionType.FreeMoney, $"Intrnational Nation Funding for {district.Name}");
+                                amount += 40_000.0m * nation.Citizens.Count;
+                                amount += 1_500.0m * nation.Provinces.Count;
+                                var tran = new Transaction(BaseEntity.Find(100), BaseEntity.Find(nation.GroupId), amount/30/24, TransactionType.FreeMoney, $"Intrnational Nation Funding for {district.Name}");
                                 TaskResult result = await tran.Execute();
                             }
                             List<GroupRole>? roles = DBCache.GetAll<GroupRole>().ToList();

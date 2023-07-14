@@ -19,6 +19,7 @@ using ChartJSCore.Models;
 using System.Linq;
 using System.Collections.Concurrent;
 using WUG.Workers;
+using Shared.Models;
 
 namespace WUG.Controllers;
 

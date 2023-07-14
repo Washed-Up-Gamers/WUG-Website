@@ -111,9 +111,9 @@ recipe_plastic_factory_base = {
 		oil = 1
 	}
 	outputs = {
-		plastic = 2.5
+		plastic = 2
 	}
-	perhour = 20
+	perhour = 40
     editable = false
 }
 
@@ -123,6 +123,7 @@ recipe_simple_components_factory_base = {
 		iron = 1
 		silicon = 1
 		copper = 1
+		plastic = 1
 	}
 	outputs = {
 		simple_components = 1.25
