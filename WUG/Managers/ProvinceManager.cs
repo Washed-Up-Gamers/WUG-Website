@@ -3,6 +3,8 @@ using WUG.NonDBO;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Xml;
+using System.Text;
+using WUG.Database.Managers;
 
 namespace WUG.Managers;
 
@@ -50,7 +52,7 @@ public class ProvinceManager
 
     public static void LoadMap()
     {
-        using var dbctx = VooperDB.DbFactory.CreateDbContext();
+        //using var dbctx = VooperDB.DbFactory.CreateDbContext();
         string data = System.IO.File.ReadAllText("Data/dystopia.json");
         var mapdata = JsonSerializer.Deserialize<MapDataJson>(data);
 
@@ -66,7 +68,16 @@ public class ProvinceManager
         XmlDocument doc = new XmlDocument();
         doc.PreserveWhitespace = true;
         doc.LoadXml(System.IO.File.ReadAllText("Data/mapfromtool.svg"));
-        List<MapState> mapStates = new();
+        Dictionary<long, MapState> mapStates = new();
+
+        Dictionary<long, Nation?> ProvinceIdsToNation = new();
+        var nations = DBCache.GetAll<Nation>().ToList();
+        foreach (var pair in mapdata.Data)
+        {
+            var nation = nations.FirstOrDefault(x => x.Name == pair.Key);
+            foreach (var provinceid in pair.Value)
+                ProvinceIdsToNation.Add(provinceid, nation);
+        }
 
         var n = doc.ChildNodes.Item(0);
         foreach (var node in doc.ChildNodes)
@@ -78,11 +89,10 @@ public class ProvinceManager
                     var child = (XmlNode)_child;
                     if (child.Name == "path")
                     {
-                        var districtname = child.Attributes["id"].Value.Replace("_", " ");
                         if (!(child.Name == "path"))
                             continue;
                         long id = long.Parse(child.Attributes["id"].Value);
-                        var district = DBCache.GetAll<District>().FirstOrDefault(x => x.Name == mapdata.Data.FirstOrDefault(x => x.Value.Contains(id)).Key);
+                        var district = ProvinceIdsToNation.ContainsKey(id) ? ProvinceIdsToNation[id] : null;
                         long disid = 100;
                         if (district is not null)
                             disid = district.Id;
@@ -91,42 +101,40 @@ public class ProvinceManager
                             Id = id,
                             D = child.Attributes["d"].Value,
                             DistrictId = disid,
-                            IsOcean = false
+                            IsOcean = ProvincesMetadata[id].TerrianType == "ocean"
                         };
                         ProvincesMetadata[id].Path = child.Attributes["d"].Value;
-                        mapStates.Add(state);
+                        mapStates.Add(state.Id, state);
                     }
                 }
             }
         }
 
-        var provincestringdata = System.IO.File.ReadAllText("Data/definition.csv");
-        foreach (var line in provincestringdata.Split('\n'))
-        {
-            if (line.Contains("sea"))
-            {
-                long id = long.Parse(line.Split(";")[0]);
-                var state = mapStates.FirstOrDefault(x => x.Id == id);
-                if (state is not null)
-                    state.IsOcean = true;
-            }
-        }
+        Console.WriteLine("Loaded SVG Paths into memory");
+
         Random rnd = new Random();
-        var _mapStates = new List<MapState>();
-        foreach (var state in mapStates)
+        bool createdNewProvinces = false;
+        var _mapStates = new Dictionary<long, MapState>();
+        foreach (var state in mapStates.Values)
         {
-            if (state.DistrictId == 100 || state.IsOcean == true)
+            //if (state.DistrictId == 100 || state.IsOcean == true)
+            if (state.IsOcean == true)
                 continue;
 
-            var districtstate = _mapStates.FirstOrDefault(x => x.DistrictId == state.DistrictId);
+            var districtstate = _mapStates.ContainsKey(state.DistrictId) ? _mapStates[state.DistrictId] : null;
             var districtmapdata = MapController.DistrictMaps.FirstOrDefault(x => x.DistrictId == state.DistrictId);
             if (districtstate is not null)
             {
                 districtmapdata.Provinces.Add(state);
-                districtstate.D += $" {state.D}";
+                districtstate.DStringBuilder.Append($" {state.D}");
                 var posinfo = state.D.Split(" ");
                 int xpos = (int)double.Parse(posinfo[1]);
                 int ypos = (int)double.Parse(posinfo[2]);
+                //var posinfo = state.D.Split(" ");
+                //int xpos = (int)double.Parse(posinfo[0].Split("m")[1]);
+                //var firstpart = posinfo[1].Split("h")[0];
+                //firstpart = firstpart.Split("v")[0];
+                //int ypos = (int)double.Parse(firstpart);
                 state.XPos = xpos;
                 state.YPos = ypos;
 
@@ -144,11 +152,13 @@ public class ProvinceManager
                 districtstate = new MapState()
                 {
                     Id = state.DistrictId,
-                    D = state.D,
+                    D = "",
+                    DStringBuilder = new StringBuilder(1_000_000),
                     DistrictId = state.DistrictId,
                     IsOcean = false
                 };
-                _mapStates.Add(districtstate);
+                districtstate.DStringBuilder.Append(state.D);
+                _mapStates.Add(districtstate.Id, districtstate);
 
                 districtmapdata = new()
                 {
@@ -168,25 +178,58 @@ public class ProvinceManager
             var dbprovince = DBCache.Get<Province>(state.Id);
             if (dbprovince is null)
             {
-                var district = DBCache.Get<District>(state.DistrictId);
+                var district = DBCache.Get<Nation>(state.DistrictId);
                 dbprovince = new(rnd)
                 {
-                    DistrictId = state.DistrictId,
+                    NationId = state.DistrictId,
                     Id = state.Id,
                     Name = $"Province {state.Id}"
                 };
-                DBCache.Put(dbprovince.Id, dbprovince);
-                dbctx.Provinces.Add(dbprovince);
+                createdNewProvinces = true;
+                DBCache.AddNew(dbprovince.Id, dbprovince);
+                //dbctx.Provinces.Add(dbprovince);
                 //district.Provinces.Add(dbprovince);
             }
             else
             {
-                dbprovince.DistrictId = districtstate.DistrictId;
-                dbprovince.District = districtstate.District;
+                dbprovince.NationId = districtstate.DistrictId;
+                dbprovince.Nation = districtstate.District;
             }
         }
-        dbctx.SaveChanges();
+        //dbctx.SaveChanges();
 
-        MapController.MapStates = _mapStates;
+        Console.WriteLine("Finished Loading Provinces");
+
+        foreach (var value in _mapStates.Values)
+        {
+            value.D = value.DStringBuilder.ToString();
+            value.DStringBuilder.Clear();
+            value.DStringBuilder = null;
+        }
+        MapController.MapStates = _mapStates.Values.ToList();
+
+        if (createdNewProvinces)
+        {
+            foreach (var nation in DBCache.GetAll<Nation>())
+            {
+                nation.Provinces = DBCache.GetAll<Province>().Where(x => x.NationId == nation.Id).ToList();
+                var populationtarget = nation.Citizens.Count() * 2_500_000.0;
+                populationtarget += 500_000.0;
+                populationtarget += nation.Provinces.Count() * 10_000;
+                var baseProvincePopulation = populationtarget / nation.Provinces.Count;
+                var totalPrevProvincePopulation = nation.Provinces.Sum(x => x.Population);
+                var ratio = totalPrevProvincePopulation / populationtarget;
+                foreach (var province in nation.Provinces)
+                {
+                    province.Nation = nation;
+                    province.PopulationMultiplier = province.Population / baseProvincePopulation / ratio;
+                    province.DevelopmentValue = (int)(Math.Floor(Math.Pow(province.Population, Defines.NProvince[NProvince.DEVELOPMENT_POPULATION_EXPONENT])) * Defines.NProvince[NProvince.DEVELOPMENT_POPULATION_FACTOR]);
+                    province.MigrationAttraction = 1;
+                }
+                nation.ProvincesByDevelopmnet = nation.Provinces.OrderByDescending(x => x.DevelopmentValue).ToList();
+                nation.ProvincesByMigrationAttraction = nation.Provinces.OrderByDescending(x => x.MigrationAttraction).ToList();
+                nation.HourlyTick();
+            }
+        }
     }
 }

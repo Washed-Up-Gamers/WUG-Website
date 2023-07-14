@@ -2,32 +2,26 @@ using System.Text.Json.Serialization;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using WUG.Database.Models.Entities;
-using Valour.Api.Models;
 using Microsoft.EntityFrameworkCore;
-using System.Data;
-using WUG.VoopAI;
-using Valour.Api.Client;
-using Valour.Api.Nodes;
 using WUG.Scripting.Tokens;
+using System.Data;
 
 namespace WUG.Database.Models.Users;
 
 public enum Rank
 {
-    Spleen = 1,
-    Crab = 2,
-    Gaty = 3,
-    Corgi = 4,
-    Oof = 5,
+    WashedUp = 1,
+    Expert = 2,
+    Enjoyer = 3,
+    Fan = 4,
+    Noob = 5,
     Unranked = 6
 }
 
 [Table("users")]
-public class SVUser : BaseEntity
+public class User : BaseEntity
 {
-    [BigInt]
-    public long ValourId { get; set; }
-
+    public ulong DiscordUserId { get; set; }
     public int ForumXp { get; set;}
     public float MessageXp { get; set;}
     public int CommentLikes { get; set;}
@@ -58,15 +52,15 @@ public class SVUser : BaseEntity
 
     public override EntityType EntityType => EntityType.User;
 
-    public async ValueTask<List<PlanetRole>> GetValourRolesAsync()
+    public async ValueTask<List<DiscordRole>> GetValourRolesAsync()
     {
-        var member = await PlanetMember.FindAsyncByUser(ValourId, VoopAI.VoopAI.PlanetId);
+        var member = await VoopAI.Server.GetMemberAsync(DiscordUserId);
         if (member is null) return new();
-        return await member.GetRolesAsync();
+        return member.Roles.ToList();
     }
 
     public async ValueTask<bool> IsGovernmentAdmin() {
-        return (await GetValourRolesAsync()).Any(x => x.Name == "Government Admin");
+        return (await GetValourRolesAsync()).Any(x => x.Name == "Site Admin");
     }
 
     public int GetNumberOfJobSlotsFilled()
@@ -79,41 +73,9 @@ public class SVUser : BaseEntity
 
     public override async Task Create()
     {
-        if (OAuthToken is null || EcoAccountId != 0)
+        if (OAuthToken is null)
             return;
-        var account = ValourCache.GetAll<EcoAccount>().FirstOrDefault(x => x.PlanetId == VoopAI.VoopAI.PlanetId && x.UserId == ValourId && x.AccountType == Valour.Shared.Models.Economy.AccountType.User);
-        if (account is null) {
-            var ecoaccount = new EcoAccount()
-            {
-                Name = $"{Id}",
-                AccountType = Valour.Shared.Models.Economy.AccountType.User,
-                UserId = ValourId,
-                PlanetId = VoopAI.VoopAI.PlanetId,
-                CurrencyId = VoopAI.VoopAI.SVCurrencyId,
-                BalanceValue = 0.0m
-            };
-
-            var http = new HttpClient()
-            {
-                BaseAddress = new Uri("https://app.valour.gg")
-            };
-
-            http.DefaultRequestHeaders.Add("Authorization", OAuthToken);
-            // Set node to primary node for main http client
-            http.DefaultRequestHeaders.Add("X-Server-Select", (await NodeManager.GetNodeForPlanetAsync(ecoaccount.PlanetId)).Name);
-
-            var result = await ValourClient.PostAsyncWithResponse<EcoAccount>(ecoaccount.BaseRoute, ecoaccount, http);
-            //var result = await EcoAccount.CreateAsync(ecoaccount);
-            Console.WriteLine(result.Message);
-            if (result.Success)
-            {
-                EcoAccountId = result.Data.Id;
-            }
-        }
-        else
-        {
-            EcoAccountId = account.Id;
-        }
+        Money = 50_000.0m;
     }
 
     public static string RemoveWhitespace(string input)
@@ -123,7 +85,7 @@ public class SVUser : BaseEntity
             .ToArray());
     }
 
-    public void NewMessage(PlanetMessage msg)
+    public void NewMessage(DiscordMessage msg)
     {
         if (LastActiveMinute.AddSeconds(60) < DateTime.UtcNow)
         {
@@ -148,7 +110,7 @@ public class SVUser : BaseEntity
         Points += (short)Content.Length;
 
         // if there is media then add 150 points
-        if (msg.AttachmentsData.Contains("https://cdn.valour.gg/content/"))
+        if (msg.Attachments.Any(x => x.MediaType.Contains("image/")))
         {
             Points += 150;
         }
@@ -162,19 +124,19 @@ public class SVUser : BaseEntity
 
     public bool IsMinister(string ministertype)
     {
-        if (DBCache.Vooperia.GetMemberRoles(this).Any(x => x.Name == ministertype))
+        if (DBCache.UnitedNations.GetMemberRoles(this).Any(x => x.Name == ministertype))
             return true;
         return false;
     }
 
-    public static SVUser? FindByName(string name)
+    public static User? FindByName(string name)
     {
-        return DBCache.GetAll<SVUser>().FirstOrDefault(x => x.Name == name);
+        return DBCache.GetAll<User>().FirstOrDefault(x => x.Name == name);
     }
     
-    public static SVUser? Find(long Id)
+    public static User? Find(long Id)
     {
-        return DBCache.Get<SVUser>(Id);
+        return DBCache.Get<User>(Id);
     }
 
     public bool HasPermissionWithKey(string apikey, GroupPermission permission)
@@ -193,10 +155,15 @@ public class SVUser : BaseEntity
         return false;
     }
 
-    public SVUser(string name, long valourId)
+    public User()
+    {
+
+    }
+
+    public User(string name, ulong discorduserid)
     {
         Id = IdManagers.UserIdGenerator.Generate();
-        ValourId = valourId;
+        DiscordUserId = discorduserid;
         Name = name;
         ForumXp = 0;
         MessageXp = 0;
@@ -215,7 +182,7 @@ public class SVUser : BaseEntity
 
     public async Task<IEnumerable<Group>> GetJoinedGroupsAsync()
     {
-        using var dbctx = VooperDB.DbFactory.CreateDbContext();
+        using var dbctx = WashedUpDB.DbFactory.CreateDbContext();
         var groups = await dbctx.Groups.Where(x => x.MembersIds.Contains(Id)).ToListAsync();
 
         return groups;
@@ -225,7 +192,7 @@ public class SVUser : BaseEntity
     {
         List<Group> groups = new List<Group>();
 
-        using var dbctx = VooperDB.DbFactory.CreateDbContext();
+        using var dbctx = WashedUpDB.DbFactory.CreateDbContext();
 
         var topGroups = DBCache.GetAll<Group>().Where(x => x.IsOwner(this));
 
@@ -238,43 +205,42 @@ public class SVUser : BaseEntity
         return groups;
     }
 
-    public async Task CheckRoles(PlanetMember member)
+    public async Task CheckRoles(DiscordMember member)
     {
-        var roles = await member.GetRolesAsync();
-
         // check rank role
         var rankname = Rank.ToString();
-        if (!roles.Any(x => x.Name == rankname))
+        if (!member.Roles.Any(x => x.Name == rankname))
         {
-            var result = await member.Node.PostAsync($"api/members/{member.Id}/roles/{VoopAI.VoopAI.RankRoleIds[rankname]}", null);
-            Console.WriteLine(result);
+            await member.GrantRoleAsync(VoopAI.Roles[VoopAI.ConvertRankTypeToString(Rank)]);
         }
-        foreach (var role in roles.Where(x => VoopAI.VoopAI.RankNames.Contains(x.Name)).ToList())
+        foreach (var role in member.Roles.Where(x => VoopAI.RankNames.Contains(x.Name)).ToList())
         {
             if (role.Name != rankname)
             {
-                await member.Node.DeleteAsync($"api/members/{member.Id}/roles/{VoopAI.VoopAI.RankRoleIds[role.Name]}");
+                await member.RevokeRoleAsync(role);
             }
         }
 
-        if (DistrictId is not null)
+        if (NationId is not null)
         {
-            var districtrole = VoopAI.VoopAI.DistrictRoles[District.Name + " District"];
-            if (!roles.Any(x => x.Id == districtrole.Id))
+            if (VoopAI.Roles.ContainsKey(Nation.Name))
             {
-                var result = await member.Node.PostAsync($"api/members/{member.Id}/roles/{districtrole.Id}", null);
-                Console.WriteLine(result.Message);
-            }
-            foreach (var role in roles.Where(x => VoopAI.VoopAI.DistrictRoles.ContainsKey(x.Name)).ToList())
-            {
-                if (role.Id != districtrole.Id)
+                var nationrole = VoopAI.Roles[Nation.Name];
+                if (!member.Roles.Any(x => x.Id == nationrole.Id))
                 {
-                    await member.Node.DeleteAsync($"api/members/{member.Id}/roles/{role.Id}");
+                    await member.GrantRoleAsync(VoopAI.Roles[VoopAI.ConvertRankTypeToString(Rank)]);
+                }
+                foreach (var role in member.Roles.Where(x => VoopAI.NationRoles.ContainsKey(x.Name)).ToList())
+                {
+                    if (role.Id != nationrole.Id)
+                    {
+                        await member.GrantRoleAsync(role);
+                    }
                 }
             }
         }
 
-        if (IsSenator())
+        if (IsCouncilMember())
         {
             var vooperia = (Group)BaseEntity.Find(100);
             if (!vooperia.MembersIds.Contains(Id))
@@ -292,10 +258,10 @@ public class SVUser : BaseEntity
             }
         }
 
-        if (roles.Any(x => x.Name == "Senator") && !IsSenator())
-            await member.Node.DeleteAsync($"api/members/{member.Id}/roles/18993953105772544");
-        if (!roles.Any(x => x.Name == "Senator") && IsSenator())
-            await member.Node.PostAsync($"api/members/{member.Id}/roles/18993953105772544", null);
+        if (member.Roles.Any(x => x.Name == "Council Member") && !IsCouncilMember())
+            await member.GrantRoleAsync(member.Roles.First(x => x.Name == "Council Member"));
+        if (!member.Roles.Any(x => x.Name == "Council Member") && IsCouncilMember())
+            await member.GrantRoleAsync(VoopAI.Server.Roles.Values.First(x => x.Name == "Council Member"));
     }
 
     public async ValueTask<string> GetPfpRingColor()
@@ -304,11 +270,11 @@ public class SVUser : BaseEntity
         if (IsCFV()) return "1cbabd";
         if (await IsPrimeMinister()) return "03A1A4";
         if (await IsSupremeCourtJustice()) return "4FEDF0";
-        if (IsSenator()) return "1bf278";
+        if (IsCouncilMember()) return "1bf278";
         return "1bd9f2";
     }
 
-    public bool IsEmperor() => ValourId == 12200448886571008;
+    public bool IsEmperor() => DiscordUserId == 12200448886571008;
     public async ValueTask<bool> IsPrimeMinister() {
         return (await GetValourRolesAsync()).Any(x => x.Name == "Prime Minister");
     }
@@ -317,6 +283,6 @@ public class SVUser : BaseEntity
         return (await GetValourRolesAsync()).Any(x => x.Name == "Supreme Court Justice");
     }
 
-    public bool IsCFV() => ValourId == 12201879245422592;
-    public bool IsSenator() => DBCache.GetAll<Senator>().Any(x => x.UserId == Id);
+    public bool IsCFV() => DiscordUserId == 259004891148582914;
+    public bool IsCouncilMember() => DBCache.GetAll<CouncilMember>().Any(x => x.UserId == Id);
 }

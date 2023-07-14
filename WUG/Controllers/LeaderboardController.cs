@@ -4,7 +4,6 @@ using WUG.Managers;
 using WUG.Database.Models.Users;
 using System.Diagnostics;
 using Microsoft.AspNetCore.Identity;
-using Valour.Api.Models;
 using WUG.Models.Leaderboard;
 using Microsoft.EntityFrameworkCore;
 using WUG.Helpers;
@@ -25,7 +24,7 @@ public class LeaderboardController : SVController
     {
         var model = new LeaderboardIndexModel()
         {
-            Users = DBCache.GetAll<SVUser>().OrderByDescending(x => x.Xp).ToList(),
+            Users = DBCache.GetAll<User>().OrderByDescending(x => x.Xp).ToList(),
             Page = id,
             Amount = 25
         };

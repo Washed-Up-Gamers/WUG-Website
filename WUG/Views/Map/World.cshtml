@@ -16,11 +16,12 @@
     }
 
     #svg {
-        /*transform: scale(1.2);
-            position: absolute;*/
+        transform: scale(0.97);
+        /*position: absolute;*/
         top: 0px;
         left: 0px;
         height: 100%;
+        margin-top: -25px;
         /*opacity: 0.5;*/
     }
 
@@ -67,7 +68,7 @@
         {
             <img src="~/media/map/woketexture.png" id="background" />
         }
-        <svg id="svg" viewBox="0 0 2560 1280">
+        <svg id="svg" viewBox="0 0 5120 2560">
             <style>
                 path {
                     fill: white;
@@ -79,23 +80,44 @@
             </style>
             @if (resourcetomap is null)
             {
-                @foreach (var province in Model)
+                @if (true)
                 {
-                    <a href="/District/View/@province.District.Name">
-                        <path d="@province.D" id="@province.Id" style="fill:#@province.District.Color;stroke: #@province.District.Color !important" class="province"></path>
-                    </a>
+                    @foreach (var province in Model)
+                    {
+                        <a href="/District/View/@province.District?.Name">
+                            <path d="@province.D" id="@province.Id" style="fill:#@(province.District?.Color ?? "(255, 255, 255");stroke: #@(province.District?.Color ?? "(255, 255, 255") !important" class="province"></path>
+                        </a>
+                    }
+                }
+                else
+                {
+                    @foreach (var district in MapController.DistrictMaps)
+                    {
+                        @foreach (var province in district.Provinces)
+                        {
+                            @if (province.DistrictId == 100)
+                                continue;
+                            <a href="/Province/View/@province.Id">
+                                <path d="@province.D" id="@province.Id" style="fill:# @(province.District?.Color ?? "(255, 255, 255");stroke: black;stroke-width: 0.5px;" class="province"></path>
+                            </a>
+                        }
+                    }
                 }
             }
             else 
             {
                 @foreach (var province in Model)
                 {
-                    <path d="@province.D" id="@province.Id" style="fill:#@province.District.Color;stroke: #@province.District.Color !important" class="province"></path>
+                    @if (province.DistrictId == 100)
+                        continue;
+                    <path d="@province.D" id="@province.Id" style="fill:#@(province.District?.Color ?? "(255, 255, 255");stroke: #@(province.District?.Color ?? "(255, 255, 255") !important" class="province"></path>
                 }
                 @foreach(var district in MapController.DistrictMaps)
                 {
                     @foreach (var province in district.Provinces)
                     {
+                        @if (province.DistrictId == 100)
+                            continue;
                         var dbprovince = DBCache.Get<Province>(province.Id);
                         var buildingobj = GameDataManager.BaseBuildingObjs.Values.First(x => x.MustHaveResource == resourcetomap);
                         var production = $"{dbprovince.GetMiningResourceProduction(resourcetomap) / 10550.0 * buildingobj.Recipes.First().PerHour * buildingobj.Recipes.First().Outputs.First().Value:n2}";

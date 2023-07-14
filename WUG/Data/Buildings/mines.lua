@@ -53,16 +53,16 @@ building_zinc_mine = {
 	type = "Mine"
 }
 
-building_silicon_mine = {
+building_sand_mine = {
 	recipes = [
-		recipe_silicon_mining_base
+		recipe_sand_mining_base
 	]
 	buildingcosts = {
 		steel = 2000
 		simple_components = 2000
 		advanced_components = 200
 	}
-    musthaveresource = "Silicon"
+    musthaveresource = "Sand"
 	type = "Mine"
 }
 
@@ -105,16 +105,16 @@ building_gold_mine = {
 	type = "Mine"
 }
 
-building_crystallite_mine = {
+building_pothium_mine = {
 	recipes = [
-		recipe_crystallite_mining_base
+		recipe_pothium_mining_base
 	]
 	buildingcosts = {
 		steel = 2000
 		simple_components = 2000
 		advanced_components = 200
 	}
-    musthaveresource = "Crystallite"
+    musthaveresource = "Pothium"
 	type = "Mine"
 }
 

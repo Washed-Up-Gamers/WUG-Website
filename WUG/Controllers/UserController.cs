@@ -4,7 +4,6 @@ using WUG.Managers;
 using WUG.Database.Models.Users;
 using System.Diagnostics;
 using Microsoft.AspNetCore.Identity;
-using Valour.Api.Models;
 using WUG.Helpers;
 using WUG.Models.Users;
 using WUG.Extensions;
@@ -15,9 +14,9 @@ namespace WUG.Controllers;
 [ApiExplorerSettings(IgnoreApi = true)]
 public class UserController : SVController {
     private readonly ILogger<UserController> _logger;
-    private readonly VooperDB _dbctx;
+    private readonly WashedUpDB _dbctx;
 
-    public UserController(ILogger<UserController> logger, VooperDB dbctx)
+    public UserController(ILogger<UserController> logger, WashedUpDB dbctx)
     {
         _logger = logger;
         _dbctx = dbctx;
@@ -52,7 +51,7 @@ public class UserController : SVController {
                     Building = building,
                     Role = DBCache.Get<GroupRole>(building.EmployeeGroupRoleId),
                     JobApplication = application,
-                    User = DBCache.Get<SVUser>(application.UserId)
+                    User = DBCache.Get<User>(application.UserId)
                 });
             }
         }
@@ -221,7 +220,7 @@ public class UserController : SVController {
         if (id is null)
             return View(null);
 
-        SVUser? user = DBCache.GetAll<SVUser>().FirstOrDefault(x => x.Id == id);
+        User? user = DBCache.GetAll<User>().FirstOrDefault(x => x.Id == id);
 
         return View(user);
     }

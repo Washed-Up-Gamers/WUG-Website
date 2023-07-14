@@ -4,7 +4,6 @@ using WUG.Models.States;
 using WUG.Managers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
-using Valour.Api.Models;
 using WUG.Helpers;
 using WUG.Extensions;
 using WUG.Database.Models.Districts;
@@ -20,10 +19,10 @@ namespace WUG.Controllers;
 public class StateController : SVController
 {
     private readonly ILogger<StateController> _logger;
-    private readonly VooperDB _dbctx;
+    private readonly WashedUpDB _dbctx;
 
     public StateController(ILogger<StateController> logger,
-        VooperDB dbctx)
+        WashedUpDB dbctx)
     {
         _logger = logger;
         _dbctx = dbctx;

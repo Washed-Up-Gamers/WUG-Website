@@ -17,7 +17,7 @@ namespace WUG.API
             app.MapGet   ("api/eco/transaction/send", SendTransaction).RequireCors("ApiPolicy");
         }
 
-        private static async Task SendTransaction(HttpContext ctx, VooperDB db, long fromid, long toid, string apikey, decimal amount, string detail, TransactionType trantype, bool? isanexpense = null)
+        private static async Task SendTransaction(HttpContext ctx, WashedUpDB db, long fromid, long toid, string apikey, decimal amount, string detail, TransactionType trantype, bool? isanexpense = null)
         {
             // get Entity with the api key
             BaseEntity? entity = await BaseEntity.FindByApiKey(apikey, db);
@@ -76,7 +76,7 @@ namespace WUG.API
                 }
             }
 
-            var tran = new SVTransaction(fromentity, toentity, amount, trantype, detail);
+            var tran = new Transaction(fromentity, toentity, amount, trantype, detail);
             if (isanexpense is not null)
                 tran.IsAnExpense = isanexpense;
 

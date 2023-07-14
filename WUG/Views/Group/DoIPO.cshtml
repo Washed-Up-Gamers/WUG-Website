@@ -1,0 +1,109 @@
+﻿@model IssueIPOModel
+@{
+    ViewData["Title"] = "Company IPO";
+
+    User user = UserManager.GetUser(Context)!;
+}
+
+<style>
+    .form-text {
+        display: block;
+    }
+</style>
+
+<div class="container vw-100">
+    <div class="col-12">
+        <h4>Submit IPO</h4>
+
+        <p>An IPO is the initial selling of stock from your company. You can choose how much stock to sell, and how much stock you would like to keep. Remember, anyone with over 50% stock will <b>automatically</b> be given full group permissions!</p>
+        <p>
+            Stock value is simply the stock's balance divided by number of stock times 5. Of course, in the market, people will choose buy and sell prices on their own, which will inflate or deflate your company's value. The lowest price you can IPO at
+            is $1. So if you set the initial starting balance to $10,000, you can issue a max of 50,000 shares.
+        </p>
+        <br />
+        @await Html.PartialAsync("_StatusMessage", TempData["StatusMessage"])
+        <br />
+        <hr />
+
+        <p>@Model.Group.Name's Balance: $@($"{Model.Group.Money:n2}")</p>
+        <p>Your maximum IPO: @($"{Math.Floor(Model.Group.Money * 5):n0}") shares</p>
+    </div>
+
+    <form method="post">
+        <div class="row">
+            <div class="col-md-6" style="max-width:35%;">
+                <div asp-validation-summary="All" class="text-danger"></div>
+                @Html.HiddenFor(x => x.GroupId)
+                <div class="form-group">
+                    <label asp-for="Ticker"></label>
+                    <span asp-description-for="Ticker" class="form-text" style="color:#888888" />
+                    <input asp-for="Ticker" class="form-control" />
+                    <span asp-validation-for="Ticker" class="text-danger"></span>
+                </div>
+                <br />
+                <div class="form-group">
+                    <label asp-for="StartingBalance"></label>
+                    <span asp-description-for="StartingBalance" class="form-text" style="color:#888888" />
+                    <input asp-for="StartingBalance" class="form-control" value="5000" min="5000" max="@((long)Math.Floor(Model.Group.Money))" id="stockbalance" oninput="checkinputforstockbalance" />
+                    <span asp-validation-for="StartingBalance" class="text-danger"></span>
+                </div>
+                <br />
+                <div class="form-group">
+                    <label asp-for="Amount"></label>
+                    <span asp-description-for="Amount" class="form-text" style="color:#888888" />
+                    <input asp-for="Amount" class="form-control" min="0" max="@((long)Math.Floor(Model.Group.Money * 5))" id="shares" oninput="checkinputforincorrectprice()" />
+                    <span asp-validation-for="Amount" class="text-warning"></span>
+                    <span class="text-danger" id="shareswarning"></span>
+                </div>
+                <br />
+                <div class="form-group">
+                    <label asp-for="Keep"></label>
+                    <span asp-description-for="Keep" class="form-text" style="color:#888888" />
+                    <input asp-for="Keep" class="form-control" min="0" max="@((long)Math.Floor(Model.Group.Money * 5))" />
+                    <span asp-validation-for="Keep" class="text-danger"></span>
+                </div>
+                <br />
+                <div class="form-group">
+                    <span id="price" class="text-warning">Price: $0</span>
+                </div>
+                <br />
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="container" style="align-content:flex-start">
+                <div class="d-flex">
+                    <div class="flex-column" style="margin-right:5px; margin-left: -15px">
+                        <button type="submit" class="btn btn-outline-warning">Issue Stock</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+    @section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+}
+
+<script>
+    function checkinputforincorrectprice() {
+      var shares = document.getElementById("shares").value
+      var stockbalance = document.getElementById("stockbalance").value
+      var price = stockbalance / shares * 5
+      if (price < 1 && shares != 0 && stockbalance != 0) {
+          var el = document.getElementById("shareswarning")
+          el.innerHTML = `The price is under ¢1, either lower the amount of shares or increase the stockbalance amount!`
+        }
+      else {
+        var el = document.getElementById("shareswarning")
+        el.innerHTML = ""
+      }
+      var el = document.getElementById("price")
+      el.innerHTML = `Price: $${price.toFixed(2)}`
+    }
+
+    function checkinputforstockbalance(element) {
+      checkinputforincorrectprice()
+    }
+    checkinputforincorrectprice()
+</script>
+
+</div>

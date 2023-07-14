@@ -1,0 +1,468 @@
+﻿@model WUG.Models.Exchange.ExchangeTradeModel
+@using WUG.Database.Models.Economy.Stocks
+@inject WashedUpDB dbctx
+@using Microsoft.EntityFrameworkCore
+
+@if (Model == null)
+{
+    <div class="container vw-100">
+        <h4>Ticker not found!</h4>
+    </div>
+
+    return;
+}
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+@{
+    ViewData["Title"] = $"Trade: {Model.Security.Ticker}";
+
+    var user = UserManager.GetUser(Context);
+
+    Group group = DBCache.Get<Group>(Model.Security.GroupId);
+
+    BaseEntity owner = group.Owner;
+
+    long owned = 0;
+    if (Model.Chosen_Account != null)
+    {
+        owned = (await dbctx.SecurityOwnerships.FirstOrDefaultAsync(x => x.SecurityId == Model.Security.Id && x.OwnerId == Model.Chosen_Account.Id))?.Amount ?? 0;
+    }
+
+    long available = Model.Security.OpenShares;
+}
+<body style="min-width:1500px;min-height:700px">
+    <div class="container-fluid w-100">
+        <div class="row">
+            <div class="col-1"></div>
+            <div class="col-2 stocktable">
+                <div class="d-flex justify-content-between flex-wrap">
+                    <h4 style="text-align:start;display:inline-block">$@Model.Security.Ticker</h4>
+                    <div>
+                        <h2 id="stockprice" class="cashtext" style="text-align:end;display:inline-block">$@Math.Round(Model.Security.Price, 2)</h2>
+                        <h5 id="percText" class="cashtext" style="text-align:end;display:inline-block;color:white">(0)</h5>
+                    </div>
+                </div>
+                <h5>@group.Name</h5>
+                <hr />
+                <h6 id="stockissued">Stock Issued: @Model.Security.Shares</h6>
+                <h6 id="openshares">Available: @Model.Security.OpenShares</h6>
+                <h6 id="stockbalance">Stock Balance: $@($"{Model.Security.Balance:n0}")</h6>
+                <h6>CEO: @owner.Name</h6>
+                <h6>CEO Wealth: $@($"{owner.Money:n0}")</h6>
+
+                <br />
+                <hr />
+                <br />
+                <h5>Ownership</h5>
+                <br />
+                <canvas id="ownership" height="200" width="200"></canvas>
+            </div>
+            <div class="col-6 stocktable">
+                <canvas id="priceChart" style="text-align:center"></canvas>
+                <br />
+                <button class="btn btn-outline-primary" style="display:inline-block" onclick="minutebutton()" id="minutebutton">60m</button>
+                <button class="btn btn-outline-primary" style="display:inline-block" onclick="hourbutton()" id="hourbutton">24h</button>
+                <button class="btn btn-outline-primary" style="display:inline-block" onclick="weekbutton()" id="weekbutton">7d</button>
+            </div>
+            <div class="col-2 stocktable">
+                <h4 id="owned-text">You own @($"{owned:n0}") $@Model.Security.Ticker</h4>
+                @if (Model.Chosen_Account is not null)
+                {
+                    <h4 id="balance-text">You have $@($"{Model.Chosen_Account.Money:n2}")</h4>
+                }
+                <hr />
+                @if (Model.Chosen_Account is null)
+                {
+                    <h6>You are not logged in.</h6>
+                }
+                else
+                {
+                    <h6>Buying/Selling as @Model.Chosen_Account.Name</h6>
+                    <iframe style="display: none;" name="frame" onLoad="Submitted(this)"></iframe>
+                    <!form action="/Exchange/Buy" target="frame" method="POST">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="accountid" value="@Model.Chosen_Account.Id">
+                        <input type="hidden" name="ticker" value="@Model.Security.Ticker">
+                        <div class="m-t-9">
+                            <h6 id="buytotal">Total: $0</h6>
+                            <input id="amount-input-buy" type="number" step="1" class="form-control" placeholder="Amount"
+                            aria-label="amount" aria-describedby="center_at" name="amount" oninput="UpdateBuyTotal(this)" />
+                        </div>
+                        <div class="m-t-9">
+                            <button type="submit" class="btn btn-primary btn-block">Buy</button>
+                        </div>
+                    </!form>
+                    <!form action="/Exchange/Sell" target="frame" method="POST">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="accountid" value="@Model.Chosen_Account.Id">
+                        <input type="hidden" name="ticker" value="@Model.Security.Ticker">
+                        <div class="m-t-9">
+                            <h6 id="selltotal">Total: $0</h6>
+                            <input id="amount-input-sell" type="number" step="1" class="form-control" placeholder="Amount"
+                            aria-label="amount" aria-describedby="center_at" name="amount" oninput="UpdateSellTotal(this)" />
+                        </div>
+                        <div class="m-t-9">
+                        <button type="submit" class="btn btn-primary btn-block">Sell</button>
+                        </div>
+                    </!form>
+                    <span id="Output for buy/sell" class="text-warning"></span>
+                }
+            </div>
+            <div class="col-1"></div>
+        </div>
+    </div>
+</body>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/3.1.3/signalr.min.js"></script>
+<script type="text/javascript" src="/js/stock-controller.js"></script>
+@{
+    var pricehistory = await dbctx.SecurityHistories.Where(x => x.SecurityId == Model.Security.Id && x.HistoryType == HistoryType.Minute).OrderByDescending(x => x.Time).Take(59).Select(x => x.Price).ToListAsync();
+    pricehistory.Reverse();
+    pricehistory.Add(Model.Security.Price);
+    var stupidlabels = new List<string>();
+    int i = 0;
+    foreach (var item in pricehistory) 
+    {
+        stupidlabels.Add($"{0-i}");
+        i += 1;
+    }
+    stupidlabels.Reverse();
+}
+
+<script>
+    var ticker = "@Model.Security.Ticker";
+    var accountid = "@Model.Chosen_Account.Id";
+    var graphsetting = "Minutes"
+
+    PrepSignalR();
+    ConnectSignalR();
+
+    var isTabActive;
+
+    window.onfocus = function () {
+        isTabActive = true;
+    };
+
+    window.onblur = function () {
+        isTabActive = false;
+    };
+
+    var minutes = 1;
+    var curminute = 0;
+
+    Chart.defaults.global.defaultFontColor = "#fff";
+
+    var chart = null;
+
+    google.charts.load('current', { 'packages': ['corechart'] });
+    google.charts.setOnLoadCallback(MakeGraph);
+
+    function MakeGraph() {
+
+        var data = {
+            datasets: [{
+                data: [@String.Join(", ", pricehistory)],
+                borderColor: 'rgba(26, 217, 77, 1.0)',
+                backgroundColor: 'rgba(26, 217, 77, 0.1)',
+                lineTension: 0
+            }],
+
+            //These labels appear in the legend and in the tooltips when hovering different arcs
+            labels: [
+                @String.Join(", ", stupidlabels)
+            ],
+
+        };
+
+        console.log(data);
+
+        options = {
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        //beginAtZero: true
+                    },
+                }]
+            },
+            legend: {
+                display: false
+            },
+        }
+
+        var ctx = $('#priceChart');
+        chart = new Chart(ctx, {
+            type: 'line',
+            data: data,
+            options: options
+        });
+        setgraph(chart)
+
+        nowprice = chart.data.datasets[0].data[chart.data.datasets[0].data.length - 1]
+        prevprice = chart.data.datasets[0].data[0]
+        var percent = Round(((nowprice - prevprice) / prevprice) * 100.0);
+        if (percent > 0) {
+            document.getElementById("percText").style.color = "lightgreen";
+            $('#percText').html("(+" + percent + "%)");
+        }
+        else if (percent < 0) {
+            document.getElementById("percText").style.color = "lightcoral";
+            $('#percText').html("(" + percent + "%)");
+        }
+        else {
+            document.getElementById("percText").style.color = "white";
+            $('#percText').html("(0%)");
+        }
+    }
+
+    //setInterval(DoUpdate, 5000);
+    //setInterval(DoShift, 60000);
+    //setInterval(DoAmount, 5000);
+
+    // Update prices
+    function DoUpdate() {
+        $.get('/Exchange/GetCurrentData?id=@Model.Security.Ticker', function (out) {
+            var value = parseFloat(out);
+            var rvalue = Math.round((value + Number.EPSILON) * 100) / 100;
+            $('#priceText').html('¢' + rvalue);
+            chart.data.datasets[0].data[59] = value;
+            chart.update();
+            console.log(value);
+
+            var before = chart.data.datasets[0].data[0];
+            var after = chart.data.datasets[0].data[59];
+
+            if (before > after) {
+
+                chart.data.datasets[0].borderColor = 'rgba(255, 60, 0, 1.0)';
+                chart.data.datasets[0].backgroundColor = 'rgba(255, 60, 0, 0.1)';
+            }
+            else {
+                chart.data.datasets[0].borderColor = 'rgba(26, 217, 77, 1.0)';
+                chart.data.datasets[0].backgroundColor = 'rgba(26, 217, 77, 0.1)';
+            }
+
+            var percent = Round(((after - before) / before) * 100.0);
+
+            if (percent > 0) {
+                document.getElementById("percText").style.color = "lightgreen";
+                $('#percText').html("(+" + percent + "%)");
+            }
+            else if (percent < 0) {
+                document.getElementById("percText").style.color = "lightcoral";
+                $('#percText').html("(" + percent + "%)");
+            }
+            else {
+                document.getElementById("percText").style.color = "white";
+                $('#percText').html("(0%)");
+            }
+
+
+        });
+    }
+
+    function Round(v) {
+        return Math.round((v + Number.EPSILON) * 100) / 100;
+    }
+
+    function DoShift() {
+        curminute = curminute + 1;
+        if (curminute < minutes) {
+            return;
+        }
+
+        curminute = 0;
+        chart.data.datasets[0].data.splice(0, 1);
+        $.get('/Exchange/GetCurrentData?id=@Model.Security.Ticker', function (out) {
+            var value = parseFloat(out);
+            chart.data.datasets[0].data.push(value);
+            chart.update();
+        });
+    }
+
+    function DoAmount() {
+
+        $.get('/Exchange/Available?id=@Model.Security.Ticker', function (out) {
+            var value = parseFloat(out);
+            $('#availableText').html('Buy (' + value + ' Available)');
+        });
+    }
+
+    $('#buybox').on('input', function () {
+        if ($('#buybox').val() < 0) {
+            $('#buybox').val(' ');
+        }
+
+        $('#buyPrice').html("Price: (Calculating)");
+
+        UpdateBuyPrice();
+    });
+
+    $('#sellbox').on('input', function () {
+        if ($('#sellbox').val() < 0) {
+            $('#sellbox').val(' ');
+        }
+
+        $('#sellPrice').html("Price: (Calculating)");
+
+        UpdateSellPrice();
+    });
+
+    var lock = false;
+
+    $('#buybutton').click(function () {
+
+        if (lock) {
+            $('#buytext').html("Please wait!");
+        }
+
+        lock = true;
+
+        $.ajax({
+            url: '/Exchange/BuyStock',
+            method: 'POST',
+            data: { ticker: "@Model.Security.Ticker", amount: $('#buybox').val() },
+
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader("RequestVerificationToken",
+                    $('input:hidden[name="__RequestVerificationToken"]').val());
+            },
+            success: function (data) {
+                console.log(data);
+                $('#buytext').html(data);
+                if (data == "Success") {
+                    window.location.reload(true);
+                }
+
+                lock = false;
+            },
+            error: function (xhr, error) {
+                console.log(error);
+            }
+
+        });
+    });
+
+    function UpdateBuyPrice() {
+
+        if ($('#buybox').val() == 0) {
+            return;
+        }
+
+        $.get('/Exchange/CalculateBuy?ticker=@Model.Security.Ticker&amount=' + $('#buybox').val(), function (out) {
+            var value = parseFloat(out);
+            $('#buyPrice').html("Price: " + Round(value) + " (After Tax)");
+            });
+    }
+
+    function UpdateSellPrice() {
+
+        if ($('sellbox').val() == 0) {
+            return;
+        }
+
+        $.get('/Exchange/CalculateSell?ticker=@Model.Security.Ticker&amount=' + $('#sellbox').val(), function (out) {
+            var value = parseFloat(out);
+            $('#sellPrice').html("Price: " + Round(value) + " (After Tax)");
+            });
+    }
+
+    $('#sellbutton').click(function () {
+
+        if (lock) {
+            $('#buytext').html("Please wait!");
+        }
+
+        lock = true;
+
+        $.ajax({
+            url: '/Exchange/SellStock',
+            method: 'POST',
+            data: { ticker: "@Model.Security.Ticker", amount: $('#sellbox').val() },
+
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader("RequestVerificationToken",
+                    $('input:hidden[name="__RequestVerificationToken"]').val());
+            },
+            success: function (data) {
+                console.log(data);
+                $('#selltext').html(data);
+                if (data == "Success") {
+                    window.location.reload(true);
+                }
+
+                lock = false;
+            },
+            error: function (xhr, error) {
+                console.log(error);
+            }
+
+        });
+    });
+
+    @{
+        var ownerships = await dbctx.SecurityOwnerships.Where(x => x.SecurityId == Model.Security.Id).OrderByDescending(x => x.Amount).ToListAsync();
+
+        List<(string, long)> ownership = new List<(string, long)>();
+
+        foreach (var ownership_obj in ownerships)
+        {
+            ownership.Add(new(ownership_obj.Owner.Name, ownership_obj.Amount));
+        }
+        var keys = ownership.Select(x => '"' + x.Item1 + '"');
+        var values = ownership.Select(x => x.Item2);
+    }
+    var colors = [];
+    var borders = [];
+
+    var r = 60;
+    var g = 255;
+    var b = 100;
+    var a = 1.0;
+
+    odata = [@String.Join(", ", values)]
+    odata.forEach(e => MakeColor());
+
+    function MakeColor() {
+        colors.push('rgba(' + r + ',' + g + ',' + b + ',' + a + ')');
+        borders.push('rgba(0, 0, 0, 0.3)');
+        g = g - 10;
+        b = b - 10;
+        a = a - 0.05;
+        console.log("Hello?");
+    }
+
+    console.log(colors);
+
+    // Ownership chart
+    ownerdata = {
+        datasets: [{
+            data: [@String.Join(", ", values)],
+            borderColor: borders.reverse(),
+            backgroundColor: colors.reverse()
+        }],
+
+        // These labels appear in the legend and in the tooltips when hovering different arcs
+        labels: [@Html.Raw(String.Join(", ", keys))],
+
+    };
+
+    owneroptions = {
+        legend: {
+            display: false
+
+        },
+        cutoutPercentage: 70
+    }
+
+    var own = $('#ownership');
+    var ownership = new Chart(own, {
+        type: 'doughnut',
+        data: ownerdata,
+        options: owneroptions
+    });
+
+</script>

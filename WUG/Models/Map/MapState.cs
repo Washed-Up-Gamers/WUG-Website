@@ -1,10 +1,12 @@
-﻿namespace WUG.Models.Map;
+﻿using System.Text;
+
+namespace WUG.Models.Map;
 
 public class MapState
 {
     public long Id { get; set; }
     public long DistrictId { get; set; }
-    public District District => DBCache.Get<District>(DistrictId);
+    public Nation District => DBCache.Get<Nation>(DistrictId);
     public string GetMapColor() {
         var province = DBCache.Get<Province>(Id);
         if (province.StateId is null) {
@@ -14,6 +16,7 @@ public class MapState
     }
 
     public string D { get; set; }
+    public StringBuilder DStringBuilder { get; set; }
     public bool IsOcean { get; set; }
 
     public int XPos { get; set; }

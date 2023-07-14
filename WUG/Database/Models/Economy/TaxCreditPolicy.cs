@@ -22,7 +22,7 @@ public class TaxCreditPolicy
 
     // should be set to Null if this is a Imperial Tax Credit
 
-    public long DistrictId { get; set; }
+    public long NationId { get; set; }
     public TaxCreditType taxCreditType { get; set; }
     // amount this tax credit has paid in the current month
     public decimal Paid { get; set; }

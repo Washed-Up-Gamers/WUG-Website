@@ -5,7 +5,7 @@ public class JobOpening
     public ProducingBuilding Building { get; set; }
     public GroupRole Role { get; set; }
     public JobApplication? JobApplication { get; set; }
-    public SVUser? User { get; set; }
+    public User? User { get; set; }
 }
 
 public class JobOpeningsModel

@@ -14,27 +14,27 @@ namespace WUG.Managers;
 public static class UserManager
 {
     static List<string> LoginCodes = new();
-    static Dictionary<string, long> SessionIdsToSvids = new();
+    static Dictionary<string, long> SessionIdsToWugid = new();
 
-    public static SVUser? GetUser(HttpContext ctx)
+    public static User? GetUser(HttpContext ctx)
     {
         string? d = null;
-        ctx.Request.Cookies.TryGetValue("svid", out d);
+        ctx.Request.Cookies.TryGetValue("wugid", out d);
         if (d is null) {
             return null;
         }
-        return DBCache.Get<SVUser>(long.Parse(d!));
+        return DBCache.Get<User>(long.Parse(d!));
     }
     
     public static void AddLogin(string code, long id)
     {
-        SessionIdsToSvids.Add(code, id);
+        SessionIdsToWugid.Add(code, id);
     }
 
-    public static long GetSvidFromSession(HttpContext ctx)
+    public static long GetWugidFromSession(HttpContext ctx)
     {
         long svid = 0;
-        SessionIdsToSvids.Remove(ctx.Session.GetString("code"), out svid);
+        SessionIdsToWugid.Remove(ctx.Session.GetString("code"), out svid);
         return svid;
     }
 

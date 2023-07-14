@@ -1,6 +1,8 @@
 using System.Collections.Concurrent;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
+using WUG.Database.Models.Economy.Stocks;
+using SV2.Database.Models.Misc;
 using WUG.Database.Models.Corporations;
 using WUG.Database.Models.Factories;
 using WUG.Database.Models.Misc;
@@ -23,8 +25,8 @@ public class DBCacheItemAddition
             DBCache.dbctx.Add((Group)Item);
         else if (Type == typeof(GroupRole))
             DBCache.dbctx.Add((GroupRole)Item);
-        else if (Type == typeof(SVUser))
-            DBCache.dbctx.Add((SVUser)Item);
+        else if (Type == typeof(User))
+            DBCache.dbctx.Add((User)Item);
         else if (Type == typeof(TaxPolicy))
             DBCache.dbctx.Add((TaxPolicy)Item);
         else if (Type == typeof(ItemDefinition))
@@ -39,8 +41,8 @@ public class DBCacheItemAddition
             DBCache.dbctx.Add((UBIPolicy)Item);
         else if (Type == typeof(Transaction))
             DBCache.dbctx.Add((Transaction)Item);
-        else if (Type == typeof(District))
-            DBCache.dbctx.Add((District)Item);
+        else if (Type == typeof(Nation))
+            DBCache.dbctx.Add((Nation)Item);
         else if (Type == typeof(Province))
             DBCache.dbctx.Add((Province)Item);
         else if (Type == typeof(Infrastructure))
@@ -55,8 +57,8 @@ public class DBCacheItemAddition
             DBCache.dbctx.Add((Recipe)Item);
         else if (Type == typeof(ItemTrade))
             DBCache.dbctx.Add((ItemTrade)Item);
-        else if (Type == typeof(Senator))
-            DBCache.dbctx.Add((Senator)Item);
+        else if (Type == typeof(CouncilMember))
+            DBCache.dbctx.Add((CouncilMember)Item);
         else if (Type == typeof(NewsPost))
             DBCache.dbctx.Add((NewsPost)Item);
         else if (Type == typeof(BuildingRequest))
@@ -67,6 +69,8 @@ public class DBCacheItemAddition
             DBCache.dbctx.Add((CurrentTime)Item);
         else if (Type == typeof(CorporationShareClass))
             DBCache.dbctx.Add((CorporationShareClass)Item);
+        else if (Type == typeof(Security))
+            DBCache.dbctx.Add((Security)Item);
     }
 }
 
@@ -80,10 +84,11 @@ public static class DBCache
     public static ConcurrentQueue<DBCacheItemAddition> ItemQueue = new();
     public static ConcurrentDictionary<string, Recipe> Recipes = new();
 
-    public static VooperDB dbctx { get; set; }
+    public static WashedUpDB dbctx { get; set; }
 
-    public static Group Vooperia => Get<Group>(100)!;
+    public static Group UnitedNations => Get<Group>(100)!;
 
+    public static UpdateTimeStuff UpdateTimeStuff { get; set; }
     public static CurrentTime CurrentTime { get; set; }
 
     /// <summary>
@@ -92,6 +97,7 @@ public static class DBCache
     public static Dictionary<long, List<ProducingBuilding>> ProvincesBuildings = new();
 
     public static ConcurrentDictionary<long, ProducingBuilding> ProducingBuildingsById = new();
+    public static ConcurrentDictionary<string, Security> SecuritiesByTicker = new();
 
     public static IEnumerable<ProducingBuilding> GetAllProducingBuildings()
     {
@@ -209,7 +215,7 @@ public static class DBCache
         if (group is not null)
             return group;
 
-        var user = Get<SVUser>(Id);
+        var user = Get<User>(Id);
         if (user is not null)
             return user;
 
@@ -223,7 +229,7 @@ public static class DBCache
         if (group is not null)
             return group;
 
-        var user = Get<SVUser>(Id);
+        var user = Get<User>(Id);
         if (user is not null)
             return user;
 
@@ -232,25 +238,25 @@ public static class DBCache
 
     public static async Task LoadAsync()
     {
-        dbctx = VooperDB.DbFactory.CreateDbContext();
+        dbctx = WashedUpDB.DbFactory.CreateDbContext();
         //#if !DEBUG
 
         foreach (Group group in dbctx.Groups) {
             group.SVItemsOwnerships = new();
             Put(group.Id, group);
         }
-        foreach(SVUser user in dbctx.Users) {
+        foreach(User user in dbctx.Users) {
             user.SVItemsOwnerships = new();
             Put(user.Id, user);
         }
         foreach(TaxPolicy policy in dbctx.TaxPolicies) {
             Put(policy.Id, policy);
         }
-        foreach(District district in dbctx.Districts) {
-            Put(district.Id, district);
+        foreach(Nation nation in dbctx.Nations) {
+            Put(nation.Id, nation);
         }
         foreach(Province province in dbctx.Provinces) {
-            province.District = Get<District>(province.DistrictId);
+            province.Nation = Get<Nation>(province.NationId);
             ProvincesBuildings[province.Id] = new();
             Put(province.Id, province);
         }
@@ -289,6 +295,11 @@ public static class DBCache
         }
         foreach(var _obj in dbctx.Votes)
             Put(_obj.Id, _obj);
+        foreach (var _obj in dbctx.Securities)
+        {
+            Put(_obj.Id, _obj);
+            SecuritiesByTicker[_obj.Ticker] = _obj;
+        }
         foreach (var _obj in dbctx.States)
             Put(_obj.Id, _obj);
         foreach (var _obj in dbctx.Recipes)
@@ -303,9 +314,9 @@ public static class DBCache
         foreach (var _obj in dbctx.CorporationShareClasses)
             Put(_obj.Id, _obj);
 
-        foreach (District district in GetAll<District>())
+        foreach (Nation district in GetAll<Nation>())
         {
-            district.Provinces = GetAll<Province>().Where(x => x.DistrictId == district.Id).ToList();
+            district.Provinces = GetAll<Province>().Where(x => x.NationId == district.Id).ToList();
         }
 
         foreach (SVItemOwnership item in dbctx.SVItemOwnerships) 
@@ -331,6 +342,15 @@ public static class DBCache
 
             CurrentTime = Get<CurrentTime>(100)!;
         }
+
+        UpdateTimeStuff = await dbctx.UpdateTimeStuffs.FirstOrDefaultAsync(x => x.Id == 100);
+        if (UpdateTimeStuff is null)
+        {
+            AddNew(100, new UpdateTimeStuff() { Id = 100, LastProvinceSlotGiven = DateTime.UtcNow.AddDays(-10) });
+
+            UpdateTimeStuff = Get<UpdateTimeStuff>(100)!;
+        }
+
         //#endif
     }
 

@@ -4,7 +4,6 @@ using WUG.Managers;
 using System.Diagnostics;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
-using Valour.Api.Models;
 using WUG.Helpers;
 using WUG.Extensions;
 using WUG.Database.Managers;
@@ -20,10 +19,10 @@ namespace WUG.Controllers;
 public class ProvinceController : SVController
 {
     private readonly ILogger<ProvinceController> _logger;
-    private readonly VooperDB _dbctx;
+    private readonly WashedUpDB _dbctx;
 
     public ProvinceController(ILogger<ProvinceController> logger,
-        VooperDB dbctx)
+        WashedUpDB dbctx)
     {
         _logger = logger;
         _dbctx = dbctx;
@@ -165,7 +164,7 @@ public class ProvinceController : SVController
         if (!DBCache.HCache[typeof(Province)].TryGetValue(id, out object _obj))
             return Redirect("/");
         Province province = (Province)_obj;
-        SVUser? user = UserManager.GetUser(HttpContext);
+        User? user = UserManager.GetUser(HttpContext);
 
         if (user is null)
             return Redirect("/account/login");
@@ -212,7 +211,7 @@ public class ProvinceController : SVController
             return Redirect("/");
 
         var user = HttpContext.GetUser();
-        if (province.District.GovernorId != user.Id)
+        if (province.Nation.GovernorId != user.Id)
             return RedirectBack("You must be governor of the district to change the governor of a province!");
 
         province.GovernorId = GovernorId;
@@ -231,23 +230,23 @@ public class ProvinceController : SVController
         if (province is null) return Redirect("/");
 
         var user = HttpContext.GetUser();
-        if (province.District.GovernorId != user.Id)
+        if (province.Nation.GovernorId != user.Id)
             return RedirectBack("You must be governor of the district to change the state of a province!");
         if (model.StateId is null) {
             province.StateId = null;
             StatusMessage = $"Successfully changed the state of this province to none";
-            return Redirect($"/District/View/{province.District.Name}");
+            return Redirect($"/District/View/{province.Nation.Name}");
         }
         else {
             State? state = DBCache.Get<State>(model.StateId);
             if (state is null) return Redirect("/");
 
-            if (state.DistrictId != province.DistrictId)
+            if (state.DistrictId != province.NationId)
                 return RedirectBack("You can not assign a state to a province that is not in the same district!");
 
             province.StateId = model.StateId;
             StatusMessage = $"Successfully changed the state of this province to {state.Name}";
-            return Redirect($"/District/View/{province.District.Name}");
+            return Redirect($"/District/View/{province.Nation.Name}");
         }
     }
 
@@ -257,7 +256,7 @@ public class ProvinceController : SVController
         if (province is null)
             return Redirect("/");
 
-        SVUser? user = UserManager.GetUser(HttpContext);
+        User? user = UserManager.GetUser(HttpContext);
 
         if (user is null)
             return Redirect("/account/login");

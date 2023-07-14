@@ -5,8 +5,6 @@ using WUG.Database.Models.Users;
 using WUG.Database.Models.Economy;
 using System.Threading.Tasks;
 using System.ComponentModel.DataAnnotations.Schema;
-using Valour.Api.Client;
-using Valour.Api.Items;
 
 namespace WUG.Database.Models.Entities;
 
@@ -25,7 +23,7 @@ public interface IHasOwner
 }
 
 [JsonDerivedType(typeof(Group), 0)]
-[JsonDerivedType(typeof(SVUser), 1)]
+[JsonDerivedType(typeof(User), 1)]
 public abstract class BaseEntity
 {
     [Key]
@@ -47,8 +45,6 @@ public abstract class BaseEntity
     [VarChar(36)]
     public string ApiKey { get; set; }
 
-    public long EcoAccountId { get; set; } = 0;
-
     [NotMapped]
     public string? ImageUrl
     {
@@ -65,11 +61,14 @@ public abstract class BaseEntity
     [Column("imageurl")]
     public string? _ImageUrl { get; set; }
 
-    public long? DistrictId { get; set; }
+    public long? NationId { get; set; }
+
+    [DecimalType(3)]
+    public decimal Money { get; set; }
 
     [NotMapped]
     [JsonIgnore]
-    public District District => DBCache.Get<District>(DistrictId)!;
+    public Nation Nation => DBCache.Get<Nation>(NationId)!;
 
     [NotMapped]
     public Dictionary<long, SVItemOwnership> SVItemsOwnerships { get; set; }
@@ -77,23 +76,7 @@ public abstract class BaseEntity
     public virtual EntityType EntityType { get; }
 
     public static BaseEntity? Find(long Id) => DBCache.FindEntity(Id);
-
     public static BaseEntity? Find(long? Id) => DBCache.FindEntity(Id);
-
-    public virtual async ValueTask<EcoAccount> GetEcoAccountAsync() => await EcoAccount.FindAsync(EcoAccountId, VoopAI.VoopAI.PlanetId);
-
-    public async ValueTask<decimal> GetCreditsAsync()
-    {
-        var account = await GetEcoAccountAsync();
-        if (account is not null)
-            return account.BalanceValue;
-        return 0.0m;
-    }
-
-    public async Task<bool> SetCreditsAsync(decimal credits)
-    {
-        return false;
-    }
 
     // these methods will simply call Valour.API methods once Valour adds the Community Item System
     public async ValueTask<double> GetOwnershipOfResource(string resource) 
@@ -162,22 +145,7 @@ public abstract class BaseEntity
     }
 
     public virtual async Task Create() {
-        if (EcoAccountId == 0)
-        {
-            var ecoaccount = new EcoAccount()
-            {
-                Name = $"{Id}",
-                AccountType = Valour.Shared.Models.Economy.AccountType.Planet,
-                UserId = ValourNetClient.BotId,
-                PlanetId = VoopAI.VoopAI.PlanetId,
-                CurrencyId = VoopAI.VoopAI.SVCurrencyId,
-                BalanceValue = 0
-            };
-            var result = await Item.CreateAsync(ecoaccount);
-            Console.WriteLine(result.Message);
-            if (result.Success)
-                EcoAccountId = result.Data.Id;
-        }
+        Money = 0.0m;
     }
 
     public double GetHourlyProductionOfResource(long itemdefid) 
@@ -205,16 +173,16 @@ public abstract class BaseEntity
         return total;
     }
 
-    public async Task<decimal> GetAvgTaxableBalance(VooperDB dbctx, int hours = 720)
+    public async Task<decimal> GetAvgTaxableBalance(WashedUpDB dbctx, int hours = 720)
     {
         DateTime timetocheck = DateTime.UtcNow.AddHours(-hours);
         return await dbctx.EntityBalanceRecords.Where(x => x.EntityId == Id && x.Time > timetocheck).AverageAsync(x => x.TaxableBalance);
     }
 
-    public async ValueTask DoIncomeTax(VooperDB dbctx)
+    public async ValueTask DoIncomeTax(WashedUpDB dbctx)
     {
         // districts do not pay income tax
-        if (EntityType == EntityType.Group && DBCache.Get<District>(Id) is not null)
+        if (EntityType == EntityType.Group && DBCache.Get<Nation>(Id) is not null)
             return;
 
         // nonprofits do not pay taxes
@@ -240,15 +208,15 @@ public abstract class BaseEntity
 
         List<TaxPolicy> policies = null;
 
-        if (DistrictId is not null)
+        if (NationId is not null)
         {
 
             // do district level taxes
             policies = EntityType switch
             {
-                EntityType.Group => DBCache.GetAll<TaxPolicy>().Where(x => x.DistrictId == DistrictId && x.taxType == TaxType.GroupIncome).OrderBy(x => x.Minimum).ToList(),
-                EntityType.Corporation => DBCache.GetAll<TaxPolicy>().Where(x => x.DistrictId == DistrictId && x.taxType == TaxType.CorporateIncome).OrderBy(x => x.Minimum).ToList(),
-                EntityType.User => DBCache.GetAll<TaxPolicy>().Where(x => x.DistrictId == DistrictId && x.taxType == TaxType.PersonalIncome).OrderBy(x => x.Minimum).ToList()
+                EntityType.Group => DBCache.GetAll<TaxPolicy>().Where(x => x.NationId == NationId && x.taxType == TaxType.GroupIncome).OrderBy(x => x.Minimum).ToList(),
+                EntityType.Corporation => DBCache.GetAll<TaxPolicy>().Where(x => x.NationId == NationId && x.taxType == TaxType.CorporateIncome).OrderBy(x => x.Minimum).ToList(),
+                EntityType.User => DBCache.GetAll<TaxPolicy>().Where(x => x.NationId == NationId && x.taxType == TaxType.PersonalIncome).OrderBy(x => x.Minimum).ToList()
             };
 
             foreach (TaxPolicy policy in policies)
@@ -262,7 +230,7 @@ public abstract class BaseEntity
             }
             if (totaldue > 0.1m)
             {
-                var taxtrans = new SVTransaction(this, BaseEntity.Find((long)DistrictId), totaldue, TransactionType.TaxPayment, $"Income Tax Payment for ¢{TaxAbleBalance - taxablebalance30dago} of income.");
+                var taxtrans = new Transaction(this, BaseEntity.Find((long)NationId), totaldue, TransactionType.TaxPayment, $"Income Tax Payment for ¢{TaxAbleBalance - taxablebalance30dago} of income.");
                 taxtrans.NonAsyncExecute(true);
             }
 
@@ -274,9 +242,9 @@ public abstract class BaseEntity
         // now do imperial level taxes
         policies = EntityType switch
         {
-            EntityType.Group => DBCache.GetAll<TaxPolicy>().Where(x => x.DistrictId == 100 && x.taxType == TaxType.GroupIncome).OrderBy(x => x.Minimum).ToList(),
-            EntityType.Corporation => DBCache.GetAll<TaxPolicy>().Where(x => x.DistrictId == 100 && x.taxType == TaxType.CorporateIncome).OrderBy(x => x.Minimum).ToList(),
-            EntityType.User => DBCache.GetAll<TaxPolicy>().Where(x => x.DistrictId == 100 && x.taxType == TaxType.PersonalIncome).OrderBy(x => x.Minimum).ToList()
+            EntityType.Group => DBCache.GetAll<TaxPolicy>().Where(x => x.NationId == 100 && x.taxType == TaxType.GroupIncome).OrderBy(x => x.Minimum).ToList(),
+            EntityType.Corporation => DBCache.GetAll<TaxPolicy>().Where(x => x.NationId == 100 && x.taxType == TaxType.CorporateIncome).OrderBy(x => x.Minimum).ToList(),
+            EntityType.User => DBCache.GetAll<TaxPolicy>().Where(x => x.NationId == 100 && x.taxType == TaxType.PersonalIncome).OrderBy(x => x.Minimum).ToList()
         };
 
         foreach(TaxPolicy policy in policies)
@@ -289,16 +257,16 @@ public abstract class BaseEntity
                 break;
         }
         if (totaldue > 0.1m) {
-            SVTransaction taxtrans = new SVTransaction(this, BaseEntity.Find(100), totaldue, TransactionType.TaxPayment, $"Income Tax Payment for ¢{TaxAbleBalance - taxablebalance30dago} of income.");
+            Transaction taxtrans = new Transaction(this, BaseEntity.Find(100), totaldue, TransactionType.TaxPayment, $"Income Tax Payment for ¢{TaxAbleBalance - taxablebalance30dago} of income.");
             taxtrans.NonAsyncExecute(true);
         }
 
         // do district level balance tx
-        TaxPolicy? _policy = DBCache.GetAll<TaxPolicy>().FirstOrDefault(x => x.DistrictId == DistrictId && x.taxType == TaxType.UserBalance);
+        TaxPolicy? _policy = DBCache.GetAll<TaxPolicy>().FirstOrDefault(x => x.NationId == NationId && x.taxType == TaxType.UserBalance);
         if (_policy is not null) {
-            totaldue = _policy.GetTaxAmount(await GetCreditsAsync());
+            totaldue = _policy.GetTaxAmount(Money);
             if (totaldue > 0.1m) {
-                var taxtrans = new SVTransaction(this, BaseEntity.Find((long)DistrictId), totaldue, TransactionType.TaxPayment, $"Balance Tax Payment tax id: {_policy.Id}");
+                var taxtrans = new Transaction(this, BaseEntity.Find((long)NationId), totaldue, TransactionType.TaxPayment, $"Balance Tax Payment tax id: {_policy.Id}");
                 taxtrans.NonAsyncExecute(true);
                 _policy.Collected += totaldue;
             }
@@ -333,11 +301,11 @@ public abstract class BaseEntity
         return groups;
     }
 
-    public static async Task<BaseEntity?> FindByApiKey(string apikey, VooperDB dbctx)
+    public static async Task<BaseEntity?> FindByApiKey(string apikey, WashedUpDB dbctx)
     {
         BaseEntity? entity = DBCache.GetAll<Group>().FirstOrDefault(x => x.ApiKey == apikey);
         if (entity is null) {
-            entity = DBCache.GetAll<SVUser>().FirstOrDefault(x => x.ApiKey == apikey);
+            entity = DBCache.GetAll<User>().FirstOrDefault(x => x.ApiKey == apikey);
         }
 
         if (entity is null)

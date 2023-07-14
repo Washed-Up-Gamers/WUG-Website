@@ -29,14 +29,14 @@ namespace WUG.API
             await ctx.Response.WriteAsJsonAsync(items);
         }
 
-        private static async Task GetItemsFromDefinition(HttpContext ctx, VooperDB db, long definitionid)
+        private static async Task GetItemsFromDefinition(HttpContext ctx, WashedUpDB db, long definitionid)
         {
             IEnumerable<SVItemOwnership> definitions = DBCache.GetAll<SVItemOwnership>().Where(x => x.DefinitionId == definitionid);
 
             await ctx.Response.WriteAsJsonAsync(definitions);
         }
 
-        private static async Task GetItem(HttpContext ctx, VooperDB db, long itemid)
+        private static async Task GetItem(HttpContext ctx, WashedUpDB db, long itemid)
         {
             // find Item
             SVItemOwnership? item = DBCache.GetAll<SVItemOwnership>().FirstOrDefault(x => x.Id == itemid);
@@ -49,7 +49,7 @@ namespace WUG.API
             await ctx.Response.WriteAsJsonAsync(item);
         }
 
-        private static async Task GetOwner(HttpContext ctx, VooperDB db, long itemid)
+        private static async Task GetOwner(HttpContext ctx, WashedUpDB db, long itemid)
         {
             // find Item
             SVItemOwnership? item = DBCache.GetAll<SVItemOwnership>().FirstOrDefault(x => x.Id == itemid);
@@ -84,7 +84,7 @@ namespace WUG.API
             await ctx.Response.WriteAsync((entity.SVItemsOwnerships.ContainsKey(itemdefid) ? entity.SVItemsOwnerships[itemdefid].Amount : 0).ToString());
         }
 
-        private static async Task Give(HttpContext ctx, VooperDB db, long itemdefid, string apikey, long fromid, long toid, int amount, string detail)
+        private static async Task Give(HttpContext ctx, WashedUpDB db, long itemdefid, string apikey, long fromid, long toid, int amount, string detail)
         {
             // find Item
             var def = DBCache.Get<ItemDefinition>(itemdefid);

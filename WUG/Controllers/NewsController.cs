@@ -5,7 +5,6 @@ using System.Diagnostics;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
-using Valour.Api.Models;
 using WUG.Database.Models.Districts;
 using WUG.Helpers;
 using WUG.Database.Models.News;
@@ -16,10 +15,10 @@ namespace WUG.Controllers;
 public class NewsController : SVController
 {
     private readonly ILogger<NewsController> _logger;
-    private readonly VooperDB _dbctx;
+    private readonly WashedUpDB _dbctx;
 
     public NewsController(ILogger<NewsController> logger,
-        VooperDB dbctx)
+        WashedUpDB dbctx)
     {
         _logger = logger;
         _dbctx = dbctx;
@@ -42,7 +41,7 @@ public class NewsController : SVController
     [HttpGet]
     public async Task<IActionResult> Create(long groupid)
     {
-        SVUser? user = UserManager.GetUser(HttpContext);
+        User? user = UserManager.GetUser(HttpContext);
 
         if (user is null)
         {
@@ -71,7 +70,7 @@ public class NewsController : SVController
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(NewsPost model)
     {
-        SVUser? user = UserManager.GetUser(HttpContext);
+        User? user = UserManager.GetUser(HttpContext);
         if (user is null)
             return Redirect("/account/login");
 

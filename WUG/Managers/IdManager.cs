@@ -11,6 +11,7 @@ public static class IdManagers
     public static IdManager GroupIdGenerator = new(1);
 
     public static IdManager StatIdGenerator = new(2);
+    public static IdManager SecurityHistoryIdGenerator = new(3);
 }
 
 public class IdManager

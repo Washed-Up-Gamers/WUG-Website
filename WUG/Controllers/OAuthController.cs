@@ -14,12 +14,12 @@ namespace WUG.Controllers;
 
 public class OauthController : SVController
 {
-    private readonly VooperDB _context;
+    private readonly WashedUpDB _context;
 
     public static List<AuthorizeModel> authModels = new List<AuthorizeModel>();
 
     public OauthController(
-        VooperDB context)
+        WashedUpDB context)
     {
         _context = context;
     }
@@ -35,7 +35,7 @@ public class OauthController : SVController
     [UserRequired]
     public async Task<IActionResult> Authorize(string response_type, long client_id, string redirect_uri, string scope, string state)
     {
-        SVUser user = HttpContext.GetUser();
+        User user = HttpContext.GetUser();
 
         if (response_type == null || string.IsNullOrWhiteSpace(response_type))
         {
@@ -154,7 +154,7 @@ public class OauthController : SVController
             if (app.Secret != client_secret)
                 return Unauthorized("Failed authorization. This failure has been logged.");
 
-            var user = DBCache.Get<SVUser>(auth.UserID);
+            var user = DBCache.Get<User>(auth.UserID);
             var entity = DBCache.FindEntity(auth.EntityId);
             if (!(entity.EntityType == EntityType.User))
             {

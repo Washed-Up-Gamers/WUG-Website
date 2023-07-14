@@ -3,7 +3,6 @@ using Shared.Models.Entities;
 using WUG.Extensions;
 using WUG.Helpers;
 using WUG.Models.Recipes;
-using Valour.Api.Models;
 
 namespace WUG.Controllers;
 

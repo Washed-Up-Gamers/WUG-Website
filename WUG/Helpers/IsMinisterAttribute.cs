@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Mvc;
 using WUG.Controllers;
 using System.Security.Claims;
-using Valour.Api.Models;
 
 namespace WUG.Helpers;
 
@@ -17,7 +16,7 @@ public class IsMinisterAttribute : ActionFilterAttribute
 
     public override void OnActionExecuting(ActionExecutingContext context)
     {
-        SVUser? user = UserManager.GetUser(context.HttpContext);
+        User? user = UserManager.GetUser(context.HttpContext);
         SVController controller = (SVController)context.Controller;
         if (user is null)
             context.Result = controller.Redirect("/Account/Login");

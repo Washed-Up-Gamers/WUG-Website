@@ -2,10 +2,10 @@
 
 public class GovernmentIndexModel
 {
-    public SVUser? Emperor;
-    public SVUser? PrimeMinister;
-    public SVUser? CFV;
-    public List<Senator> Senators;
-    public List<SVUser> Justices;
-    public List<SVUser> PanelMembers;
+    public User? Emperor;
+    public User? PrimeMinister;
+    public User? CFV;
+    public List<CouncilMember> Senators;
+    public List<User> Justices;
+    public List<User> PanelMembers;
 }

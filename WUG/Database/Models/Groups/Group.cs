@@ -5,7 +5,6 @@ using WUG.Database.Models.Entities;
 using WUG.Database.Models.Users;
 using Microsoft.EntityFrameworkCore;
 using WUG.Web;
-using Valour.Api.Models;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace WUG.Database.Models.Groups;
@@ -24,12 +23,8 @@ public enum GroupTypes
 
 public enum ReadableGroupTypes {
     Company = 0,
-    Corporation = 1,
     NonProfit = 2,
-    PoliticalParty = 3,
-    District = 4,
-    State = 5,
-    Province = 6
+    PoliticalParty = 3
 }
 
 public enum GroupFlag
@@ -83,7 +78,7 @@ public class Group : BaseEntity, IHasOwner
     [JsonIgnore]
     public BaseEntity Owner => BaseEntity.Find(OwnerId)!;
 
-    public bool IsInGroup(SVUser user)
+    public bool IsInGroup(User user)
     {
         return MembersIds.Contains(user.Id);
     }
@@ -220,7 +215,7 @@ public class Group : BaseEntity, IHasOwner
     {
         List<Group> groups = new List<Group>();
 
-        using var dbctx = VooperDB.DbFactory.CreateDbContext();
+        using var dbctx = WashedUpDB.DbFactory.CreateDbContext();
 
         var topGroups = await dbctx.Groups.Where(x => x.OwnerId == Id).ToListAsync();
 

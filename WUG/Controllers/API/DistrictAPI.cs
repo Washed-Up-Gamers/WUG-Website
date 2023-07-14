@@ -19,7 +19,7 @@ public class DistrictAPI : BaseAPI
 
     private static async Task GetDistrictAsync(HttpContext ctx, long id)
     {
-        await ctx.Response.WriteAsJsonAsync(DBCache.Get<District>(id));
+        await ctx.Response.WriteAsJsonAsync(DBCache.Get<Nation>(id));
     }
 
     private static async Task GetAllProvincesAsync(HttpContext ctx)

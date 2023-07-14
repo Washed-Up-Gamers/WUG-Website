@@ -10,7 +10,7 @@ namespace WUG.Workers
     {
         private readonly IServiceScopeFactory _scopeFactory;
         public readonly ILogger<ItemTradeWorker> _logger;
-        private static VooperDB dbctx;
+        private static WashedUpDB dbctx;
         private static DateTime LastTime = DateTime.UtcNow;
 
         public ItemTradeWorker(ILogger<ItemTradeWorker> logger,
@@ -18,7 +18,7 @@ namespace WUG.Workers
         {
             _logger = logger;
             _scopeFactory = scopeFactory;
-            dbctx = VooperDB.DbFactory.CreateDbContext();
+            dbctx = WashedUpDB.DbFactory.CreateDbContext();
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)

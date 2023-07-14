@@ -8,6 +8,7 @@ using WUG.Database.Models.Users;
 using WUG.Web;
 using System.Data;
 using System.Diagnostics;
+using TargetType = WUG.Database.Models.Stats.TargetType;
 
 namespace WUG.Workers;
 
@@ -16,14 +17,14 @@ public class StatWorker : BackgroundService
     private readonly IServiceScopeFactory _scopeFactory;
     public readonly ILogger<StatWorker> _logger;
 
-    private readonly VooperDB _dbctx;
+    private readonly WashedUpDB _dbctx;
 
     public StatWorker(ILogger<StatWorker> logger,
                         IServiceScopeFactory scopeFactory)
     {
         _logger = logger;
         _scopeFactory = scopeFactory;
-        _dbctx = VooperDB.DbFactory.CreateDbContext();
+        _dbctx = WashedUpDB.DbFactory.CreateDbContext();
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -45,7 +46,7 @@ public class StatWorker : BackgroundService
                             }
                         }
 
-                        foreach (var user in DBCache.GetAll<SVUser>())
+                        foreach (var user in DBCache.GetAll<User>())
                         {
                             _dbctx.Stats.Add(new Stat()
                             {
@@ -66,7 +67,7 @@ public class StatWorker : BackgroundService
                             Id = IdManagers.StatIdGenerator.Generate(), 
                             TargetType = TargetType.Global, 
                             StatType = StatType.Population,
-                            Value = DBCache.GetAll<Province>().Sum(x => x.Population)});
+                            Value = DBCache.GetAll<Province>().Where(x => x.NationId != 100).Sum(x => x.Population)});
 
                         _dbctx.Stats.Add(new Stat()
                         {
@@ -74,7 +75,7 @@ public class StatWorker : BackgroundService
                             Id = IdManagers.StatIdGenerator.Generate(),
                             TargetType = TargetType.Global,
                             StatType = StatType.UsedBuildingSlots,
-                            Value = DBCache.GetAll<Province>().Sum(x => x.BuildingSlotsUsed)
+                            Value = DBCache.GetAll<Province>().Where(x => x.NationId != 100).Sum(x => x.BuildingSlotsUsed)
                         });
 
                         _dbctx.Stats.Add(new Stat()
@@ -83,10 +84,10 @@ public class StatWorker : BackgroundService
                             Id = IdManagers.StatIdGenerator.Generate(),
                             TargetType = TargetType.Global,
                             StatType = StatType.TotalBuildingSlots,
-                            Value = DBCache.GetAll<Province>().Sum(x => x.BuildingSlots)
+                            Value = DBCache.GetAll<Province>().Where(x => x.NationId != 100).Sum(x => x.BuildingSlots)
                         });
 
-                        foreach (var district in DBCache.GetAll<District>())
+                        foreach (var district in DBCache.GetAll<Nation>())
                         {
                             _dbctx.Stats.Add(new Stat()
                             {

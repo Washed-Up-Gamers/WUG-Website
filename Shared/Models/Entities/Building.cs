@@ -25,7 +25,7 @@ public abstract class BuildingBase : Item, ITickable
     public async ValueTask<BaseEntity> GetOwnerAsync() => await BaseEntity.FindAsync(OwnerId);
     public async ValueTask<Province> GetProvinceAsync() => await Province.FindAsync(ProvinceId);
     public async ValueTask<LuaBuilding> GetLuaBuildingAsync() => await LuaBuilding.FindAsync(LuaBuildingObjId);
-    public async ValueTask<District> GetDistrictAsync() => await District.FindAsync(DistrictId);
+    public async ValueTask<Nation> GetDistrictAsync() => await Nation.FindAsync(DistrictId);
     public async ValueTask<Recipe> GetRecipeAsync() => await Recipe.FindAsync(RecipeId);
 
     public bool SuccessfullyTicked { get; set; }
@@ -83,7 +83,7 @@ public abstract class ProducingBuilding : BuildingBase
     }
 
     public BaseEntity Owner { get; set; }
-    public District District { get; set; }
+    public Nation District { get; set; }
     public Province Province { get; set; }
     public Recipe Recipe { get; set; }
 }

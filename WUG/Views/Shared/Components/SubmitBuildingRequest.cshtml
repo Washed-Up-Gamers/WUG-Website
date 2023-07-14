@@ -32,7 +32,7 @@
         <span>Costs to build:</span>
         <br />
         <div class="buildingcosts">
-            @foreach ((var resource, var amount) in Model.LuaBuildingObj.BuildingCosts.Evaluate(new ExecutionState(Model.Province.District, Model.Province)))
+            @foreach ((var resource, var amount) in Model.LuaBuildingObj.BuildingCosts.Evaluate(new ExecutionState(Model.Province.Nation, Model.Province)))
             {
                 <div class="resource-row">
                     <span style="align-self: flex-start">@resource.Replace("_", " ")</span>
@@ -78,7 +78,7 @@
                     @{
                         ProducingBuilding building = DBCache.GetAllProducingBuildings().FirstOrDefault(x => Model.AlreadyExistingBuildingId == x.Id);
                     }
-                    @foreach ((var resource, var amount) in Model.LuaBuildingObj.GetConstructionCost(BaseEntity.Find(Model.RequesterId), Model.Province.District, Model.Province, building, 1))
+                    @foreach ((var resource, var amount) in Model.LuaBuildingObj.GetConstructionCost(BaseEntity.Find(Model.RequesterId), Model.Province.Nation, Model.Province, building, 1))
                     {
                         <div class="resource-row">
                             <span style="align-self: flex-start">@resource.Replace("_", " ")</span>

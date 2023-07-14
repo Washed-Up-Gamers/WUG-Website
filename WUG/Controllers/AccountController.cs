@@ -4,16 +4,13 @@ using WUG.Managers;
 using WUG.Database.Models.Users;
 using System.Diagnostics;
 using WUG.Models.Manage;
-using Valour.Shared.Models;
-using WUG.VoopAI;
-using Valour.Shared.Authorization;
-using Valour.Api.Client;
 using System.Web;
 using System.Text.Json;
 using WUG.Helpers;
-using Valour.Api.Nodes;
 using WUG.NonDBO;
-using Valour.Shared;
+using WUG.Models.Oauth;
+using System.Net;
+using System.Net.Http;
 
 namespace WUG.Controllers;
 
@@ -37,7 +34,7 @@ public class AccountController : SVController {
 
     public async Task<IActionResult> Manage()
     {
-        SVUser? user = UserManager.GetUser(HttpContext);
+        User? user = UserManager.GetUser(HttpContext);
         UserManageModel userManageModel = new()
         {
             Id = user.Id,
@@ -55,7 +52,7 @@ public class AccountController : SVController {
 
     public async Task<IActionResult> ViewAPIKey()
     {
-        SVUser? user = UserManager.GetUser(HttpContext);
+        User? user = UserManager.GetUser(HttpContext);
 
         if (user is null) 
         {
@@ -67,67 +64,81 @@ public class AccountController : SVController {
 
     public IActionResult Logout()
     {
-        HttpContext.Response.Cookies.Delete("svid");
+        HttpContext.Response.Cookies.Delete("wugid");
         return Redirect("/");
     }
 
     public IActionResult Entered()
     {
         
-        long svid = UserManager.GetSvidFromSession(HttpContext);
+        long wugid = UserManager.GetWugidFromSession(HttpContext);
         Console.WriteLine(HttpContext.Session.GetString("code"));
-        HttpContext.Response.Cookies.Append("svid", svid.ToString());
+        HttpContext.Response.Cookies.Append("wugid", wugid.ToString());
         return Redirect("/");
     }
 
-    public static List<string> NodeNames = new()
-    {
-        "emma",
-        "jeff"
-    };
-
     [Route("/callback")]
-    public async Task<IActionResult> Callback(string code, string state, string node = "")
+    public async Task<IActionResult> Callback(string code, string state)
     {
         if (!OAuthStates.Contains(state))
             return Forbid();
 
-        var url = $"api/oauth/token?client_id={ValourConfig.instance.OAuthClientId}&client_secret={ValourConfig.instance.OAuthClientSecret}&grant_type=authorization_code&code={code}&redirect_uri={HttpUtility.UrlEncode(Redirecturl)}&state={state}";
+        HttpClient client = new HttpClient();
 
-        TaskResult<Valour.Api.Models.AuthToken> result;
-        if (node != "")
-            result = await ValourClient.GetJsonAsync<Valour.Api.Models.AuthToken>(url, http: NodeManager.GetNodeFromName(node)?.HttpClient);
-        else
+        var url = $"https://discord.com/api/oauth2/token";
+
+        string stringresult = "";
+        using (var content = new FormUrlEncodedContent(new List<KeyValuePair<string, string>>()
         {
-            result = new();
-            foreach (var name in NodeNames)
-            {
-                result = await ValourClient.GetJsonAsync<Valour.Api.Models.AuthToken>(url, http: NodeManager.GetNodeFromName(name)?.HttpClient);
-                if (result.Success)
-                    break;
-            }
-        }
-        //Console.WriteLine(result.Data);
-        if (!result.Success)
-            Console.WriteLine(result.Message);
-        var token = result.Data;
-        var valouruser = await Valour.Api.Models.User.FindAsync(token.UserId);
+            new("client_id", DiscordConfig.instance.OAuthClientId.ToString()),
+            new("client_secret", DiscordConfig.instance.OAuthClientSecret),
+            new("grant_type", "authorization_code"),
+            new("code", code),
+            new("redirect_uri", Redirecturl)
+        }))
+        {
+            content.Headers.Clear();
+            content.Headers.Add("Content-Type", "application/x-www-form-urlencoded");
 
-        var user = DBCache.GetAll<SVUser>().FirstOrDefault(x => x.ValourId == token.UserId);
+            HttpResponseMessage response = await client.PostAsync(url, content);
+
+            stringresult = await response.Content.ReadAsStringAsync();
+        }
+
+        var result = JsonSerializer.Deserialize<DiscordOAuthResponse>(stringresult);
+
+        HttpWebRequest webRequest1 = (HttpWebRequest)WebRequest.Create("https://discord.com/api/users/@me");
+        webRequest1.Method = "Get";
+        webRequest1.ContentLength = 0;
+        webRequest1.Headers.Add("Authorization", "Bearer " + result.access_token);
+        webRequest1.ContentType = "application/x-www-form-urlencoded";
+
+        string apiResponse = "";
+        using (HttpWebResponse response1 = webRequest1.GetResponse() as HttpWebResponse)
+        {
+            StreamReader reader1 = new StreamReader(response1.GetResponseStream());
+            apiResponse = reader1.ReadToEnd();
+        }
+
+        var userinfo = JsonSerializer.Deserialize<DiscordUserInfo>(apiResponse);
+        ulong userid = ulong.Parse(userinfo.id);
+
+        var member = await VoopAI.Server.GetMemberAsync(userid);
+        var user = DBCache.GetAll<User>().FirstOrDefault(x => x.DiscordUserId == userid);
         if (user is null)
         {
-            using var dbctx = VooperDB.DbFactory.CreateDbContext();
-            user = new SVUser(valouruser.Name, valouruser.Id);
+            using var dbctx = WashedUpDB.DbFactory.CreateDbContext();
+            user = new User(member.Nickname, userid);
             DBCache.AddNew(user.Id, user);
 
             //await dbctx.SaveChangesAsync();
         }
 
-        user.ImageUrl = valouruser.PfpUrl;
-        user.OAuthToken = token.Id;
+        user.ImageUrl = member.AvatarUrl;
+        user.Name = member.Nickname;
         await user.Create();
 
-        HttpContext.Response.Cookies.Append("svid", user.Id.ToString());
+        HttpContext.Response.Cookies.Append("wugid", user.Id.ToString());
         return Redirect("/");
     }
 
@@ -135,30 +146,9 @@ public class AccountController : SVController {
     {
         var oauthstate = Guid.NewGuid().ToString();
 
-        AuthorizeModel model = new()
-        {
-            ClientId = ValourConfig.instance.OAuthClientId,
-            RedirectUri = HttpUtility.UrlEncode(Redirecturl),
-            UserId = ValourNetClient.BotId,
-            ResponseType = "",
-            Scope = UserPermissions.Minimum.Value | UserPermissions.View.Value | UserPermissions.EconomyViewPlanet.Value | UserPermissions.EconomySendPlanet.Value
-            | UserPermissions.EconomyViewGlobal.Value | UserPermissions.EconomySendGlobal.Value,
-            Code = "",
-            State = oauthstate
-        };
-
-        string url = $"https://app.valour.gg/authorize?client_id={ValourConfig.instance.OAuthClientId}";
-        url += $"&response_type=code&redirect_uri={HttpUtility.UrlEncode(Redirecturl)}&state={oauthstate}&scope={model.Scope}";
         OAuthStates.Add(oauthstate);
+        var url = $"https://discord.com/api/oauth2/authorize?client_id=1124797654199717938&redirect_uri={HttpUtility.UrlEncode(Redirecturl)}&response_type=code&scope=identify&state={oauthstate}";
         return Redirect(url);
-        //Console.WriteLine(oauthstate);
-
-        // var result = await ValourClient.PostAsyncWithResponse<string>($"api/oauth/authorize", model);
-        // if (!result.Success)
-        //     Console.WriteLine(result.Message);
-        //var url = result.Data;
-        // OAuthStates.Add(oauthstate);
-        //return Redirect(url);
     }
 
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
@@ -166,4 +156,24 @@ public class AccountController : SVController {
     {
         return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
     }
+}
+
+public class DiscordOAuthDataModel
+{
+    public long client_id { get; set; }
+    public string client_secret { get; set; }
+    public string grant_type { get; set; }
+    public string code { get; set; }
+    public string redirect_uri { get; set; }
+}
+
+public class DiscordOAuthResponse
+{
+    public string access_token { get; set; }
+}
+
+public class DiscordUserInfo
+{
+    public string username { get; set; }
+    public string id { get; set; }
 }

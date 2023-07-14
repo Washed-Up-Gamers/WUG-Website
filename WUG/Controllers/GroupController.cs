@@ -7,10 +7,12 @@ using WUG.Helpers;
 using WUG.Extensions;
 using Microsoft.AspNetCore.Identity;
 using WUG.Models.Groups;
-using Valour.Api.Models;
 using Microsoft.AspNetCore.Authorization;
 using WUG.Models.Manage;
 using System.Data;
+using Microsoft.EntityFrameworkCore;
+using WUG.Database.Models.Economy.Stocks;
+using System.Text.Json;
 
 namespace WUG.Controllers;
 
@@ -19,9 +21,9 @@ public class GroupController : SVController
 {
     private readonly ILogger<GroupController> _logger;
 
-    private readonly VooperDB _dbctx;
+    private readonly WashedUpDB _dbctx;
 
-    public GroupController(ILogger<GroupController> logger, VooperDB dbctx)
+    public GroupController(ILogger<GroupController> logger, WashedUpDB dbctx)
     {
         _logger = logger;
         _dbctx = dbctx;
@@ -105,7 +107,7 @@ public class GroupController : SVController
 
     public IActionResult Create()
     {
-        SVUser? user = UserManager.GetUser(HttpContext);
+        User? user = UserManager.GetUser(HttpContext);
 
         if (user is null) 
         {
@@ -119,7 +121,7 @@ public class GroupController : SVController
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(CreateGroupModel model)
     {
-        SVUser? user = UserManager.GetUser(HttpContext);
+        User? user = UserManager.GetUser(HttpContext);
         if (user is null) 
             return Redirect("/account/login");
 
@@ -137,7 +139,7 @@ public class GroupController : SVController
         Group group = new Group(model.Name, user.Id) {
             Description = model.Description,
             GroupType = model.GroupType,
-            DistrictId = model.DistrictId,
+            NationId = model.DistrictId,
             ImageUrl = model.ImageUrl,
             OwnerId = user.Id
         };
@@ -160,7 +162,7 @@ public class GroupController : SVController
             Description = group.Description,
             Open = group.Open,
             Id = group.Id,
-            DistrictId = group.DistrictId,
+            DistrictId = group.NationId,
             ImageUrl = group.ImageUrl,
             GroupType = group.GroupType
         });
@@ -273,7 +275,7 @@ public class GroupController : SVController
         //    return View(model);
         //}
 
-        SVUser user = HttpContext.GetUser();
+        User user = HttpContext.GetUser();
 
         Group prevgroup = Group.Find(model.Id)!;
 
@@ -309,7 +311,7 @@ public class GroupController : SVController
             prevgroup.Name = model.Name;
             prevgroup.ImageUrl = model.ImageUrl;
             prevgroup.Open = model.Open;
-            prevgroup.DistrictId = model.DistrictId;
+            prevgroup.NationId = model.DistrictId;
             prevgroup.Description = model.Description;
         }
 
@@ -470,7 +472,7 @@ public class GroupController : SVController
     [UserRequired]
     public IActionResult TransferGroup(long groupid)
     {
-        SVUser user = HttpContext.GetUser();
+        User user = HttpContext.GetUser();
 
         // Retrieve group
         Group group = DBCache.Get<Group>(groupid);
@@ -543,6 +545,268 @@ public class GroupController : SVController
         group.MembersIds.Add(toentity.Id);
 
         return RedirectBack($"Successfully transferred group ownership to {toentity.Name}");
+    }
+
+    [HttpGet]
+    [UserRequired]
+    public async Task<IActionResult> DoIPO(long groupid)
+    {
+        Group group = DBCache.Get<Group>(groupid);
+
+        User user = HttpContext.GetUser();
+        if (TempData["form"] != null)
+        {
+            var model = JsonSerializer.Deserialize<IssueIPOModel>((string)TempData["form"]);
+            model.Group = group;
+            model.GroupId = group.Id;
+            return View(model);
+        }
+
+        if (group == null)
+            return RedirectBack($"Could not find the group with id {groupid}");
+
+        if (group.HasPermission(user, GroupPermissions.Eco))
+        {
+            if (group.Money < 10000.0m)
+            {
+                return RedirectBack("Error: Your group must be worth at least $10,000!");
+            }
+
+            // Already IPOed
+            if (DBCache.GetAll<Security>().FirstOrDefault(s => s.GroupId == groupid) is not null)
+            {
+                return RedirectBack("This group has already been IPOed!");
+            }
+
+            IssueIPOModel model = new IssueIPOModel()
+            {
+                Group = group,
+                GroupId = groupid
+            };
+
+            return View(model);
+        }
+        else
+        {
+            return RedirectBack("You do not have group Eco permissions!");
+        }
+    }
+
+    [HttpPost]
+    [UserRequired]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> DoIPO(IssueIPOModel model)
+    {
+        Group group = DBCache.Get<Group>(model.GroupId);
+
+        User user = HttpContext.GetUser();
+
+        TempData["form"] = JsonSerializer.Serialize(model);
+        if (group == null)
+            return RedirectBack($"Could not find the group!");
+
+        if (group.GroupType is GroupTypes.District or GroupTypes.State or GroupTypes.Province or GroupTypes.NonProfit or GroupTypes.PoliticalParty || group.Id == 100)
+            return RedirectBack($"Only companies can IPO!");
+
+        if (group.HasPermission(user, GroupPermissions.Eco))
+        {
+            if (model.StartingBalance > group.Money)
+                return RedirectBack("Your stock's initial starting balance must be lower than your group's balance!");
+
+            // Already IPOed
+            if (DBCache.GetAll<Security>().FirstOrDefault(s => s.GroupId == group.Id) is not null)
+                return RedirectBack("This group has already been IPOed!");
+
+            // Ticker already taken
+            if (DBCache.GetAll<Security>().Any(x => x.Ticker == model.Ticker))
+                return RedirectBack("That ticker is already taken!");
+
+            long max = (int)Math.Floor(model.StartingBalance * 5.0m);
+
+            long amount = model.Amount;
+            long keep = model.Keep;
+
+            if (model.StartingBalance < 5000.0m)
+                return RedirectBack("Starting balance must be $5,000 or higher!");
+            if (model.StartingBalance / amount * 5 > 200.0m)
+                return RedirectBack("Initial starting price must be under $200! Increase the amount you are issuing to bring down the initial starting price.");
+            if (model.StartingBalance / amount * 5 < 1.0m)
+                return RedirectBack("Initial starting price must be above $1! Decrease the amount you are issuing or increase the starting balance to bring up the initial starting price.");
+
+            if (amount > max)
+            {
+                return RedirectBack("You cannot issue that much stock!");
+            }
+            if (keep > amount)
+            {
+                return RedirectBack("You cannot keep more stock than you issue!");
+            }
+            if (amount < 100)
+            {
+                return RedirectBack("You cannot issue less than 100 shares!");
+            }
+
+            var tran = new Transaction(group, BaseEntity.Find(99), model.StartingBalance, TransactionType.IPO, "IPO");
+            tran.NonAsyncExecute(true);
+
+            var security = new Security()
+            {
+                Id = IdManagers.GeneralIdGenerator.Generate(),
+                Balance = model.StartingBalance,
+                Shares = model.Amount,
+                OpenShares = model.Amount - model.Keep,
+                Price = model.StartingBalance / model.Amount * 5.0m,
+                GroupId = group.Id,
+                Ticker = model.Ticker,
+                SellVolumeThisHour = 0,
+                BuyVolumeThisHour = 0,
+                SellWorthTradedThisHour = 0,
+                BuyWorthTradedThisHour = 0,
+                Description = ""
+            };
+
+            DBCache.AddNew(security.Id, security);
+            DBCache.SecuritiesByTicker.TryAdd(security.Ticker, security);
+
+            var ownership = new SecurityOwnership()
+            {
+                Id = IdManagers.GeneralIdGenerator.Generate(),
+                OwnerId = user.Id,
+                SecurityId = security.Id,
+                Amount = model.Keep
+            };
+
+            _dbctx.SecurityOwnerships.Add(ownership);
+            await _dbctx.SaveChangesAsync();
+
+            StatusMessage = $"Successfully issued {amount} ${model.Ticker}";
+
+            await VoopAI.EcoChannel.SendMessageAsync($":new: Welcome new company {model.Ticker}'s ({group.Name}) IPO with {model.Amount} stock added to the market!");
+            TempData.Remove("form");
+            return RedirectToAction("Index", controllerName: "Exchange");
+        }
+        else
+        {
+            return RedirectBack("You do not have group Eco permissions!");
+        }
+    }
+
+    [UserRequired]
+    public async Task<IActionResult> IssueStock(long groupid)
+    {
+        Group group = DBCache.Get<Group>(groupid);
+
+        User user = HttpContext.GetUser();
+
+        if (group is null)
+            return RedirectBack($"Could not find the group with id {groupid}");
+
+        if (group.HasPermission(user, GroupPermissions.Eco))
+        {
+            if (DBCache.GetAll<Security>().FirstOrDefault(x => x.GroupId == groupid) is null)
+                return RedirectToAction("DoIPO", new { groupid = groupid });
+
+            if (TempData["form"] != null)
+            {
+                var model = JsonSerializer.Deserialize<IssueStockModal>((string)TempData["form"]);
+                model.Group = group;
+                model.GroupId = group.Id;
+                return View(model);
+            }
+
+            return View(new IssueStockModal() { Group = group, GroupId = groupid});
+        }
+        else
+            return RedirectBack("You do not have group Eco permissions!");
+    }
+
+    [HttpPost]
+    [UserRequired]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> IssueStock(IssueStockModal model)
+    {
+        Group group = DBCache.Get<Group>(model.GroupId);
+
+        User user = HttpContext.GetUser();
+
+        TempData["form"] = JsonSerializer.Serialize(model);
+
+        if (group is null)
+            return RedirectBack($"Could not find the group with id {model.GroupId}");
+
+        if (group.HasPermission(user, GroupPermissions.Eco))
+        {
+            var security = DBCache.GetAll<Security>().FirstOrDefault(x => x.GroupId == model.GroupId);
+
+            if (security is null)
+                return RedirectToAction("DoIPO", new { groupid = model.GroupId });
+
+            if (model.DepositAmount < 0.0m)
+                return RedirectBack("The amount of money you wish to deposit upon issuance must be 0 or higher!");
+            if (model.DepositAmount > group.Money)
+                return RedirectBack("You can not deposit more money than your group has!");
+
+            var newbalance = security.Balance + model.DepositAmount;
+
+            long currentStock = security.Shares;
+            long newtotalshares = security.Shares + model.Amount;
+
+            var newprice = newbalance / newtotalshares * 5.0m; 
+            if (newprice < 1.0m)
+                return RedirectBack($"Cannot issue that much stock! Price would go under $1!");
+
+            if (model.Amount < 1)
+                return RedirectBack("Amount of stock to issue must be above 0!");
+            if (model.Purchase < 0)
+                return RedirectBack("Amount to buy upon issuing must be o or above");
+            if (model.Purchase > model.Amount)
+                return RedirectBack("You can't buy more stock than you issue!");
+
+            long total = 0;
+            long price = (long)(newprice* 1_000_000);
+            long balance = (long)(newbalance * 1_000_000);
+            for (int i = 0; i < model.Purchase; i++)
+            {
+                balance += price;
+                total += price;
+                price = balance / newtotalshares * 5; // apply 5x to make prices move more
+            }
+
+            var totalinDecimalForm = total / 1_000_000.0m;
+            if (user.Money < totalinDecimalForm)
+                return RedirectBack($"You lack enough money to buy {model.Purchase} shares upon issuance.");
+
+            if (model.DepositAmount > 0.00m)
+            {
+                var tran = new Transaction(group, DBCache.FindEntity(99), model.DepositAmount, TransactionType.NonTaxedOther, $"Deposit into ${security.Ticker} stock");
+                var tranresult = await tran.Execute(true);
+
+                if (!tranresult.Succeeded)
+                    return RedirectBack($"Error depositing money: {tranresult.Info}");
+            }
+
+            security.OpenShares += model.Amount;
+            security.Shares += model.Amount;
+            security.Balance += model.DepositAmount;
+            security.Price = security.Balance / security.Shares * 5.0m;
+
+            if (model.Purchase > 0)
+            {
+                var trade = new StockTrade(security.Ticker, security.Id, model.Purchase, StockTradeType.Buy, group);
+                var result = await trade.Execute(true);
+                if (!result.Succeeded)
+                    return RedirectBack($"Error buying shares upon issuance: {result.Info}");
+            }
+
+            await VoopAI.EcoChannel.SendMessageAsync($":moneybag: {security.Ticker} ({group.Name}) has issued {model.Amount} new stock!");
+            StatusMessage = $"Successfully issued {model.Amount} stock!";
+            TempData.Remove("form");
+            return RedirectToAction("Index", controllerName: "Exchange");
+        }
+        else
+        {
+            return RedirectBack("You do not have group Eco permissions!");
+        }
     }
 
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

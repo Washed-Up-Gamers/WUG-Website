@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Mvc;
 using WUG.Controllers;
 using System.Security.Claims;
-using Valour.Api.Models;
 
 namespace WUG.Helpers;
 
@@ -15,7 +14,7 @@ public class UserRequiredAttribute : ActionFilterAttribute, IActionFilter, IEndp
 
     public async ValueTask<object?> InvokeAsync(EndpointFilterInvocationContext context, EndpointFilterDelegate next)
     {
-        SVUser? user = UserManager.GetUser(context.HttpContext);
+        User? user = UserManager.GetUser(context.HttpContext);
         context.HttpContext.Items["user"] = user;
         var result = await next(context);
         return result;
@@ -30,9 +29,9 @@ public class UserRequiredAttribute : ActionFilterAttribute, IActionFilter, IEndp
             || path == "/dev/lackaccess"
             || path == "/callback")) 
         {
-            SVUser? user = UserManager.GetUser(context.HttpContext);
+            User? user = UserManager.GetUser(context.HttpContext);
             SVController controller = (SVController)context.Controller;
-            if (user is null || user.OAuthToken is null)
+            if (user is null)
                 context.Result = controller.Redirect("/Account/Login");
             context.HttpContext.Items["user"] = user;
         }

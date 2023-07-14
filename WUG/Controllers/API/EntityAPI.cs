@@ -21,7 +21,7 @@ public class EntityAPI : BaseAPI
         app.MapGet   ("api/entities/{entityid}/taxablebalancehistory", GetTaxableBalanceHistory).RequireCors("ApiPolicy");
     }
 
-    private static async Task GetTaxableBalanceHistory(HttpContext ctx, VooperDB dbctx, long entityid, int days)
+    private static async Task GetTaxableBalanceHistory(HttpContext ctx, WashedUpDB dbctx, long entityid, int days)
     {
         if (days > 90)
             days = 90;
@@ -67,7 +67,7 @@ public class EntityAPI : BaseAPI
             return;
         }
 
-        await ctx.Response.WriteAsync((await account.GetCreditsAsync()).ToString());
+        await ctx.Response.WriteAsync((account.Money).ToString());
     }
 
     private static async Task<IEnumerable<SearchResult>> Search(string name, int amount = 20)
@@ -83,7 +83,7 @@ public class EntityAPI : BaseAPI
 
         name = name.ToLower();
 
-        var users = DBCache.GetAll<SVUser>().Where(x => x.Name.ToLower().Contains(name));
+        var users = DBCache.GetAll<User>().Where(x => x.Name.ToLower().Contains(name));
         var groups = DBCache.GetAll<Group>().Where(x => x.Name.ToLower().Contains(name));
 
         entities.AddRange(users);

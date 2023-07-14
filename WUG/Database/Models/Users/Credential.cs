@@ -10,7 +10,7 @@ namespace WUG.Database.Models.Users;
 public class Credential
 {
     [ForeignKey("User_Id")]
-    public virtual SVUser User { get; set; }
+    public virtual User User { get; set; }
 
     /// <summary>
     /// The ID of this credential

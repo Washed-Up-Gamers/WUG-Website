@@ -53,7 +53,7 @@ NProvince = {
     OVERPOPULATION_MODIFIER_BASE = -0.15
 
     -- used for randomizing province populations
-    BASE_POPULATION_MIN = 2500
+    BASE_POPULATION_MIN = 1500
     BASE_POPULATION_MAX = 90000
 
     DEVELOPMENT_POPULATION_EXPONENT = 0.54

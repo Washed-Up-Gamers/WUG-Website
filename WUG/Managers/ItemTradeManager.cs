@@ -19,7 +19,7 @@ public static class ItemTradeManager
 
     static public ConcurrentQueue<ItemTrade> itemTradeQueue = new();
 
-    static public async Task<bool> Run(VooperDB dbctx)
+    static public async Task<bool> Run(WashedUpDB dbctx)
     {
         if (itemTradeQueue.IsEmpty) return false;
 

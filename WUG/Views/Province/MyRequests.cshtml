@@ -4,7 +4,7 @@
 @{
     ViewData["Title"] = "My Requests";
 
-    SVUser user = UserManager.GetUser(Context)!;
+    User user = UserManager.GetUser(Context)!;
 }
 
 <style>
@@ -99,7 +99,7 @@
                             <span>Costs to build per level</span>
                             <br>
                             <div class="buildingcosts">
-                                @foreach ((var resource, var amount) in buildingobj.BuildingCosts.Evaluate(new ExecutionState(request.Province.District, request.Province)))
+                                @foreach ((var resource, var amount) in buildingobj.BuildingCosts.Evaluate(new ExecutionState(request.Province.Nation, request.Province)))
                                 {
                                     <div class="resource-row">
                                         <span style="align-self: flex-start">@resource.Replace("_", " ")</span>
@@ -151,9 +151,9 @@
                     @{
                         Province prevprovince = null;
                         foreach (var request in Model.Where(x => x.LevelsBuilt != x.LevelsRequested)) {
-                            if (prevprovince is null || prevprovince.DistrictId != request.Province.DistrictId) {
+                            if (prevprovince is null || prevprovince.NationId != request.Province.NationId) {
                                 <row class="text-center">
-                                    <h4>@request.Province.District.Name</h4>
+                                    <h4>@request.Province.Nation.Name</h4>
                                 </row>
                             }
                             prevprovince = request.Province;

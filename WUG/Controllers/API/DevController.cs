@@ -24,19 +24,19 @@ namespace WUG.API
             await ctx.Response.WriteAsync("You lack access to SV 2.0. SV 2.0 is currently in private early alpha, public early alpha is expected in a few weeks to months.");
         }
 
-        private static async Task GetSQL(HttpContext ctx, VooperDB db, bool drop = false)
+        private static async Task GetSQL(HttpContext ctx, WashedUpDB db, bool drop = false)
         {
             if (drop && false) {
-                VooperDB.Instance.Database.EnsureDeleted();
-                VooperDB.Instance.Database.EnsureCreated();
-                await VooperDB.Instance.SaveChangesAsync();
+                WashedUpDB.Instance.Database.EnsureDeleted();
+                WashedUpDB.Instance.Database.EnsureCreated();
+                await WashedUpDB.Instance.SaveChangesAsync();
             }
-            await ctx.Response.WriteAsync(VooperDB.GenerateSQL());
+            await ctx.Response.WriteAsync(WashedUpDB.GenerateSQL());
         }
 
-        private static async Task GetDistrictProduction(HttpContext ctx, VooperDB db, string name,string resource)
+        private static async Task GetDistrictProduction(HttpContext ctx, WashedUpDB db, string name,string resource)
         {
-            var district = DBCache.GetAll<District>().FirstOrDefault(x => x.Name == name);
+            var district = DBCache.GetAll<Nation>().FirstOrDefault(x => x.Name == name);
             if (district is null)
             {
                 ctx.Response.StatusCode = 401;

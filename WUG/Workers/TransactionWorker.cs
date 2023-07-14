@@ -10,7 +10,7 @@ namespace WUG.Workers
     {
         private readonly IServiceScopeFactory _scopeFactory;
         public readonly ILogger<EconomyWorker> _logger;
-        private static VooperDB dbctx;
+        private static WashedUpDB dbctx;
         private static DateTime LastTime = DateTime.UtcNow;
 
         public TransactionWorker(ILogger<EconomyWorker> logger,
@@ -18,7 +18,7 @@ namespace WUG.Workers
         {
             _logger = logger;
             _scopeFactory = scopeFactory;
-            dbctx = VooperDB.DbFactory.CreateDbContext();
+            dbctx = WashedUpDB.DbFactory.CreateDbContext();
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -31,8 +31,6 @@ namespace WUG.Workers
                     {
                         try
                         {
-                            while (DateTime.UtcNow.Subtract(TransactionManager.LastTransactionSent).TotalMilliseconds <= 210)
-                                await Task.Delay(10);
                             if (!(await TransactionManager.Run(dbctx)))
                             {
                                 await Task.Delay(10);
@@ -43,7 +41,7 @@ namespace WUG.Workers
                             Console.WriteLine("FATAL TRANSACTION WORKER ERROR:");
                             Console.WriteLine(e.Message);
                         }
-                        if (TransactionManager.transactionQueue.IsEmpty || (DateTime.UtcNow - LastTime).TotalMinutes >= 1)
+                        if (TransactionManager.transactionQueue.IsEmpty || (DateTime.UtcNow - LastTime).TotalSeconds >= 3)
                         {
                             await dbctx.SaveChangesAsync();
                             LastTime = DateTime.UtcNow;

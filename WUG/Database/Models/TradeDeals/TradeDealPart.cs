@@ -2,7 +2,6 @@
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 using static System.Runtime.InteropServices.JavaScript.JSType;
-using Valour.Api.Models;
 
 namespace WUG.Database.Models.TradeDeals;
 
@@ -30,7 +29,7 @@ public class TradeDealBasePart
     {
         if (Type == TradeDealPartType.Credits)
         {
-            var tran = new SVTransaction(OfferorEntity, TargetEntity, Amount, TransactionType.Payment, $"Trade Deal with id {tradeDeal.Id}");
+            var tran = new Transaction(OfferorEntity, TargetEntity, Amount, TransactionType.Payment, $"Trade Deal with id {tradeDeal.Id}");
 
             // TODO: check to see if valour just went down
             // aka see if the OfferorEntity actually lacks the credits or another error has just occured.

@@ -34,7 +34,7 @@ public enum NodeType
 public class ExecutionState
 {
     public Dictionary<string, decimal> Locals { get; set; }
-    public District District { get; set; }
+    public Nation Nation { get; set; }
     public Province? Province { get; set; }
     public ProducingBuilding? Building { get; set; }
     public LuaResearch Research { get; set; }
@@ -42,10 +42,10 @@ public class ExecutionState
     public LuaRecipeEdit RecipeEdit { get; set; }
     public Dictionary<string, decimal> ChangeSystemVarsBy { get; set; }
     public ScriptScopeType? ParentScopeType { get; set; }
-    public ExecutionState(District district, Province? province, Dictionary<string, decimal>? changesystemvarsby = null, ScriptScopeType? parentscopetype = null, ProducingBuilding? building = null, LuaResearch? research = null, Recipe? recipe = null, LuaRecipeEdit? recipeedit = null)
+    public ExecutionState(Nation nation, Province? province, Dictionary<string, decimal>? changesystemvarsby = null, ScriptScopeType? parentscopetype = null, ProducingBuilding? building = null, LuaResearch? research = null, Recipe? recipe = null, LuaRecipeEdit? recipeedit = null)
     {
         Locals = new();
-        District = district;
+        Nation = nation;
         Province = province;
         ChangeSystemVarsBy = changesystemvarsby ?? new();
         ParentScopeType = parentscopetype;
@@ -283,7 +283,7 @@ public class HasStaticModifierStatement : ConditionalSyntaxNode
     {
         return state.ParentScopeType switch
         {
-            ScriptScopeType.District => state.District.StaticModifiers.Any(x => x.LuaStaticModifierObjId == StaticModifierId),
+            ScriptScopeType.Nation => state.Nation.StaticModifiers.Any(x => x.LuaStaticModifierObjId == StaticModifierId),
             ScriptScopeType.Province => state.Province.StaticModifiers.Any(x => x.LuaStaticModifierObjId == StaticModifierId),
             ScriptScopeType.Building => state.Building.StaticModifiers.Any(x => x.LuaStaticModifierObjId == StaticModifierId),
             _ => false
@@ -360,12 +360,12 @@ public class SystemVar : SyntaxNode
         {
             "district" => levels[1].ToLower() switch
             {
-                "population" => state.District.TotalPopulation
+                "population" => state.Nation.TotalPopulation
             },
             "province" => levels[1].ToLower() switch
             {
                 "population" => state.Province.Population,
-                "owner" => state.Province.District.Id,
+                "owner" => state.Province.Nation.Id,
                 "buildings" => levels[2].ToLower() switch
                 {
                     "totaloftype" => (decimal)(await state.Province.GetLevelsOfBuildingsOfTypeAsync(levels[3]))
@@ -530,7 +530,7 @@ public class LocalNode : SyntaxNode
 
 public enum ScriptScopeType
 {
-    District,
+    Nation,
     Province,
     Building,
     Research,
@@ -546,15 +546,15 @@ public class ChangeScopeNode : EffectNode
 
     public async ValueTask<ExecutionState> GetExecutionStateAsync(ExecutionState state)
     {
-        var newstate = new ExecutionState(state.District, state.Province, state.ChangeSystemVarsBy);
+        var newstate = new ExecutionState(state.Nation, state.Province, state.ChangeSystemVarsBy);
         newstate.Locals = state.Locals;
 
-        if (scopeType == ScriptScopeType.District)
+        if (scopeType == ScriptScopeType.Nation)
         {
-            var district = await District.FindAsync(long.Parse(ChangeTo));
+            var district = await Nation.FindAsync(long.Parse(ChangeTo));
             if (district is null)
                 HandleError("Could not find district", $"key: {ChangeTo}");
-            newstate.District = district;
+            newstate.Nation = district;
             newstate.ParentScopeType = scopeType;
         }
 
