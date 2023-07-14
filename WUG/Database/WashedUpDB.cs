@@ -181,6 +181,7 @@ public class WashedUpDB : DbContext, IDataProtectionKeyContext
 
     public DbSet<JobApplication> JobApplications { get; set; }
 
+    public DbSet<PriceStat> PriceStats { get; set; }
     public WashedUpDB(DbContextOptions options)
     {
             
