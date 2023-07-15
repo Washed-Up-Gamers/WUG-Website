@@ -7,7 +7,7 @@ NMilitary = {
 
 }
 
-NDistrict = {
+NNation = {
 
 }
 
@@ -58,7 +58,7 @@ NProvince = {
 
     DEVELOPMENT_POPULATION_EXPONENT = 0.54
     DEVELOPMENT_POPULATION_FACTOR = 0.04
-    DEVELOPMENT_COASTAL_BONUS = 10
+    DEVELOPMENT_COASTAL_BONUS = 5
     DEVELOPMENT_COASTAL_FACTOR = 0.05
 
     -- migration stuff
@@ -77,7 +77,7 @@ NProvince = {
 }
 
 NScore = {
-    -- district.population ^ 0.5 / 10
+    -- Nation.population ^ 0.5 / 10
     ECONOMIC_SCORE_FROM_POPULATION_EXPONENT = 0.5
     ECONOMIC_SCORE_FROM_POPULATION_DIVISOR = 10
     ECONOMIC_SCORE_PER_MINE = 5

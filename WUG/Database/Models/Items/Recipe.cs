@@ -106,7 +106,7 @@ public class Recipe : IHasOwner
         Modifiers = new();
 
         var value_executionstate = new ExecutionState(null, null, parentscopetype: ScriptScopeType.Recipe, recipe: this);
-        //var scaleby_executionstate = new ExecutionState(District, this);
+        //var scaleby_executionstate = new ExecutionState(Nation, this);
         foreach (var pair in EditsLevels)
         {
             var edit = BaseRecipe.LuaRecipeEdits[pair.Key];
@@ -128,7 +128,7 @@ public class Recipe : IHasOwner
         }
 
         var value_executionstate = new ExecutionState(null, null, parentscopetype: ScriptScopeType.Recipe, recipe: this);
-        //var scaleby_executionstate = new ExecutionState(District, this);
+        //var scaleby_executionstate = new ExecutionState(Nation, this);
         foreach (var pair in EditsLevels)
         {
             var edit = BaseRecipe.LuaRecipeEdits[pair.Key];

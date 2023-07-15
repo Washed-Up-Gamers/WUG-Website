@@ -51,7 +51,7 @@
                         <th>Name</th>
                         <th>Type</th>
                         <th>Level</th>
-                        <th>District</th>
+                        <th>Nation</th>
                         <th>Province</th>
                         <th>Recipe Name</th>
                         <th>Owner</th>
@@ -76,7 +76,7 @@
                                     <td>Advanced Factory</td>
                                 }
                                 <td>@building.Size</td>
-                                <td>@building.District.Name</td>
+                                <td>@building.Nation.Name</td>
                                 <td>@building.Province.Name</td>
                                 <td>@building.Recipe.Name</td>
                                 <td>
@@ -96,7 +96,7 @@
             </table>
         }
         else {
-            <component type="typeof(MyBuildingsComponent)" render-mode="WebAssemblyPrerendered" param-BuildingData="JsonSerializer.Serialize(Model)" param-DistrictData="JsonSerializer.Serialize(Model.Select(x => x.District).ToList())" />
+            <component type="typeof(MyBuildingsComponent)" render-mode="WebAssemblyPrerendered" param-BuildingData="JsonSerializer.Serialize(Model)" param-NationData="JsonSerializer.Serialize(Model.Select(x => x.Nation).ToList())" />
         }
     </div>
 </div>

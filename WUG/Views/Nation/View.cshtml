@@ -1,7 +1,7 @@
 @using WUG.Database;
-@using WUG.Database.Models.Districts;
+@using WUG.Database.Models.Nations;
 @using WUG.Blazor.Components;
-@model WUG.Database.Models.Districts.Nation
+@model WUG.Database.Models.Nations.Nation
 
 @{ 
     if (Model != null)
@@ -13,9 +13,9 @@
 
 <head>
     <meta property="og:title" content="@Model.Name">
-    <meta name="keywords" content="SpookVooper, Vooperia, Districts, Government">
+    <meta name="keywords" content="SpookVooper, Vooperia, Nations, Government">
     <meta property="og:description" content="@Model.Description">
-    <meta property="og:url" content="https://spookvooper.com/District/View/@Model.Name">
+    <meta property="og:url" content="https://spookvooper.com/Nation/View/@Model.Name">
     <style>
         .tooltip-dontshow {
             opacity: 0 !important;
@@ -132,7 +132,7 @@
                     else
                     {
                         <div class="p-2 align-self-center" style="text-align:center">
-                            <a asp-controller="District" asp-action="MoveDistrict" asp-route-id="@Model.Id" class="btn btn-outline-primary">Move Here</a>
+                            <a asp-controller="Nation" asp-action="MoveNation" asp-route-id="@Model.Id" class="btn btn-outline-primary">Move Here</a>
                         </div>
                     }
                 }
@@ -144,12 +144,12 @@
                 }
                 <div class="p-2 align-self-center" style="text-align:center">
                     <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#viewusers">View Citizens</button>
-                    <a asp-controller="District" asp-action="TaxPolicies" asp-route-id="@Model.Id" class="btn btn-outline-primary">View Taxes</a>
+                    <a asp-controller="Nation" asp-action="TaxPolicies" asp-route-id="@Model.Id" class="btn btn-outline-primary">View Taxes</a>
                 </div>
                 if (user is not null && user!.Id == Model.GovernorId) {
                     <div class="p-2 align-self-center" style="text-align:center">
-                        <a asp-controller="District" asp-action="Manage" asp-route-id="@Model.Id" class="btn btn-outline-primary">Edit</a>
-                        <a asp-controller="District" asp-action="ManageStates" asp-route-id="@Model.Id" class="btn btn-outline-primary">Manage States</a>
+                        <a asp-controller="Nation" asp-action="Manage" asp-route-id="@Model.Id" class="btn btn-outline-primary">Edit</a>
+                        <a asp-controller="Nation" asp-action="ManageStates" asp-route-id="@Model.Id" class="btn btn-outline-primary">Manage States</a>
                     </div>
                 }
 
@@ -169,10 +169,10 @@
                 <center>
                     @{
                         var devmapmode = Context.Request.QueryString.Value.Contains("devmapmode=true");
-                        var scalebymaxindistrict = Context.Request.QueryString.Value.Contains("scalebymaxindistrict=true");
+                        var scalebymaxinNation = Context.Request.QueryString.Value.Contains("scalebymaxinNation=true");
                         double maxresource = 0;
                         double scaledevmapvaluesby = 1;
-                        if (scalebymaxindistrict)
+                        if (scalebymaxinNation)
                             scaledevmapvaluesby = Model.Provinces.Max(x => x.DevelopmentValue) / 150.0;
                         else
                             scaledevmapvaluesby = DBCache.GetAll<Province>().Max(x => x.DevelopmentValue) / 150.0;
@@ -184,14 +184,14 @@
                             maxresource = DBCache.GetAll<Province>().Max(x => x.GetMiningResourceProduction(resourcetomap));
                         }
                     }
-                    <a href="/District/View/@Model.Name">
+                    <a href="/Nation/View/@Model.Name">
                         <button class='btn @(devmapmode || resourcetomap != null ? "btn-outline-primary" : "btn-primary")'>Normal Mode</button>
                     </a>
-                    <a href="/District/View/@Model.Name?devmapmode=true&scalebymaxindistrict=true">
-                        <button class='btn @((devmapmode && scalebymaxindistrict) ? "btn-primary" : "btn-outline-primary")'>View Development Relative to District Max</button>
+                    <a href="/Nation/View/@Model.Name?devmapmode=true&scalebymaxinNation=true">
+                        <button class='btn @((devmapmode && scalebymaxinNation) ? "btn-primary" : "btn-outline-primary")'>View Development Relative to Nation Max</button>
                     </a>
-                    <a href="/District/View/@Model.Name?devmapmode=true">
-                        <button class='btn @((devmapmode && !scalebymaxindistrict)? "btn-primary" : "btn-outline-primary")'>View Development Relative to Global Max</button>
+                    <a href="/Nation/View/@Model.Name?devmapmode=true">
+                        <button class='btn @((devmapmode && !scalebymaxinNation)? "btn-primary" : "btn-outline-primary")'>View Development Relative to Global Max</button>
                     </a>
                     <button class='btn @(resourcetomap is null ? "btn-outline-primary" : "btn-primary")' data-bs-toggle="modal" data-bs-target="#showresources">View Resource Density</button>
                     @if (resourcetomap is not null) {
@@ -199,7 +199,7 @@
                     }
                     <div class="window" id="window" style="margin-top: 15px;">
                         @{
-                            WUG.Models.Map.DistrictMap mapdata = MapController.DistrictMaps.First(x => x.DistrictId == Model.Id);
+                            WUG.Models.Map.NationMap mapdata = MapController.NationMaps.First(x => x.NationId == Model.Id);
                         }
                         <svg id="svg" viewBox="@(mapdata.LowestXPos-10) @(mapdata.LowestYPos) @((mapdata.HighestXPos-mapdata.LowestXPos)+30) @((mapdata.HighestYPos-mapdata.LowestYPos)+25)"
                              style="/* transform: scale(0.75);transform-origin: 50% 0%; */width: 75%;height: 75%;">
@@ -296,7 +296,7 @@
             } 
             else
             {
-                <h1 style="text-align:center" class="display-4">District not found!</h1>
+                <h1 style="text-align:center" class="display-4">Nation not found!</h1>
             }
         }
     </div>
@@ -373,7 +373,7 @@
                 
             </tbody>
         </table>
-        <a target="_blank" href="https://dev.spookvooper.com/wiki/District">Wiki page for Districts</a>
+        <a target="_blank" href="https://dev.spookvooper.com/wiki/Nation">Wiki page for Nations</a>
     </div>
 </div>
 
@@ -391,7 +391,7 @@
                 <br />
                 i = 0;
             }
-            <a href="/District/View/@Model.Name?resource=@building.MustHaveResource">
+            <a href="/Nation/View/@Model.Name?resource=@building.MustHaveResource">
                 <button style="margin-bottom: 10px;" class='btn @(resourcetomap == building.MustHaveResource ? "btn-primary" : "btn-outline-primary")'>@building.MustHaveResource.Replace("_", " ")</button>
             </a>
             i += 1;
@@ -399,7 +399,7 @@
     </center>
 </bootstrap-modal>
 
-<bootstrap-modal asp-modal-id="viewusers" asp-modal-title="Users in this district">
+<bootstrap-modal asp-modal-id="viewusers" asp-modal-title="Users in this Nation">
     @foreach (var item in Model.Citizens)
     {
         <div>@item.Name</div>
@@ -409,7 +409,7 @@
 @if (user is not null && await user.IsGovernmentAdmin())
 {
     <bootstrap-modal asp-modal-id="changegovernor" asp-modal-title="Change Governor">
-        <!form method="post" action="/District/ChangeGovernor/@Model.Id">
+        <!form method="post" action="/Nation/ChangeGovernor/@Model.Id">
             @Html.AntiForgeryToken()
             <div class="col-12 align-content-center text-center" style="margin-left: auto;margin-right: auto;max-width: 500px;">
                 <p>Governor Entity's name</p>
@@ -430,7 +430,7 @@
         </!form>
     </bootstrap-modal>
     <bootstrap-modal asp-modal-id="changesenator" asp-modal-title="Change Senator">
-        <!form method="post" action="/District/ChangeSenator/@Model.Id">
+        <!form method="post" action="/Nation/ChangeSenator/@Model.Id">
             @Html.AntiForgeryToken()
         <div class="col-12 align-content-center text-center" style="margin-left: auto;margin-right: auto;max-width: 500px;">
             <p>Senator User's name</p>

@@ -10,7 +10,7 @@ using WUG.Database.Managers;
 using WUG.Models.Provinces;
 using WUG.Models.Building;
 using WUG.Scripting.LuaObjects;
-using WUG.Database.Models.Districts;
+using WUG.Database.Models.Nations;
 using WUG.Database.Models.Buildings;
 using WUG.Models.Groups;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -57,17 +57,17 @@ public class BuildingController : SVController
                 if (owner.EntityType == EntityType.Group)
                 {
                     var groupowner = (Group)owner;
-                    var district = DBCache.Get<Nation>(groupowner.Id);
-                    if (district is not null)
+                    var Nation = DBCache.Get<Nation>(groupowner.Id);
+                    if (Nation is not null)
                     {
-                        if (district.Name != "New Vooperis")
+                        if (Nation.Name != "New Vooperis")
                             continue;
                     }
 
                     var state = DBCache.Get<State>(groupowner.Id);
                     if (state is not null)
                     {
-                        if (state.District.Name != "New Vooperis")
+                        if (state.Nation.Name != "New Vooperis")
                         {
                             if (state.GovernorId is not null && state.Governor.EntityType == EntityType.Group)
                             {
@@ -199,7 +199,7 @@ public class BuildingController : SVController
 
         if (recipeidbefore != model.RecipeId)
         {
-            building.District.UpdateModifiers();
+            building.Nation.UpdateModifiers();
             building.UpdateModifiers();
         }
 
@@ -263,7 +263,7 @@ public class BuildingController : SVController
 
         if (recipeidbefore != model.RecipeId)
         {
-            building.District.UpdateModifiers();
+            building.Nation.UpdateModifiers();
             building.UpdateModifiers();
         }
 
@@ -279,19 +279,19 @@ public class BuildingController : SVController
         // TODO: after we migrate to dotnet 8 with mixing of blazor and razor, update this method to use json for returning rather than "-&-"
         var buildingrequest = await _dbctx.BuildingRequests.FindAsync(buildingrequestid);
         if (!buildingrequest.Reviewed)
-            return Json(new TaskResult<long>(false, "This request has not been reviewed yet!", buildingrequestid));
+            return Json(new TaskResult<string>(false, "This request has not been reviewed yet!", buildingrequestid.ToString()));
         if (!buildingrequest.Granted)
-            return Json(new TaskResult<long>(false, "This request was not granted! However, the province's governor can change this decision, so try contacting them.", buildingrequestid));
+            return Json(new TaskResult<string>(false, "This request was not granted! However, the province's governor can change this decision, so try contacting them.", buildingrequestid.ToString()));
 
         if (buildingrequest.LevelsBuilt + levelstobuild > buildingrequest.LevelsRequested)
-            return Json(new TaskResult<long>(false, "You can not construct more levels than you were approved for!", buildingrequestid));
+            return Json(new TaskResult<string>(false, "You can not construct more levels than you were approved for!", buildingrequestid.ToString()));
 
         var user = HttpContext.GetUser();
 
         if (buildingrequest.RequesterId != user.Id) {
             Group group = DBCache.Get<Group>(buildingrequest.RequesterId);
             if (!group.HasPermission(user, GroupPermissions.Build)) {
-                return Json(new TaskResult<long>(false, "You lack permission to build as this group!", buildingrequestid));
+                return Json(new TaskResult<string>(false, "You lack permission to build as this group!", buildingrequestid.ToString()));
             }
         }
         var buildas = BaseEntity.Find(buildingrequest.RequesterId);
@@ -318,7 +318,7 @@ public class BuildingController : SVController
             });
             message += $"Click <a target='_blank' href='/Building/Manage/{result.Data.Id}'>here</a> to view the building.";
         }
-        return Json(new TaskResult<long>(result.Success, message + (buildingrequest.LevelsBuilt == buildingrequest.LevelsRequested ? "|REACHEDLIMIT" : ""), buildingrequestid));
+        return Json(new TaskResult<string>(result.Success, message + (buildingrequest.LevelsBuilt == buildingrequest.LevelsRequested ? "|REACHEDLIMIT" : ""), buildingrequestid.ToString()));
     }
 
     [UserRequired]
@@ -417,7 +417,7 @@ public class BuildingController : SVController
         LuaBuildingUpgrade luaupgradeobj = GameDataManager.BaseBuildingUpgradesObjs[upgradeid];
         BuildingUpgrade? upgrade = building.Upgrades.FirstOrDefault(x => x.LuaBuildingUpgradeId == luaupgradeobj.Id);
 
-        TaskResult<ProducingBuilding> result = await luaupgradeobj.Build(building.Owner, user, building.District, building.Province, 1, building, upgrade);
+        TaskResult<ProducingBuilding> result = await luaupgradeobj.Build(building.Owner, user, building.Nation, building.Province, 1, building, upgrade);
 
         building.UpdateModifiers();
         return RedirectBack(result.Message);

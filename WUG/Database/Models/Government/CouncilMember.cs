@@ -8,10 +8,10 @@ namespace WUG.Database.Models.Government;
 public class CouncilMember
 {
     [Key]
-    public long DistrictId { get; set; }
+    public long NationId { get; set; }
 
     [JsonIgnore]
-    public Nation District => DBCache.Get<Nation>(DistrictId)!;
+    public Nation Nation => DBCache.Get<Nation>(NationId)!;
 
     public long UserId { get; set; }
 

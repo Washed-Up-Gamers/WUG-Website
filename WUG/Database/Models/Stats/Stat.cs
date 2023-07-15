@@ -16,7 +16,7 @@ public enum StatType
 public enum TargetType
 {
     Global,
-    District,
+    Nation,
     State,
     User
 }

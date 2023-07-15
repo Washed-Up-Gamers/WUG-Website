@@ -4,8 +4,8 @@ namespace Shared.Lua.LuaObjects;
 
 public enum WhoCanResearch
 {
-    District,
-    NonDistrict,
+    Nation,
+    NonNation,
     Anyone
 }
 

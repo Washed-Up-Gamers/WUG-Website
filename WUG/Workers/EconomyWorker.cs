@@ -51,7 +51,7 @@ namespace WUG.Workers
                             }
 
                             // handle imperial dividend tax credit
-                            // TODO: add district level too
+                            // TODO: add Nation level too
                             var taxcreditpolicy = DBCache.GetAll<TaxCreditPolicy>().FirstOrDefault(x => x.NationId == 100 && x.taxCreditType == TaxCreditType.Dividend);
                             foreach (var pair in DividendsPaid)
                             {
@@ -68,7 +68,7 @@ namespace WUG.Workers
                                 decimal amount = 50_000.0m;
                                 amount += 40_000.0m * nation.Citizens.Count;
                                 amount += 1_500.0m * nation.Provinces.Count;
-                                var tran = new Transaction(BaseEntity.Find(100), BaseEntity.Find(nation.GroupId), amount/30/24, TransactionType.FreeMoney, $"Intrnational Nation Funding for {district.Name}");
+                                var tran = new Transaction(BaseEntity.Find(100), BaseEntity.Find(nation.GroupId), amount/30/24, TransactionType.FreeMoney, $"Intrnational Nation Funding for {nation.Name}");
                                 TaskResult result = await tran.Execute();
                             }
                             List<GroupRole>? roles = DBCache.GetAll<GroupRole>().ToList();
@@ -190,12 +190,12 @@ namespace WUG.Workers
                                     entitytaxes[stateid] += amount;
                                 }
 
-                                // now we do district property taxes
+                                // now we do Nation property taxes
                                 if (!entitytaxes.ContainsKey(building.NationId))
                                     entitytaxes[building.NationId] = 0.00;
                                 
-                                amount = building.District.BasePropertyTax ?? 0;
-                                amount += (building.District.PropertyTaxPerSize ?? 0) * building.Size * throughputfromupgrades;
+                                amount = building.Nation.BasePropertyTax ?? 0;
+                                amount += (building.Nation.PropertyTaxPerSize ?? 0) * building.Size * throughputfromupgrades;
                                 entitytaxes[building.NationId] += amount;
                             }
                             sw.Stop();

@@ -8,6 +8,7 @@ using WUG.Database.Models.Users;
 using WUG.Web;
 using System.Data;
 using System.Diagnostics;
+using WUG.Database.Models;
 using WUG.Database.Models.Economy.Stocks;
 
 namespace WUG.Workers;
@@ -114,6 +115,14 @@ public class SecurityHistoryWorker : BackgroundService
 
                         await _dbctx.SaveChangesAsync();
 
+                        UN.GDP = 0.0m;
+                        foreach (var nation in DBCache.GetAll<Nation>()) {
+                            nation.GDP = GDPManager.GetGDPOfANation(nation);
+                            UN.GDP += nation.GDP;
+                        }
+
+                        foreach (var state in DBCache.GetAll<State>())
+                            state.GDP = GDPManager.GetGDPOfAState(state);
 
                         //await Task.Delay(1000 * 60 * 60);
                         await Task.Delay(1000 * 20);

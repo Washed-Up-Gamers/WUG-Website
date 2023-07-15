@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using WUG.Helpers;
 using WUG.Extensions;
-using WUG.Database.Models.Districts;
+using WUG.Database.Models.Nations;
 using System.Xml.Linq;
 using WUG.Database.Managers;
 using Microsoft.EntityFrameworkCore;
@@ -141,8 +141,8 @@ public class StateController : SVController
             return Redirect("/");
 
         var user = HttpContext.GetUser();
-        if (state.District.GovernorId != user.Id)
-            return RedirectBack("You must be governor of the district to change the governor of a province!");
+        if (state.Nation.GovernorId != user.Id)
+            return RedirectBack("You must be governor of the Nation to change the governor of a province!");
 
         BaseEntity entity = BaseEntity.Find(GovernorId);
 
@@ -181,7 +181,7 @@ public class StateController : SVController
             return RedirectBack("You lack permission to manage building requests for this state!");
 
         List<BuildingRequest> requests = new();
-        var idscanmanage = DBCache.GetAll<Province>().Where(x => x.CanManageBuildingRequests(user)).Select(x => x.Id).ToList();
+        var idscanmanage = DBCache.GetAll<Province>().Where(x => x.StateId == id && x.CanManageBuildingRequests(user)).Select(x => x.Id).ToList();
         requests = await _dbctx.BuildingRequests.Where(x => x.Reviewed == toggleonlyreviewed && idscanmanage.Contains(x.ProvinceId)).ToListAsync();
 
         return View(new ManageBuildingRequestsModel() {

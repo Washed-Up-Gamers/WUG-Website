@@ -1,7 +1,7 @@
-﻿namespace WUG.Models.Districts;
-public class ManageDistrictModel
+﻿namespace WUG.Models.Nations;
+public class ManageNationModel
 {
-    public Nation District { get; set; }
+    public Nation Nation { get; set; }
     public long Id { get; set; }
     public string? Description { get; set; }
     public string? NameForState { get; set; }

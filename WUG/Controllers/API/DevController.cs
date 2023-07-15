@@ -16,7 +16,7 @@ namespace WUG.API
         {
             //app.MapGet   ("api/dev/database/sql", GetSQL);
             app.MapGet("api/dev/lackaccess", LackAccess).RequireCors("ApiPolicy");
-            app.MapGet("api/dev/getdistrictproduction", GetDistrictProduction).RequireCors("ApiPolicy");
+            app.MapGet("api/dev/getNationproduction", GetNationProduction).RequireCors("ApiPolicy");
             app.MapGet("api/dev/gettime", GetTime).RequireCors("ApiPolicy");
         }
 
@@ -34,13 +34,13 @@ namespace WUG.API
             await ctx.Response.WriteAsync(WashedUpDB.GenerateSQL());
         }
 
-        private static async Task GetDistrictProduction(HttpContext ctx, WashedUpDB db, string name,string resource)
+        private static async Task GetNationProduction(HttpContext ctx, WashedUpDB db, string name,string resource)
         {
-            var district = DBCache.GetAll<Nation>().FirstOrDefault(x => x.Name == name);
-            if (district is null)
+            var Nation = DBCache.GetAll<Nation>().FirstOrDefault(x => x.Name == name);
+            if (Nation is null)
             {
                 ctx.Response.StatusCode = 401;
-                await ctx.Response.WriteAsync($"Could not find district with name of {name}!");
+                await ctx.Response.WriteAsync($"Could not find Nation with name of {name}!");
                 return;
             }
 
@@ -49,7 +49,7 @@ namespace WUG.API
             var buildingobj = GameDataManager.BaseBuildingObjs.Values.First(x => x.MustHaveResource == resource);
             var second_part = buildingobj.Recipes.First().PerHour * buildingobj.Recipes.First().Outputs.First().Value;
             double sum = 0;
-            foreach (var province in district.Provinces)
+            foreach (var province in Nation.Provinces)
             {
                 sum += province.GetMiningResourceProduction(resource) / 10550.0 * second_part;
             }

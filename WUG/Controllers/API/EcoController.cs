@@ -4,6 +4,7 @@ using System.Diagnostics;
 using WUG.Database;
 using WUG.Database.Models.Entities;
 using WUG.Web;
+using WUG.Database.Models;
 using WUG.Database.Models.Economy;
 using Microsoft.AspNetCore.Cors;
 
@@ -15,6 +16,36 @@ namespace WUG.API
         public static void AddRoutes(WebApplication app)
         {
             app.MapGet   ("api/eco/transaction/send", SendTransaction).RequireCors("ApiPolicy");
+            app.MapGet   ("api/eco/nation/{id}/gdp", GetNationGDP).RequireCors("ApiPolicy");
+            app.MapGet   ("api/eco/state/{id}/gdp", GetStateGDP).RequireCors("ApiPolicy");
+        }
+
+        private static async Task GetNationGDP(HttpContext ctx, long id)
+        {
+            Nation? nation = DBCache.Get<Nation>(id);
+            if (nation is null && id != 100) {
+                ctx.Response.StatusCode = 401;
+                await ctx.Response.WriteAsJsonAsync(new TaskResult(false, $"Could not find nation with id {id}"));
+                return;
+            }
+            if (id == 100) {
+                await ctx.Response.WriteAsync(UN.GDP.ToString());
+                return;
+            }
+            
+            await ctx.Response.WriteAsync(nation.GDP.ToString());
+        }
+
+        private static async Task GetStateGDP(HttpContext ctx, long id)
+        {
+            State? state = DBCache.Get<State>(id);
+            if (state is null) {
+                ctx.Response.StatusCode = 401;
+                await ctx.Response.WriteAsJsonAsync(new TaskResult(false, $"Could not find state with id {id}"));
+                return;
+            }
+            
+            await ctx.Response.WriteAsync(state.GDP.ToString());
         }
 
         private static async Task SendTransaction(HttpContext ctx, WashedUpDB db, long fromid, long toid, string apikey, decimal amount, string detail, TransactionType trantype, bool? isanexpense = null)
@@ -26,7 +57,7 @@ namespace WUG.API
             if (fromentity == null)
             {
                 ctx.Response.StatusCode = 401;
-                await ctx.Response.WriteAsJsonAsync(new TaskResult(false, $"Could not find entity with svid {fromid}"));
+                await ctx.Response.WriteAsJsonAsync(new TaskResult(false, $"Could not find entity with id {fromid}"));
                 return;
             }
 
@@ -34,7 +65,7 @@ namespace WUG.API
             if (toentity == null)
             {
                 ctx.Response.StatusCode = 401;
-                await ctx.Response.WriteAsJsonAsync(new TaskResult(false, $"Could not find entity with svid {toid}"));
+                await ctx.Response.WriteAsJsonAsync(new TaskResult(false, $"Could not find entity with id {toid}"));
                 return;
             }
 

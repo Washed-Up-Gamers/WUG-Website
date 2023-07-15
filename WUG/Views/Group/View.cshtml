@@ -47,11 +47,11 @@
 
             @if (Model.NationId is not null)
             {
-                <p class="m-2" style="text-align:center; font-size:x-large">District: @Model.Nation.Name</p>
+                <p class="m-2" style="text-align:center; font-size:x-large">Nation: @Model.Nation.Name</p>
             }
             else
             {
-                <p class="m-2" style="text-align:center; font-size:x-large">District: Offworld</p>
+                <p class="m-2" style="text-align:center; font-size:x-large">Nation: Offworld</p>
             }
 
             @if (user != null)
@@ -116,26 +116,39 @@
                         if (!Model.Flags.Contains(GroupFlag.NonProfit))
                         {
                             <div class="p-2 align-self-center" style="text-align:center">
-                                <a asp-action="AddFlag" asp-controller="Group" asp-route-groupid="@Model.Id" asp-route-flag="NonProfit" class="btn btn-outline-warning">Add NonProfit FLag</a>
+                                <a asp-action="AddFlag" asp-controller="Group" asp-route-groupid="@Model.Id" asp-route-flag="NonProfit" class="btn btn-outline-warning">Add NonProfit Flag</a>
                             </div>
                         }
                         else
                         {
                             <div class="p-2 align-self-center" style="text-align:center">
-                                <a asp-action="RemoveFlag" asp-controller="Group" asp-route-groupid="@Model.Id" asp-route-flag="NonProfit" class="btn btn-outline-warning">Remove NonProfit FLag</a>
+                                <a asp-action="RemoveFlag" asp-controller="Group" asp-route-groupid="@Model.Id" asp-route-flag="NonProfit" class="btn btn-outline-warning">Remove NonProfit Flag</a>
                             </div>
                         }
 
                         if (!Model.Flags.Contains(GroupFlag.CanHaveMilitary))
                         {
                             <div class="p-2 align-self-center" style="text-align:center">
-                                <a asp-action="AddFlag" asp-controller="Group" asp-route-groupid="@Model.Id" asp-route-flag="CanHaveMilitary" class="btn btn-outline-warning">Add CanHaveMilitary FLag</a>
+                                <a asp-action="AddFlag" asp-controller="Group" asp-route-groupid="@Model.Id" asp-route-flag="CanHaveMilitary" class="btn btn-outline-warning">Add CanHaveMilitary Flag</a>
                             </div>
                         }
                         else
                         {
                             <div class="p-2 align-self-center" style="text-align:center">
-                                <a asp-action="RemoveFlag" asp-controller="Group" asp-route-groupid="@Model.Id" asp-route-flag="CanHaveMilitary" class="btn btn-outline-warning">Remove CanHaveMilitary FLag</a>
+                                <a asp-action="RemoveFlag" asp-controller="Group" asp-route-groupid="@Model.Id" asp-route-flag="CanHaveMilitary" class="btn btn-outline-warning">Remove CanHaveMilitary Flag</a>
+                            </div>
+                        }
+
+                        if (!Model.Flags.Contains(GroupFlag.SeparateEntityFromOwner))
+                        {
+                            <div class="p-2 align-self-center" style="text-align:center">
+                                <a asp-action="AddFlag" asp-controller="Group" asp-route-groupid="@Model.Id" asp-route-flag="SeparateEntityFromOwner" class="btn btn-outline-warning">Add SeparateEntityFromOwner Flag</a>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="p-2 align-self-center" style="text-align:center">
+                                <a asp-action="RemoveFlag" asp-controller="Group" asp-route-groupid="@Model.Id" asp-route-flag="SeparateEntityFromOwner" class="btn btn-outline-warning">Remove SeparateEntityFromOwner Flag</a>
                             </div>
                         }
                     }

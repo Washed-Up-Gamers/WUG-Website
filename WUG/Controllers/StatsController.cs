@@ -214,15 +214,15 @@ public class StatsController : SVController
         return View();
     }
 
-    public async Task<IActionResult> AllDistrictsGraphs()
+    public async Task<IActionResult> AllNationsGraphs()
     {
         var statsobjects = await _dbctx.Stats
-            .Where(x => x.TargetType == TargetType.District)
+            .Where(x => x.TargetType == TargetType.Nation)
             .GroupBy(x => x.TargetId)
             .Select(x => new {
                 Key = (long)x.Key,
                 Items = x
-                    .Where(x => x.TargetType == TargetType.District && x.StatType == StatType.Population)
+                    .Where(x => x.TargetType == TargetType.Nation && x.StatType == StatType.Population)
                     .OrderByDescending(x => x.Date)
                     .Take(24 * 30)
                     .ToList()
@@ -231,30 +231,30 @@ public class StatsController : SVController
 
         List<List<double?>> Data = new();
         List<string> DataTitles = new();
-        List<string> DistrictColors = new();
+        List<string> NationColors = new();
 
-        foreach (var districtdata in statsobjects)
+        foreach (var Nationdata in statsobjects)
         {
-            var districtid = (long)districtdata.Key;
-            var district = DBCache.Get<Nation>(districtid);
-            DataTitles.Add($"{district.Name} Population");
-            DistrictColors.Add($"#{district.Color}");
+            var Nationid = (long)Nationdata.Key;
+            var Nation = DBCache.Get<Nation>(Nationid);
+            DataTitles.Add($"{Nation.Name} Population");
+            NationColors.Add($"#{Nation.Color}");
 
             List<double?> data = new();
-            var objects = districtdata.Items;
+            var objects = Nationdata.Items;
             objects.Reverse();
             Data.Add(objects.Select(x => (double?)x.Value).ToList());
         }
 
-        GenerateGraphWithMoreThanOneDataSet(ViewData, "Districts Population (30 days)", DistrictColors, DataTitles, "graph1", statsobjects.First().Items.Select(x => String.Format("{0:M/d/yyyy} {0:t}", x.Date)).ToList(), Data);
+        GenerateGraphWithMoreThanOneDataSet(ViewData, "Nations Population (30 days)", NationColors, DataTitles, "graph1", statsobjects.First().Items.Select(x => String.Format("{0:M/d/yyyy} {0:t}", x.Date)).ToList(), Data);
 
         statsobjects = await _dbctx.Stats
-            .Where(x => x.TargetType == TargetType.District)
+            .Where(x => x.TargetType == TargetType.Nation)
             .GroupBy(x => x.TargetId)
             .Select(x => new {
                 Key = (long)x.Key,
                 Items = x
-                    .Where(x => x.TargetType == TargetType.District && x.StatType == StatType.TotalBuildingSlots)
+                    .Where(x => x.TargetType == TargetType.Nation && x.StatType == StatType.TotalBuildingSlots)
                     .OrderByDescending(x => x.Date)
                     .Take(24 * 30)
                     .ToList()
@@ -264,26 +264,26 @@ public class StatsController : SVController
         Data = new();
         DataTitles = new();
 
-        foreach (var districtdata in statsobjects)
+        foreach (var Nationdata in statsobjects)
         {
-            var districtid = (long)districtdata.Key;
-            var district = DBCache.Get<Nation>(districtid);
-            DataTitles.Add($"{district.Name} Total Building Slots");
+            var Nationid = (long)Nationdata.Key;
+            var Nation = DBCache.Get<Nation>(Nationid);
+            DataTitles.Add($"{Nation.Name} Total Building Slots");
 
             List<double?> data = new();
-            var objects = districtdata.Items;
+            var objects = Nationdata.Items;
             objects.Reverse();
             Data.Add(objects.Select(x => (double?)x.Value).ToList());
         }
-        GenerateGraphWithMoreThanOneDataSet(ViewData, "Districts Total Building Slots (30 days)", DistrictColors, DataTitles, "graph2", statsobjects.First().Items.Select(x => String.Format("{0:M/d/yyyy} {0:t}", x.Date)).ToList(), Data);
+        GenerateGraphWithMoreThanOneDataSet(ViewData, "Nations Total Building Slots (30 days)", NationColors, DataTitles, "graph2", statsobjects.First().Items.Select(x => String.Format("{0:M/d/yyyy} {0:t}", x.Date)).ToList(), Data);
 
         statsobjects = await _dbctx.Stats
-            .Where(x => x.TargetType == TargetType.District)
+            .Where(x => x.TargetType == TargetType.Nation)
             .GroupBy(x => x.TargetId)
             .Select(x => new {
                 Key = (long)x.Key,
                 Items = x
-                    .Where(x => x.TargetType == TargetType.District && x.StatType == StatType.UsedBuildingSlots)
+                    .Where(x => x.TargetType == TargetType.Nation && x.StatType == StatType.UsedBuildingSlots)
                     .OrderByDescending(x => x.Date)
                     .Take(24 * 30)
                     .ToList()
@@ -293,18 +293,18 @@ public class StatsController : SVController
         Data = new();
         DataTitles = new();
 
-        foreach (var districtdata in statsobjects)
+        foreach (var Nationdata in statsobjects)
         {
-            var districtid = (long)districtdata.Key;
-            var district = DBCache.Get<Nation>(districtid);
-            DataTitles.Add($"{district.Name} Used Building Slots");
+            var Nationid = (long)Nationdata.Key;
+            var Nation = DBCache.Get<Nation>(Nationid);
+            DataTitles.Add($"{Nation.Name} Used Building Slots");
 
             List<double?> data = new();
-            var objects = districtdata.Items;
+            var objects = Nationdata.Items;
             objects.Reverse();
             Data.Add(objects.Select(x => (double?)x.Value).ToList());
         }
-        GenerateGraphWithMoreThanOneDataSet(ViewData, "Districts Used Building Slots (30 days)", DistrictColors, DataTitles, "graph3", statsobjects.First().Items.Select(x => String.Format("{0:M/d/yyyy} {0:t}", x.Date)).ToList(), Data);
+        GenerateGraphWithMoreThanOneDataSet(ViewData, "Nations Used Building Slots (30 days)", NationColors, DataTitles, "graph3", statsobjects.First().Items.Select(x => String.Format("{0:M/d/yyyy} {0:t}", x.Date)).ToList(), Data);
 
         return View();
     }

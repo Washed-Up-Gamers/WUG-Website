@@ -15,7 +15,7 @@ public class MapController : SVController {
 
     public static List<MapState> MapStates = new List<MapState>();
 
-    public static List<DistrictMap> DistrictMaps = new();
+    public static List<NationMap> NationMaps = new();
 
     [TempData]
     public string StatusMessage { get; set; }

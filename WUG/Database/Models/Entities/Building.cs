@@ -3,7 +3,7 @@ using WUG.Scripting.LuaObjects;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using WUG.Scripting;
-using WUG.Database.Models.Districts;
+using WUG.Database.Models.Nations;
 using System.Text.Json.Serialization;
 using Shared.Models;
 
@@ -53,7 +53,7 @@ public abstract class BuildingBase : IHasOwner, ITickable
 
     [NotMapped]
     [JsonIgnore]
-    public Nation District => DBCache.Get<Nation>(NationId)!;
+    public Nation Nation => DBCache.Get<Nation>(NationId)!;
 
     public static BuildingBase Find(long? id)
     {
@@ -127,12 +127,12 @@ public abstract class ProducingBuilding : BuildingBase
         {
             double eff = 1.0;
             if (BuildingObj.BaseEfficiency is not null)
-                eff = (double)BuildingObj.BaseEfficiency.GetValue(new ExecutionState(District, Province));
+                eff = (double)BuildingObj.BaseEfficiency.GetValue(new ExecutionState(Nation, Province));
 
             if (BuildingType == BuildingType.Factory) {
                 eff -= (((Size - 1) * Defines.NProduction["FACTORY_INPUT_EFFICIENCY_LOSS_PER_SIZE"]) - Defines.NProduction["FACTORY_INPUT_EFFICIENCY_LOSS_PER_SIZE"]);
-                eff += District.GetModifierValue(NationModifierType.FactoryEfficiency);
-                eff *= 1 + District.GetModifierValue(NationModifierType.FactoryEfficiencyFactor);
+                eff += Nation.GetModifierValue(NationModifierType.FactoryEfficiency);
+                eff *= 1 + Nation.GetModifierValue(NationModifierType.FactoryEfficiencyFactor);
             }
             eff *= GetModifierValue(BuildingModifierType.EfficiencyFactor) + 1.00;
             return eff;
@@ -156,9 +156,9 @@ public abstract class ProducingBuilding : BuildingBase
         {
             var basevalue = BuildingType switch
             {
-                BuildingType.Farm => 1 + District.GetModifierValue(NationModifierType.FarmThroughputFactor),
-                BuildingType.Mine => 1 + District.GetModifierValue(NationModifierType.MineThroughputFactor),
-                BuildingType.Factory => 1 + District.GetModifierValue(NationModifierType.FactoryThroughputFactor),
+                BuildingType.Farm => 1 + Nation.GetModifierValue(NationModifierType.FarmThroughputFactor),
+                BuildingType.Mine => 1 + Nation.GetModifierValue(NationModifierType.MineThroughputFactor),
+                BuildingType.Factory => 1 + Nation.GetModifierValue(NationModifierType.FactoryThroughputFactor),
                 _ => 1
             };
             basevalue *= BuildingType switch
@@ -200,7 +200,7 @@ public abstract class ProducingBuilding : BuildingBase
 
             basevalue *= GetModifierValue(BuildingModifierType.ThroughputFactor) + 1.00;
             basevalue *= Province.GetModifierValue(ProvinceModifierType.AllProducingBuildingThroughputFactor) + 1.00;
-            basevalue *= District.GetModifierValue(NationModifierType.AllProducingBuildingThroughputFactor) + 1.00;
+            basevalue *= Nation.GetModifierValue(NationModifierType.AllProducingBuildingThroughputFactor) + 1.00;
 
             if (EmployeeId is not null)
                 basevalue *= 1.15;
@@ -217,9 +217,9 @@ public abstract class ProducingBuilding : BuildingBase
             string type = BuildingType.ToString().ToUpper();
             return Defines.NProduction[$"BASE_{type}_QUANTITY_CAP"] + BuildingType switch
             {
-                BuildingType.Farm => District.GetModifierValue(NationModifierType.FarmQuantityCap),
-                BuildingType.Mine => District.GetModifierValue(NationModifierType.MineQuantityCap),
-                BuildingType.Factory => District.GetModifierValue(NationModifierType.FactoryQuantityCap),
+                BuildingType.Farm => Nation.GetModifierValue(NationModifierType.FarmQuantityCap),
+                BuildingType.Mine => Nation.GetModifierValue(NationModifierType.MineQuantityCap),
+                BuildingType.Factory => Nation.GetModifierValue(NationModifierType.FactoryQuantityCap),
                 _ => 1
             };
         }
@@ -306,8 +306,8 @@ public abstract class ProducingBuilding : BuildingBase
     public void UpdateModifiers()
     {
         Modifiers = new();
-        var value_executionstate = new ExecutionState(District, Province, parentscopetype: ScriptScopeType.Building, building: this);
-        //var scaleby_executionstate = new ExecutionState(District, this);
+        var value_executionstate = new ExecutionState(Nation, Province, parentscopetype: ScriptScopeType.Building, building: this);
+        //var scaleby_executionstate = new ExecutionState(Nation, this);
         foreach (var staticmodifier in StaticModifiers)
         {
             foreach (var modifiernode in staticmodifier.BaseStaticModifiersObj.ModifierNodes)
@@ -317,12 +317,12 @@ public abstract class ProducingBuilding : BuildingBase
             }
             if (staticmodifier.BaseStaticModifiersObj.EffectBody is not null)
             {
-                staticmodifier.BaseStaticModifiersObj.EffectBody.Execute(new(District, Province, parentscopetype: ScriptScopeType.Building, building: this));
+                staticmodifier.BaseStaticModifiersObj.EffectBody.Execute(new(Nation, Province, parentscopetype: ScriptScopeType.Building, building: this));
             }
         }
 
-        value_executionstate = new ExecutionState(District, Province, parentscopetype: ScriptScopeType.Building, building: this);
-        //var scaleby_executionstate = new ExecutionState(District, this);
+        value_executionstate = new ExecutionState(Nation, Province, parentscopetype: ScriptScopeType.Building, building: this);
+        //var scaleby_executionstate = new ExecutionState(Nation, this);
         foreach (var upgrade in Upgrades)
         {
             foreach (var modifiernode in upgrade.LuaBuildingUpgradeObj.ModifierNodes)

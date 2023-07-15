@@ -6,9 +6,9 @@ using WUG.Database.Models.Economy;
 using Microsoft.EntityFrameworkCore;
 using WUG.Database.Managers;
 using WUG.Scripting;
-using NationModifier = Shared.Models.Districts.NationModifier;
+using NationModifier = Shared.Models.Nations.NationModifier;
 
-namespace WUG.Database.Models.Districts;
+namespace WUG.Database.Models.Nations;
 
 public class Nation
 {
@@ -31,13 +31,13 @@ public class Nation
     public List<Province> Provinces { get; set; }
 
     [NotMapped]
-    public List<City> Cities => DBCache.GetAll<City>().Where(x => x.DistrictId == Id).ToList();
+    public List<City> Cities => DBCache.GetAll<City>().Where(x => x.NationId == Id).ToList();
 
     [NotMapped]
     public List<User> Citizens => DBCache.GetAll<User>().Where(x => x.NationId == Id).ToList();
 
     [NotMapped]
-    public List<State> States => DBCache.GetAll<State>().Where(x => x.DistrictId == Id).ToList();
+    public List<State> States => DBCache.GetAll<State>().Where(x => x.NationId == Id).ToList();
 
     [NotMapped]
     public decimal GDP = 0.0m;
@@ -214,11 +214,11 @@ public class Nation
     public void UpdateModifiers() {
         Modifiers = new();
         var value_executionstate = new ExecutionState(this, null, parentscopetype:ScriptScopeType.Nation);
-        //var scaleby_executionstate = new ExecutionState(District, this);
+        //var scaleby_executionstate = new ExecutionState(Nation, this);
         foreach (var staticmodifier in StaticModifiers) {
             foreach (var modifiernode in staticmodifier.BaseStaticModifiersObj.ModifierNodes) {
                 var value = (double)modifiernode.GetValue(value_executionstate, staticmodifier.ScaleBy);
-                UpdateOrAddModifier((NationModifierType)modifiernode.districtModifierType!, value);
+                UpdateOrAddModifier((NationModifierType)modifiernode.NationModifierType!, value);
             }
             if (staticmodifier.BaseStaticModifiersObj.EffectBody is not null)
             {
@@ -287,7 +287,7 @@ public class Nation
         score += infrastructurewiththroughputfromupgrades * Defines.NScore[NScore.ECONOMIC_SCORE_PER_INFRASTRUCTURE];
         return new()
         {
-            District = this,
+            Nation = this,
             Score = score,
             Mines = mines,
             SimpleFactories = simplefactories,
@@ -299,7 +299,7 @@ public class Nation
 
 public class EconomicScoreReturnModel
 {
-    public Nation District { get; set; }
+    public Nation Nation { get; set; }
     public double Score { get; set; }
     public int Mines { get; set; }
     public int SimpleFactories { get; set; }

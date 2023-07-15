@@ -19,6 +19,16 @@ public class EntityAPI : BaseAPI
         app.MapGet   ("api/entities/{svid}", GetEntity).RequireCors("ApiPolicy");
         app.MapGet   ("api/entity/search", Search).RequireCors("ApiPolicy");
         app.MapGet   ("api/entities/{entityid}/taxablebalancehistory", GetTaxableBalanceHistory).RequireCors("ApiPolicy");
+        app.MapGet   ("api/entities/{id}/ownedgroups", GetOwnedGroupsAsync).RequireCors("ApiPolicy");
+    }
+
+    private static async Task<IResult> GetOwnedGroupsAsync(HttpContext ctx, long id)
+    {
+        BaseEntity? entity = BaseEntity.Find(id);
+        if (entity is null)
+            return ValourResult.NotFound($"Could not find entity with id {id}");
+
+        return Results.Json(entity.GetGroupsOwned());
     }
 
     private static async Task GetTaxableBalanceHistory(HttpContext ctx, WashedUpDB dbctx, long entityid, int days)

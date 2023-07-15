@@ -1,6 +1,6 @@
 ﻿using WUG.Scripting.LuaObjects;
 using WUG.Helpers.TreeHelper;
-using WUG.Database.Models.Districts;
+using WUG.Database.Models.Nations;
 using System.Drawing;
 using WUG.Scripting;
 using WUG.Scripting.Parser;

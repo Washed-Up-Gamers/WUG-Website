@@ -1,7 +1,7 @@
 ﻿using WUG.Scripting.LuaObjects;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace WUG.Database.Models.Districts;
+namespace WUG.Database.Models.Nations;
 
 public class Policy
 {

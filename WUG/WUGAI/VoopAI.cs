@@ -119,7 +119,7 @@ public class VoopAI
         foreach (var role in roles.Where(x => RankNames.Contains(x.Name)))
             RankRoleIds[role.Name] = role.Id;
 
-        //foreach (var role in (await (await Planet.FindAsync(PlanetId)).GetRolesAsync()).Where(x => districtsnames.Contains(x.Name + " District")))
+        //foreach (var role in (await (await Planet.FindAsync(PlanetId)).GetRolesAsync()).Where(x => Nationsnames.Contains(x.Name + " Nation")))
         //    RankRoleIds[role.Name] = role.Id;
     }
 
@@ -205,7 +205,7 @@ public class VoopAI
                 await user.CheckRoles(member);
             }
 
-            // set district
+            // set Nation
         }
 
         // TODO: add patron role management

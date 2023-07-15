@@ -7,14 +7,14 @@ using System.Diagnostics;
 
 namespace WUG.Workers;
 
-public class DistrictUpdateWorker : BackgroundService
+public class NationUpdateWorker : BackgroundService
 {
     private readonly IServiceScopeFactory _scopeFactory;
-    public readonly ILogger<DistrictUpdateWorker> _logger;
+    public readonly ILogger<NationUpdateWorker> _logger;
     private static WashedUpDB dbctx;
     private static DateTime LastTime = DateTime.UtcNow;
 
-    public DistrictUpdateWorker(ILogger<DistrictUpdateWorker> logger,
+    public NationUpdateWorker(ILogger<NationUpdateWorker> logger,
                         IServiceScopeFactory scopeFactory)
     {
         _logger = logger;
@@ -50,12 +50,12 @@ public class DistrictUpdateWorker : BackgroundService
                         Console.WriteLine($"Time took to tick provinces: {(int)(sw.Elapsed.TotalMilliseconds)}ms");
 
                         sw = Stopwatch.StartNew();
-                        foreach(var district in DBCache.GetAll<Nation>())
+                        foreach(var Nation in DBCache.GetAll<Nation>())
                         {
-                            district.HourlyTick();
+                            Nation.HourlyTick();
                         }
                         sw.Stop();
-                        Console.WriteLine($"Time took to tick districts: {(int)(sw.Elapsed.TotalMilliseconds)}ms");
+                        Console.WriteLine($"Time took to tick Nations: {(int)(sw.Elapsed.TotalMilliseconds)}ms");
                         if (times%168 == 0)
                             Console.WriteLine(times);
 
@@ -70,7 +70,7 @@ public class DistrictUpdateWorker : BackgroundService
                     }
                     catch(System.Exception e)
                     {
-                        Console.WriteLine("FATAL DISTRICT UPDATING WORKER ERROR:");
+                        Console.WriteLine("FATAL Nation UPDATING WORKER ERROR:");
                         Console.WriteLine(e.Message);
                         Console.WriteLine(e.StackTrace);
                         if (e.InnerException is not null) {
@@ -83,11 +83,11 @@ public class DistrictUpdateWorker : BackgroundService
 
             while (!task.IsCompleted)
             {
-                _logger.LogInformation("District Updating Worker running at: {time}", DateTimeOffset.Now);
+                _logger.LogInformation("Nation Updating Worker running at: {time}", DateTimeOffset.Now);
                 await Task.Delay(60000);
             }
 
-            _logger.LogInformation("District Updating Worker task stopped at: {time}", DateTimeOffset.Now);
+            _logger.LogInformation("Nation Updating Worker task stopped at: {time}", DateTimeOffset.Now);
             _logger.LogInformation("Restarting.", DateTimeOffset.Now);
         }
     }

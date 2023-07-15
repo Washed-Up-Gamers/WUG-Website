@@ -25,7 +25,7 @@ public static class BaseEntityMapper
             TaxAbleBalance = entity.TaxAbleBalance,
             ApiKey = entity.ApiKey,
             ImageUrl = entity.ImageUrl,
-            DistrictId = entity.NationId,
+            NationId = entity.NationId,
             EntityType = (Shared.Models.Entities.EntityType)entity.EntityType
         };
 

@@ -47,8 +47,6 @@ building_pothium_factory = {
 		recipe_pothium_components_factory_base
 	]
 	buildingcosts = {
-		gold = 2000
-		computer_chips = 750
 		pothium_components = 5000
 		advanced_components = 2500
 		simple_components = 15000

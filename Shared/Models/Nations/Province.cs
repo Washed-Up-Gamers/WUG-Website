@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace Shared.Models.Districts;
+namespace Shared.Models.Nations;
 
 public enum TerrainType
 {

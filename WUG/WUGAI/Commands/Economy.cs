@@ -36,7 +36,7 @@ class EconomyCommandsModule : BaseCommandModule
     }
 
     [Command("budget")]
-    public async Task SeeDistrictTaxInfo(CommandContext ctx, [RemainingText] string nationname)
+    public async Task SeeNationTaxInfo(CommandContext ctx, [RemainingText] string nationname)
     {
         var nation = DBCache.GetAll<Nation>().FirstOrDefault(x => x.Name.ToLower() == nationname.ToLower());
         if (nation is null)

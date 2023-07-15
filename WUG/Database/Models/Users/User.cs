@@ -192,8 +192,6 @@ public class User : BaseEntity
     {
         List<Group> groups = new List<Group>();
 
-        using var dbctx = WashedUpDB.DbFactory.CreateDbContext();
-
         var topGroups = DBCache.GetAll<Group>().Where(x => x.IsOwner(this));
 
         foreach (Group group in topGroups)

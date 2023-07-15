@@ -38,7 +38,7 @@ public class TaxPolicy : Item
     public decimal Rate { get; set; }
 
     // should be 100 if this tax policy is by Vooperia
-    public long DistrictId { get; set; }
+    public long NationId { get; set; }
     public TaxType taxType { get; set; }
 
     // the min amount after which the tax has effect

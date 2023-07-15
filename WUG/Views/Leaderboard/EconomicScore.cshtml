@@ -25,7 +25,7 @@
 </style>
 
 <center>
-    <h4 style="text-align:center">Districts by Economic Score</h4>
+    <h4 style="text-align:center">Nations by Economic Score</h4>
 </center>
 
 <div class="container vw-100">
@@ -33,7 +33,7 @@
         <table class="table">
             <thead>
                 <tr class="header">
-                    <th>District</th>
+                    <th>Nation</th>
                     <th>Economic Score</th>
                     <th>Population</th>
                     <th>Levels of Mines</th>
@@ -45,17 +45,17 @@
             <tbody>
                 @{
                     var models = new List<EconomicScoreReturnModel>();
-                    foreach (var district in DBCache.GetAll<Nation>())
+                    foreach (var Nation in DBCache.GetAll<Nation>())
                     {
-                        models.Add(await district.GetEconomicScore());
+                        models.Add(await Nation.GetEconomicScore());
                     }
                     models = models.OrderByDescending(x => x.Score).ToList();
                     foreach (var _model in models)
                     {
                         <tr>
-                            <td>@_model.District.Name</td>
+                            <td>@_model.Nation.Name</td>
                             <td>@($"{_model.Score:n0}")</td>
-                            <td>@($"{_model.District.TotalPopulation:n0}")</td>
+                            <td>@($"{_model.Nation.TotalPopulation:n0}")</td>
                             <td>@_model.Mines</td>
                             <td>@_model.SimpleFactories</td>
                             <td>@_model.AdvancedFactories</td>

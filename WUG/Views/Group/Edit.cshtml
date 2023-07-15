@@ -51,9 +51,9 @@
                         @Html.HiddenFor(x => x.GroupType)
                     </div>
                     <div class="form-group">
-                        <label asp-for="DistrictId"></label>
+                        <label asp-for="NationId"></label>
                         <br />
-                        <select class="form-control" asp-for="DistrictId" asp-items="DBCache.GetAll<Nation>().Select(x => new SelectListItem() { Text = x.Name, Value = x.Id.ToString()})"></select>
+                        <select class="form-control" asp-for="NationId" asp-items="DBCache.GetAll<Nation>().Select(x => new SelectListItem() { Text = x.Name, Value = x.Id.ToString()})"></select>
                     </div>
                     @if (Model.Group.HasPermission(user, GroupPermissions.Edit))
                     {

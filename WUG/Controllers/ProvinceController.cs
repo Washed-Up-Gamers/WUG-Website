@@ -11,7 +11,9 @@ using WUG.Models.Provinces;
 using Microsoft.EntityFrameworkCore;
 using System.Net;
 using WUG.Views.ProvinceViews.Models;
-using WUG.Database.Models.Districts;
+using WUG.Database.Models.Nations;
+using WUG.Models.Building;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace WUG.Controllers;
 
@@ -42,11 +44,57 @@ public class ProvinceController : SVController
     [UserRequired]
     public IActionResult ViewBuildings(long id)
     {
+        var user = HttpContext.GetUser();
         Province? province = DBCache.Get<Province>(id);
         if (province is null)
-            return Redirect("/");
+            return RedirectBack();
 
-        return View(province);
+        var viewbuildingmodel = new ProvinceViewBuildingModel()
+        {
+            ManageModels = new(),
+            Province = province
+        };
+
+        foreach (var building in province.GetBuildings())
+        {
+
+            var model = new CreateBuildingRequestModel()
+            {
+                Province = building.Province,
+                LuaBuildingObj = building.BuildingObj,
+                ProvinceId = building.ProvinceId,
+                BuildingId = building.LuaBuildingObjId,
+                AlreadyExistingBuildingId = building.Id,
+                CanBuildAs = new(),
+                IncludeScript = viewbuildingmodel.ManageModels.Count == 0,
+                PrefixForIds = "",
+                User = user
+            };
+
+            var managemodel = new BuildingManageModel()
+            {
+                Building = building,
+                Name = building.Name,
+                Description = building.Description,
+                RecipeId = building.RecipeId,
+                BuildingId = building.Id,
+                createBuildingRequestModel = model
+            };
+
+            // only groups/corporations can have building employees
+            if (building.Owner.EntityType == EntityType.Group || building.Owner.EntityType == EntityType.Corporation)
+            {
+                var group = (Group)building.Owner;
+                var ownerauthority = group.GetAuthority(user);
+                managemodel.GroupRolesForEmployee = new();
+                managemodel.GroupRolesForEmployee.Add(new("None", "0"));
+                managemodel.GroupRolesForEmployee.AddRange(group.Roles.Where(x => x.Authority < ownerauthority).Select(x => new SelectListItem(x.Name, x.Id.ToString(), x.Id == building.EmployeeGroupRoleId)));
+            }
+
+            viewbuildingmodel.ManageModels.Add(managemodel);
+        }
+
+        return View(viewbuildingmodel);
     }
 
     [HttpGet("/Province/BulkManage")]
@@ -212,7 +260,7 @@ public class ProvinceController : SVController
 
         var user = HttpContext.GetUser();
         if (province.Nation.GovernorId != user.Id)
-            return RedirectBack("You must be governor of the district to change the governor of a province!");
+            return RedirectBack("You must be governor of the Nation to change the governor of a province!");
 
         province.GovernorId = GovernorId;
 
@@ -231,22 +279,22 @@ public class ProvinceController : SVController
 
         var user = HttpContext.GetUser();
         if (province.Nation.GovernorId != user.Id)
-            return RedirectBack("You must be governor of the district to change the state of a province!");
+            return RedirectBack("You must be governor of the Nation to change the state of a province!");
         if (model.StateId is null) {
             province.StateId = null;
             StatusMessage = $"Successfully changed the state of this province to none";
-            return Redirect($"/District/View/{province.Nation.Name}");
+            return Redirect($"/Nation/View/{province.Nation.Name}");
         }
         else {
             State? state = DBCache.Get<State>(model.StateId);
             if (state is null) return Redirect("/");
 
-            if (state.DistrictId != province.NationId)
-                return RedirectBack("You can not assign a state to a province that is not in the same district!");
+            if (state.NationId != province.NationId)
+                return RedirectBack("You can not assign a state to a province that is not in the same Nation!");
 
             province.StateId = model.StateId;
             StatusMessage = $"Successfully changed the state of this province to {state.Name}";
-            return Redirect($"/District/View/{province.Nation.Name}");
+            return Redirect($"/Nation/View/{province.Nation.Name}");
         }
     }
 

@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 using Shared.Managers;
-using Shared.Models.Districts;
+using Shared.Models.Nations;
 
 namespace Shared.Models.Items;
 
@@ -97,7 +97,7 @@ public class Recipe : Item
 
         var baserecipe = await GetBaseRecipeAsync();
         var value_executionstate = new ExecutionState(null, null, parentscopetype: ScriptScopeType.Recipe, recipe: this);
-        //var scaleby_executionstate = new ExecutionState(District, this);
+        //var scaleby_executionstate = new ExecutionState(Nation, this);
         foreach (var pair in EditsLevels)
         {
             var edit = baserecipe.LuaRecipeEdits[pair.Key];
@@ -120,7 +120,7 @@ public class Recipe : Item
 
         var baserecipe = await GetBaseRecipeAsync();
         var value_executionstate = new ExecutionState(null, null, parentscopetype: ScriptScopeType.Recipe, recipe: this);
-        //var scaleby_executionstate = new ExecutionState(District, this);
+        //var scaleby_executionstate = new ExecutionState(Nation, this);
         foreach (var pair in EditsLevels)
         {
             var edit = baserecipe.LuaRecipeEdits[pair.Key];

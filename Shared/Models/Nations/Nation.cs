@@ -1,7 +1,7 @@
-using Shared.Models.Districts.Modifiers;
+using Shared.Models.Nations.Modifiers;
 using System.Text.Json.Serialization;
 
-namespace Shared.Models.Districts;
+namespace Shared.Models.Nations;
 
 public class NationModifier
 {
@@ -75,7 +75,7 @@ public class Nation : Item
                 return cached;
         }
 
-        var item = (await SVClient.GetJsonAsync<Nation>($"api/districts/{id}")).Data;
+        var item = (await SVClient.GetJsonAsync<Nation>($"api/Nations/{id}")).Data;
 
         if (item is not null)
             await item.AddToCache();
@@ -99,11 +99,11 @@ public class Nation : Item
     public void UpdateModifiers() {
         Modifiers = new();
         var value_executionstate = new ExecutionState(this, null, parentscopetype:ScriptScopeType.Nation);
-        //var scaleby_executionstate = new ExecutionState(District, this);
+        //var scaleby_executionstate = new ExecutionState(Nation, this);
         foreach (var staticmodifier in StaticModifiers) {
             foreach (var modifiernode in staticmodifier.BaseStaticModifiersObj.ModifierNodes) {
                 var value = (double)modifiernode.GetValue(value_executionstate, staticmodifier.ScaleBy);
-                UpdateOrAddModifier((NationModifierType)modifiernode.districtModifierType!, value);
+                UpdateOrAddModifier((NationModifierType)modifiernode.NationModifierType!, value);
             }
         }
     }

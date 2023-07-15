@@ -181,7 +181,7 @@
                     <span>Costs to upgrade:</span>
                     <br/>
                     <div class="buildingcosts" style="height: 75px;">
-                        @foreach ((var resource, var amount) in luaupgrade.GetConstructionCost(Model.Building.Owner, Model.Building.District, Model.Building.Province, Model.Building, upgrade, 1))
+                        @foreach ((var resource, var amount) in luaupgrade.GetConstructionCost(Model.Building.Owner, Model.Building.Nation, Model.Building.Province, Model.Building, upgrade, 1))
                         {
                             <div class="resource-row">
                                 <span style="align-self: flex-start">@resource.Replace("_", " ")</span>
@@ -216,7 +216,7 @@
                     </td>
                 </tr>
                 <tr class="mergedrow dividertop">
-                    <th class="infobox-row-name">@Model.Building.District.NameForProvince</th>
+                    <th class="infobox-row-name">@Model.Building.Nation.NameForProvince</th>
                     <td class="infobox-row-value">
                         <a href="/Province/View/@Model.Building.ProvinceId">
                             <span>@Model.Building.Province.Name</span>
@@ -224,9 +224,9 @@
                    </td>
                 </tr>
                 <tr class="mergedrow">
-                    <th class="infobox-row-name">District</th>
+                    <th class="infobox-row-name">Nation</th>
                     <td class="infobox-row-value">
-                        <a href="/District/View/@Model.Building.District.Name">@Model.Building.District.Name</a>
+                        <a href="/Nation/View/@Model.Building.Nation.Name">@Model.Building.Nation.Name</a>
                     </td>
                 </tr>
                 <tr class="mergedrow">
@@ -461,8 +461,8 @@
                     runningtotal *= runningtotalforstacking;
 
                     runningtotalforstacking = 1;
-                    var districttypestoget = new List<NationModifierType?>() { NationModifierType.AllProducingBuildingThroughputFactor };
-                    districttypestoget.Add(Model.Building.BuildingType switch
+                    var Nationtypestoget = new List<NationModifierType?>() { NationModifierType.AllProducingBuildingThroughputFactor };
+                    Nationtypestoget.Add(Model.Building.BuildingType switch
                     {
                         BuildingType.Mine => NationModifierType.MineThroughputFactor,
                         BuildingType.Factory => NationModifierType.FactoryThroughputFactor,
@@ -470,7 +470,7 @@
                         BuildingType.Infrastructure => NationModifierType.InfrastructureThroughputFactor
                     });
 
-                    @foreach (var item in Model.Building.Province.GetStaticModifiersOfTypes(null, districttypestoget, true, false))
+                    @foreach (var item in Model.Building.Province.GetStaticModifiersOfTypes(null, Nationtypestoget, true, false))
                     {
                         runningtotalforstacking += item.value;
                         <tr>
@@ -481,7 +481,7 @@
                     }
 
                     runningtotalforstacking = 1;
-                    var state = new ExecutionState(Model.Building.District, Model.Building.Province, parentscopetype: ScriptScopeType.Building, building: Model.Building);
+                    var state = new ExecutionState(Model.Building.Nation, Model.Building.Province, parentscopetype: ScriptScopeType.Building, building: Model.Building);
                     @foreach (var item in Model.Building.StaticModifiers.Where(x => x.BaseStaticModifiersObj.ModifierNodes.Any(n => n.buildingModifierType == BuildingModifierType.ThroughputFactor)))
                     {
                         var node = item.BaseStaticModifiersObj.ModifierNodes.FirstOrDefault(x => x.buildingModifierType == BuildingModifierType.ThroughputFactor);

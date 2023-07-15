@@ -128,21 +128,21 @@ public class ItemTrade
 
         if (!(TradeType == ItemTradeType.Server) && GameDataManager.Resources.ContainsKey(toitem.Definition.Name) && toitem.Definition.IsSVItem)
         {
-            TaxPolicy? FromDistrictTaxPolicy = DBCache.GetAll<TaxPolicy>().FirstOrDefault(x => x.NationId == fromEntity.NationId && x.Target == toitem.Definition.Name && (x.taxType == TaxType.ImportTariff || x.taxType == TaxType.ExportTariff));
-            TaxPolicy? ToDistrictTaxPolicy = DBCache.GetAll<TaxPolicy>().FirstOrDefault(x => x.NationId == toEntity.NationId && x.Target == toitem.Definition.Name && (x.taxType == TaxType.ImportTariff || x.taxType == TaxType.ExportTariff));
+            TaxPolicy? FromNationTaxPolicy = DBCache.GetAll<TaxPolicy>().FirstOrDefault(x => x.NationId == fromEntity.NationId && x.Target == toitem.Definition.Name && (x.taxType == TaxType.ImportTariff || x.taxType == TaxType.ExportTariff));
+            TaxPolicy? ToNationTaxPolicy = DBCache.GetAll<TaxPolicy>().FirstOrDefault(x => x.NationId == toEntity.NationId && x.Target == toitem.Definition.Name && (x.taxType == TaxType.ImportTariff || x.taxType == TaxType.ExportTariff));
 
             // fun fact, the entity IRL that imports or exports pays the tariff
 
-            if (FromDistrictTaxPolicy is not null) {
-                decimal taxamount = FromDistrictTaxPolicy.GetTaxAmountForResource((decimal)Amount);
-                string detail = $"Tax payment for item id: {Id}, Tax Id: {FromDistrictTaxPolicy.Id}, Tax Type: {FromDistrictTaxPolicy.taxType}";
-                var tran = new Transaction(fromEntity, BaseEntity.Find(FromDistrictTaxPolicy!.NationId!), taxamount, TransactionType.TaxPayment, detail);
+            if (FromNationTaxPolicy is not null) {
+                decimal taxamount = FromNationTaxPolicy.GetTaxAmountForResource((decimal)Amount);
+                string detail = $"Tax payment for item id: {Id}, Tax Id: {FromNationTaxPolicy.Id}, Tax Type: {FromNationTaxPolicy.taxType}";
+                var tran = new Transaction(fromEntity, BaseEntity.Find(FromNationTaxPolicy!.NationId!), taxamount, TransactionType.TaxPayment, detail);
                 tran.NonAsyncExecute(true);
             }
-            if (ToDistrictTaxPolicy is not null) {
-                decimal taxamount = ToDistrictTaxPolicy.GetTaxAmountForResource((decimal)Amount);
-                string detail = $"Tax payment for item trade id: {Id}, Tax Id: {ToDistrictTaxPolicy.Id}, Tax Type: {ToDistrictTaxPolicy.taxType}";
-                var tran = new Transaction(toEntity, BaseEntity.Find(ToDistrictTaxPolicy!.NationId!), taxamount, TransactionType.TaxPayment, detail);
+            if (ToNationTaxPolicy is not null) {
+                decimal taxamount = ToNationTaxPolicy.GetTaxAmountForResource((decimal)Amount);
+                string detail = $"Tax payment for item trade id: {Id}, Tax Id: {ToNationTaxPolicy.Id}, Tax Type: {ToNationTaxPolicy.taxType}";
+                var tran = new Transaction(toEntity, BaseEntity.Find(ToNationTaxPolicy!.NationId!), taxamount, TransactionType.TaxPayment, detail);
                 tran.NonAsyncExecute(true);
             }
         }

@@ -5,12 +5,12 @@ namespace WUG.Models.Map;
 public class MapState
 {
     public long Id { get; set; }
-    public long DistrictId { get; set; }
-    public Nation District => DBCache.Get<Nation>(DistrictId);
+    public long NationId { get; set; }
+    public Nation Nation => DBCache.Get<Nation>(NationId);
     public string GetMapColor() {
         var province = DBCache.Get<Province>(Id);
         if (province.StateId is null) {
-            return District.Color;
+            return Nation.Color;
         }
         return province.State.MapColor;
     }
@@ -23,9 +23,9 @@ public class MapState
     public int YPos { get; set; }
 }
 
-public class DistrictMap
+public class NationMap
 {
-    public long DistrictId { get; set; }
+    public long NationId { get; set; }
     public int LowestXPos { get; set; }
     public int LowestYPos { get; set; }
     public int HighestXPos { get; set; }

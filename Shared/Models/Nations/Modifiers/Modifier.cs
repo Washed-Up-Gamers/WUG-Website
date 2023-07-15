@@ -1,4 +1,4 @@
-namespace Shared.Models.Districts.Modifiers;
+namespace Shared.Models.Nations.Modifiers;
 
 /// <summary>
 /// Enum of all modifiers in the Nation scope

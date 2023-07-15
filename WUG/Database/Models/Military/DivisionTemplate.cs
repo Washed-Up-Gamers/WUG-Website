@@ -8,7 +8,7 @@ public class DivisionTemplate
 {
     [Key]
     public long Id { get; set; }
-    public long DistrictId { get; set; }
+    public long NationId { get; set; }
     public string Name { get; set; }
 
     [Column(TypeName = "jsonb[]")]

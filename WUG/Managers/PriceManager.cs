@@ -30,6 +30,7 @@ public static class PriceManager
         steel:2.75
         """;
         foreach (var stringpair in data.Split("\n")) {
+            Console.WriteLine(stringpair);
             var pair = stringpair.Split(":");
             _resourceprices.Add(pair[0], decimal.Parse(pair[1]));
         }
@@ -94,5 +95,7 @@ public static class PPIManager {
             PPI = PPI,
             Time = DateTime.UtcNow
         };
+
+        return stat;
     }
 }

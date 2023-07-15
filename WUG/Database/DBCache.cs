@@ -308,15 +308,15 @@ public static class DBCache
             Put(_obj.Id, _obj);
         }
         foreach (var _obj in dbctx.Senators)
-            Put(_obj.DistrictId, _obj);
+            Put(_obj.NationId, _obj);
         foreach (var _obj in dbctx.Corporations)
             Put(_obj.Id, _obj);
         foreach (var _obj in dbctx.CorporationShareClasses)
             Put(_obj.Id, _obj);
 
-        foreach (Nation district in GetAll<Nation>())
+        foreach (Nation Nation in GetAll<Nation>())
         {
-            district.Provinces = GetAll<Province>().Where(x => x.NationId == district.Id).ToList();
+            Nation.Provinces = GetAll<Province>().Where(x => x.NationId == Nation.Id).ToList();
         }
 
         foreach (SVItemOwnership item in dbctx.SVItemOwnerships) 

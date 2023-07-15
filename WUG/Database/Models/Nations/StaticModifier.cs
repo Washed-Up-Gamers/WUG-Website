@@ -3,7 +3,7 @@ using WUG.Scripting.LuaObjects;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 
-namespace WUG.Database.Models.Districts;
+namespace WUG.Database.Models.Nations;
 public class StaticModifier
 {
     public bool Decay { get; set; }
@@ -20,11 +20,11 @@ public class StaticModifier
     [JsonIgnore]
     public LuaStaticModifier BaseStaticModifiersObj => GameDataManager.BaseStaticModifiersObjs[LuaStaticModifierObjId];
 
-    public string GenerateHtmlForTooltip(Nation district, Province? province = null) {
+    public string GenerateHtmlForTooltip(Nation Nation, Province? province = null) {
         var html = $"<span class='modifier-tooltip-name'><b>{BaseStaticModifiersObj.Name}</b></span>";
         if (BaseStaticModifiersObj.Description is not null)
             html += $"<br/><span class='modifier-tooltip-description'>{BaseStaticModifiersObj.Description}</span>";
-        var state = new ExecutionState(district, province);
+        var state = new ExecutionState(Nation, province);
         foreach (var item in BaseStaticModifiersObj.ModifierNodes) {
             html += "<br/>"+item.GenerateHTMLForListing(state);
         }
@@ -33,7 +33,7 @@ public class StaticModifier
         return html;
     }
 
-    public Shared.Models.Districts.StaticModifier ToModel()
+    public Shared.Models.Nations.StaticModifier ToModel()
     {
         return new()
         {

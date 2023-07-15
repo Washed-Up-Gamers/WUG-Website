@@ -1,9 +1,9 @@
-﻿using Shared.Models.Districts;
+﻿using Shared.Models.Nations;
 using WUG.Database.Models.Groups;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 
-namespace WUG.Database.Models.Districts;
+namespace WUG.Database.Models.Nations;
 public class State {
     [Column("id")]
     public long Id { get; set; }
@@ -23,12 +23,12 @@ public class State {
     [NotMapped]
     public Group Group => DBCache.Get<Group>(GroupId)!;
 
-    [Column("districtid")]
-    public long DistrictId { get; set; }
+    [Column("Nationid")]
+    public long NationId { get; set; }
 
     [NotMapped]
     [JsonIgnore]
-    public Nation District => DBCache.Get<Nation>(DistrictId)!;
+    public Nation Nation => DBCache.Get<Nation>(NationId)!;
 
     [Column("governorid")]
     public long? GovernorId { get; set; }
@@ -47,13 +47,16 @@ public class State {
     public double? PropertyTaxPerSize { get; set; }
 
     [NotMapped]
+    public decimal GDP = 0.0m;
+
+    [NotMapped]
     public IEnumerable<Province> Provinces => DBCache.GetAll<Province>().Where(x => x.StateId == Id);
 
     [NotMapped]
     public long Population => Provinces.Sum(x => x.Population);
 
     public bool CanEdit(BaseEntity entity) {
-        if (entity.Id == District.GovernorId) return true;
+        if (entity.Id == Nation.GovernorId) return true;
         if (Governor is not null) {
             if (Governor.EntityType == EntityType.User)
                 return GovernorId == entity.Id;
@@ -67,7 +70,7 @@ public class State {
     }
 
     public bool CanManageBuildingRequests(BaseEntity entity) {
-        if (entity.Id == District.GovernorId) return true;
+        if (entity.Id == Nation.GovernorId) return true;
         if (Governor is not null) {
             if (Governor.EntityType == EntityType.User)
                 return GovernorId == entity.Id;

@@ -5,7 +5,7 @@
             <MudTh><MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<ProducingBuilding, object>(x=>x.Name)">Name</MudTableSortLabel></MudTh>
             <MudTh><MudTableSortLabel SortBy="new Func<ProducingBuilding, object>(x=>x.BuildingType)">Type</MudTableSortLabel></MudTh>
             <MudTh><MudTableSortLabel SortBy="new Func<ProducingBuilding, object>(x=>x.Size)">Level</MudTableSortLabel></MudTh>
-            <MudTh><MudTableSortLabel SortBy="new Func<ProducingBuilding, object>(x => x.District.Name)">District</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<ProducingBuilding, object>(x => x.Nation.Name)">Nation</MudTableSortLabel></MudTh>
             <MudTh><MudTableSortLabel SortBy="new Func<ProducingBuilding, object>(x => x.Province.Name)">Province</MudTableSortLabel></MudTh>
             <MudTh><MudTableSortLabel SortBy="new Func<ProducingBuilding, object>(x => x.Recipe.Name)">Recipe Name</MudTableSortLabel></MudTh>
             <MudTh><MudTableSortLabel SortBy="new Func<ProducingBuilding, object>(x => x.Owner.Name)">Owner</MudTableSortLabel></MudTh>
@@ -25,7 +25,7 @@
                 }
             </MudTd>
             <MudTd DataLabel="Level">@context.Size</MudTd>
-            <MudTd DataLabel="District">@context.District.Name</MudTd>
+            <MudTd DataLabel="Nation">@context.Nation.Name</MudTd>
             <MudTd DataLabel="Province">@context.Province.Name</MudTd>
             <MudTd DataLabel="Recipe">@context.Recipe.Name</MudTd>
             <MudTd DataLabel="Owner">
@@ -59,33 +59,33 @@
     public string BuildingData { get; set; }
 
     [Parameter]
-    public string DistrictData { get; set; }
+    public string NationData { get; set; }
 
     public List<ProducingBuilding> Buildings { get; set; }
-    public List<Nation> Districts { get; set; }
+    public List<Nation> Nations { get; set; }
 
     public bool Show = false;
 
     protected override async Task OnInitializedAsync()
     {
         Buildings = JsonSerializer.Deserialize<List<ProducingBuilding>>(BuildingData);
-        Districts = JsonSerializer.Deserialize<List<Nation>>(DistrictData);
+        Nations = JsonSerializer.Deserialize<List<Nation>>(NationData);
 
-        foreach (var district in Districts)
+        foreach (var Nation in Nations)
         {
-            await SVCache.Put(district.Id, district, true);
+            await SVCache.Put(Nation.Id, Nation, true);
 
             // put provinces and states into cache
-            foreach (var province in district.Provinces)
+            foreach (var province in Nation.Provinces)
                 await SVCache.Put(province.Id, province, true);
-            foreach (var state in district.States)
+            foreach (var state in Nation.States)
                 await SVCache.Put(state.Id, state, true);
         }
 
         foreach (var building in Buildings)
         {
             building.Owner = await building.GetOwnerAsync();
-            building.District = await building.GetDistrictAsync();
+            building.Nation = await building.GetNationAsync();
             building.Province = await building.GetProvinceAsync();
 
             if (building.Recipe is null)

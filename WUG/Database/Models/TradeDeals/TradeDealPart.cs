@@ -1,4 +1,4 @@
-﻿using WUG.Database.Models.Districts;
+﻿using WUG.Database.Models.Nations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 using static System.Runtime.InteropServices.JavaScript.JSType;

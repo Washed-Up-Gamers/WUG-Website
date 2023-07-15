@@ -114,6 +114,6 @@ recipe_oil_well_mining_base = {
 	outputs = {
 		oil = 1
 	}
-	perhour = 3.5
+	perhour = 6
     editable = false
 }

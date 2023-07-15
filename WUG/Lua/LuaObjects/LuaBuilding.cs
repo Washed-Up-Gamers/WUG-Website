@@ -32,7 +32,7 @@ public class LuaBuilding
         return recipes;
     }
 
-    public Dictionary<string, double> GetConstructionCost(BaseEntity entity, Nation district, Province province, ProducingBuilding? building, int levels) {
+    public Dictionary<string, double> GetConstructionCost(BaseEntity entity, Nation Nation, Province province, ProducingBuilding? building, int levels) {
         Dictionary<string, double> totalresources = new();
         Dictionary<string, decimal> changesystemvarsby = new Dictionary<string, decimal>() {
             { @"province.buildings.totaloftype[""infrastructure""]", 0.0m },
@@ -46,7 +46,7 @@ public class LuaBuilding
             // get total cost of resources for the upgrades
             foreach (var upgrade in building.Upgrades)
             {
-                foreach ((var resource, var amount) in upgrade.LuaBuildingUpgradeObj.GetConstructionCost(entity, district, province, building, upgrade, upgrade.Level, true))
+                foreach ((var resource, var amount) in upgrade.LuaBuildingUpgradeObj.GetConstructionCost(entity, Nation, province, building, upgrade, upgrade.Level, true))
                 {
                     if (!totalresources.ContainsKey(resource))
                         totalresources[resource] = 0;
@@ -56,7 +56,7 @@ public class LuaBuilding
         }
 
         for (int i = 0; i < levels; i++) {
-            var costs = BuildingCosts.Evaluate(new ExecutionState(district, province, changesystemvarsby));
+            var costs = BuildingCosts.Evaluate(new ExecutionState(Nation, province, changesystemvarsby));
             foreach ((var resource, var amount) in costs) {
                 if (!totalresources.ContainsKey(resource))
                     totalresources[resource] = 0;
@@ -69,14 +69,14 @@ public class LuaBuilding
         return totalresources;
     }
 
-    public async ValueTask<TaskResult> CanBuild(BaseEntity buildas, BaseEntity caller, Nation district, Province province, ProducingBuilding? building, int levels) {
+    public async ValueTask<TaskResult> CanBuild(BaseEntity buildas, BaseEntity caller, Nation Nation, Province province, ProducingBuilding? building, int levels) {
         if (levels <= 0)
             return new(false, "The amount of levels you wish to build must be greater than 0!");
 
         if (OnlyGovernorCanBuild && !province.CanManageBuildingRequests(caller))
             return new(false, $"Only the Governor of {province.Name} can build this building!");
 
-        var costs = GetConstructionCost(buildas, district, province, building, levels);
+        var costs = GetConstructionCost(buildas, Nation, province, building, levels);
 
         // check for resources
         foreach ((var resource, var amount) in costs) {
@@ -93,12 +93,12 @@ public class LuaBuilding
         return new(true, null);
     }
 
-    public async ValueTask<TaskResult<ProducingBuilding>> Build(BaseEntity buildas, BaseEntity caller, Nation district, Province province, int levels, ProducingBuilding? building = null) {
-        var canbuild = await CanBuild(buildas, caller, district, province, building, levels);
+    public async ValueTask<TaskResult<ProducingBuilding>> Build(BaseEntity buildas, BaseEntity caller, Nation Nation, Province province, int levels, ProducingBuilding? building = null) {
+        var canbuild = await CanBuild(buildas, caller, Nation, province, building, levels);
         if (!canbuild.Success)
             return new(false, canbuild.Message);
 
-        var costs = GetConstructionCost(buildas, district, province, building, levels);
+        var costs = GetConstructionCost(buildas, Nation, province, building, levels);
         foreach ((var resource, var amount) in costs) {
             await buildas.ChangeResourceAmount(resource, -amount, "Construction");
         }
@@ -114,7 +114,7 @@ public class LuaBuilding
             building.Modifiers = new();
             building.Id = IdManagers.GeneralIdGenerator.Generate();
             building.OwnerId = buildas.Id;
-            building.NationId = district.Id;
+            building.NationId = Nation.Id;
             building.ProvinceId = province.Id;
             building.RecipeId = Recipes.First().Id;
             building.LuaBuildingObjId = Name;
@@ -171,7 +171,7 @@ public class LuaBuilding
             }
         }
 
-        district.UpdateModifiers();
+        Nation.UpdateModifiers();
 
         return new(true, $"Successfully built {levels} levels of {PrintableName}.", building);
     }

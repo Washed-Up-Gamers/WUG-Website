@@ -92,15 +92,15 @@ public class ProvinceManager
                         if (!(child.Name == "path"))
                             continue;
                         long id = long.Parse(child.Attributes["id"].Value);
-                        var district = ProvinceIdsToNation.ContainsKey(id) ? ProvinceIdsToNation[id] : null;
+                        var Nation = ProvinceIdsToNation.ContainsKey(id) ? ProvinceIdsToNation[id] : null;
                         long disid = 100;
-                        if (district is not null)
-                            disid = district.Id;
+                        if (Nation is not null)
+                            disid = Nation.Id;
                         var state = new MapState()
                         {
                             Id = id,
                             D = child.Attributes["d"].Value,
-                            DistrictId = disid,
+                            NationId = disid,
                             IsOcean = ProvincesMetadata[id].TerrianType == "ocean"
                         };
                         ProvincesMetadata[id].Path = child.Attributes["d"].Value;
@@ -117,16 +117,16 @@ public class ProvinceManager
         var _mapStates = new Dictionary<long, MapState>();
         foreach (var state in mapStates.Values)
         {
-            //if (state.DistrictId == 100 || state.IsOcean == true)
+            //if (state.NationId == 100 || state.IsOcean == true)
             if (state.IsOcean == true)
                 continue;
 
-            var districtstate = _mapStates.ContainsKey(state.DistrictId) ? _mapStates[state.DistrictId] : null;
-            var districtmapdata = MapController.DistrictMaps.FirstOrDefault(x => x.DistrictId == state.DistrictId);
-            if (districtstate is not null)
+            var Nationstate = _mapStates.ContainsKey(state.NationId) ? _mapStates[state.NationId] : null;
+            var Nationmapdata = MapController.NationMaps.FirstOrDefault(x => x.NationId == state.NationId);
+            if (Nationstate is not null)
             {
-                districtmapdata.Provinces.Add(state);
-                districtstate.DStringBuilder.Append($" {state.D}");
+                Nationmapdata.Provinces.Add(state);
+                Nationstate.DStringBuilder.Append($" {state.D}");
                 var posinfo = state.D.Split(" ");
                 int xpos = (int)double.Parse(posinfo[1]);
                 int ypos = (int)double.Parse(posinfo[2]);
@@ -138,62 +138,62 @@ public class ProvinceManager
                 state.XPos = xpos;
                 state.YPos = ypos;
 
-                if (districtmapdata.LowestXPos > xpos)
-                    districtmapdata.LowestXPos = xpos;
-                if (districtmapdata.LowestYPos > ypos)
-                    districtmapdata.LowestYPos = ypos;
-                if (districtmapdata.HighestXPos < xpos)
-                    districtmapdata.HighestXPos = xpos;
-                if (districtmapdata.HighestYPos < ypos)
-                    districtmapdata.HighestYPos = ypos;
+                if (Nationmapdata.LowestXPos > xpos)
+                    Nationmapdata.LowestXPos = xpos;
+                if (Nationmapdata.LowestYPos > ypos)
+                    Nationmapdata.LowestYPos = ypos;
+                if (Nationmapdata.HighestXPos < xpos)
+                    Nationmapdata.HighestXPos = xpos;
+                if (Nationmapdata.HighestYPos < ypos)
+                    Nationmapdata.HighestYPos = ypos;
             }
             else
             {
-                districtstate = new MapState()
+                Nationstate = new MapState()
                 {
-                    Id = state.DistrictId,
+                    Id = state.NationId,
                     D = "",
                     DStringBuilder = new StringBuilder(1_000_000),
-                    DistrictId = state.DistrictId,
+                    NationId = state.NationId,
                     IsOcean = false
                 };
-                districtstate.DStringBuilder.Append(state.D);
-                _mapStates.Add(districtstate.Id, districtstate);
+                Nationstate.DStringBuilder.Append(state.D);
+                _mapStates.Add(Nationstate.Id, Nationstate);
 
-                districtmapdata = new()
+                Nationmapdata = new()
                 {
                     Provinces = new(),
-                    DistrictId = state.DistrictId,
+                    NationId = state.NationId,
                     LowestXPos = 9999,
                     LowestYPos = 9999,
                     HighestYPos = 0,
                     HighestXPos = 0,
                 };
 
-                districtmapdata.Provinces.Add(state);
+                Nationmapdata.Provinces.Add(state);
 
-                MapController.DistrictMaps.Add(districtmapdata);
+                MapController.NationMaps.Add(Nationmapdata);
             }
 
             var dbprovince = DBCache.Get<Province>(state.Id);
             if (dbprovince is null)
             {
-                var district = DBCache.Get<Nation>(state.DistrictId);
+                var Nation = DBCache.Get<Nation>(state.NationId);
                 dbprovince = new(rnd)
                 {
-                    NationId = state.DistrictId,
+                    NationId = state.NationId,
                     Id = state.Id,
                     Name = $"Province {state.Id}"
                 };
                 createdNewProvinces = true;
                 DBCache.AddNew(dbprovince.Id, dbprovince);
                 //dbctx.Provinces.Add(dbprovince);
-                //district.Provinces.Add(dbprovince);
+                //Nation.Provinces.Add(dbprovince);
             }
             else
             {
-                dbprovince.NationId = districtstate.DistrictId;
-                dbprovince.Nation = districtstate.District;
+                dbprovince.NationId = Nationstate.NationId;
+                dbprovince.Nation = Nationstate.Nation;
             }
         }
         //dbctx.SaveChanges();

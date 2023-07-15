@@ -7,7 +7,7 @@ public enum ElectionType
     Senate = 1,
     PM = 2,
     President = 3,
-    DistrictGovernor = 4
+    NationGovernor = 4
 }
 
 public class ResultData
@@ -26,13 +26,13 @@ public class Election
 {
     public long Id {get; set; }
 
-    // District the election is for
-    public long DistrictId { get; set; }
+    // Nation the election is for
+    public long NationId { get; set; }
 
     [NotMapped]
-    public Nation District {
+    public Nation Nation {
         get {
-            return DBCache.Get<Nation>(DistrictId);
+            return DBCache.Get<Nation>(NationId);
         }
     }
 
@@ -68,8 +68,8 @@ public class Election
 
     public string GetElectionTitle()
     {
-        if (DistrictId != 100) {
-            return $"The {District.Name} Senate Election";
+        if (NationId != 100) {
+            return $"The {Nation.Name} Senate Election";
         }
 
         else if (Type == ElectionType.PM) {
@@ -87,10 +87,10 @@ public class Election
 
     }
 
-    public Election(DateTime start_date, DateTime end_date, List<long> choiceids, long districtid, ElectionType type)
+    public Election(DateTime start_date, DateTime end_date, List<long> choiceids, long Nationid, ElectionType type)
     {
         Id = IdManagers.GeneralIdGenerator.Generate();
-        DistrictId = districtid;
+        NationId = Nationid;
         Start_Date = start_date;
         End_Date = end_date;
         ChoiceIds = choiceids;

@@ -1,7 +1,7 @@
 ﻿@model ManageStatesModel
 
 @{
-    ViewData["Title"] = $"Manage {Model.District.NameForState.Pluralize()}";
+    ViewData["Title"] = $"Manage {Model.Nation.NameForState.Pluralize()}";
 
     User user = UserManager.GetUser(Context)!;
 }
@@ -38,7 +38,7 @@
 
 <div class="container vw-100">
     <div class="col-12">
-        <a asp-controller="District" asp-action="View" asp-route-name="@Model.District.Name">
+        <a asp-controller="Nation" asp-action="View" asp-route-name="@Model.Nation.Name">
             <button class="btn btn-primary">Go Back</button>
         </a>
 
@@ -48,12 +48,12 @@
 
         @await Html.PartialAsync("_StatusMessage", TempData["StatusMessage"])
 
-        <!form method="post" action="/District/CreateState">
+        <!form method="post" action="/Nation/CreateState">
             @Html.AntiForgeryToken()
             <div class="row">
                 <div class="col-md-6">
                     <div asp-validation-summary="All" class="text-danger"></div>
-                    @Html.Hidden("DistrictId", Model.CreateStateModel.DistrictId)
+                    @Html.Hidden("NationId", Model.CreateStateModel.NationId)
                     <div class="form-group">
                         <label asp-for="CreateStateModel.Name"></label>
                         <span asp-description-for="CreateStateModel.Name" class="form-text" style="color:#888888" />
@@ -79,7 +79,7 @@
                 <div class="container" style="align-content:flex-start">
                     <div class="d-flex">
                         <div class="flex-column" style="margin-right:5px; margin-left: -15px">
-                            <button type="submit" class="btn btn-primary">Create @Model.District.NameForState</button>
+                            <button type="submit" class="btn btn-primary">Create @Model.Nation.NameForState</button>
                         </div>
                     </div>
                 </div>
@@ -91,8 +91,8 @@
         <table class="table">
             <thead>
                 <tr class="header">
-                    <th>@Model.District.NameForState Name</th>
-                    <th>Num of @Model.District.NameForProvince.Pluralize()</th>
+                    <th>@Model.Nation.NameForState Name</th>
+                    <th>Num of @Model.Nation.NameForProvince.Pluralize()</th>
                 </tr>
             </thead>
             <tbody>

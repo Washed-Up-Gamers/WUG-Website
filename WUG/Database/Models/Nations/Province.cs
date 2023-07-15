@@ -8,10 +8,10 @@ using WUG.Managers;
 using WUG.Scripting.LuaObjects;
 using WUG.Database.Models.Users;
 using WUG.Scripting;
-using ProvinceModifier = Shared.Models.Districts.ProvinceModifier;
-using Shared.Models.Districts;
+using ProvinceModifier = Shared.Models.Nations.ProvinceModifier;
+using Shared.Models.Nations;
 
-namespace WUG.Database.Models.Districts;
+namespace WUG.Database.Models.Nations;
 
 public class ProvinceConsumerGoodsData
 {
@@ -43,7 +43,7 @@ public class Province
 
     // brought to you by the Vooperians For Wokism (VFW)
     /// <summary>
-    /// This multiples the "base population" we get from the district
+    /// This multiples the "base population" we get from the Nation
     /// </summary>
     public double PopulationMultiplier { get; set; }
 
@@ -124,23 +124,23 @@ public class Province
         PopulationMultiplier = 0.25;
     }
 
-    public List<(string modifiername, double value)> GetStaticModifiersOfTypes(List<ProvinceModifierType?>? provincetypes, List<NationModifierType?> districttypes, bool AlsoUseDistrictModifiers, bool UseProvinceModifiers = true, bool IncludeDevStage = false)
+    public List<(string modifiername, double value)> GetStaticModifiersOfTypes(List<ProvinceModifierType?>? provincetypes, List<NationModifierType?> Nationtypes, bool AlsoUseNationModifiers, bool UseProvinceModifiers = true, bool IncludeDevStage = false)
     {
         if (provincetypes is null)
             provincetypes = new();
-        if (districttypes is null)
-            districttypes = new();
+        if (Nationtypes is null)
+            Nationtypes = new();
         var result = new List<(string modifiername, double value)>();
         var modifiers = new List<StaticModifier>();
         if (UseProvinceModifiers)
             modifiers.AddRange(StaticModifiers);
-        if (AlsoUseDistrictModifiers)
+        if (AlsoUseNationModifiers)
             modifiers.AddRange(Nation.StaticModifiers);
         foreach (var modifier in modifiers)
         {
             foreach (var node in modifier.BaseStaticModifiersObj.ModifierNodes)
             {
-                if ((provincetypes.Contains(node.provinceModifierType) && node.provinceModifierType is not null) || (districttypes.Contains(node.districtModifierType) && node.districtModifierType is not null))
+                if ((provincetypes.Contains(node.provinceModifierType) && node.provinceModifierType is not null) || (Nationtypes.Contains(node.NationModifierType) && node.NationModifierType is not null))
                 {
                     (string modifiername, double value) item = new()
                     {
@@ -148,7 +148,7 @@ public class Province
                         value = (double)node.GetValue(new(Nation, this, null, (node.provinceModifierType is not null ? ScriptScopeType.Province : ScriptScopeType.Nation)))
                     };
                     if ((provincetypes.Contains(node.provinceModifierType) && node.provinceModifierType is not null && node.provinceModifierType.ToString().Contains("Factor"))
-                        || (districttypes.Contains(node.districtModifierType) && node.districtModifierType is not null && node.districtModifierType.ToString().Contains("Factor")))
+                        || (Nationtypes.Contains(node.NationModifierType) && node.NationModifierType is not null && node.NationModifierType.ToString().Contains("Factor")))
                     {
                         item.value += 1;
                     }
@@ -160,7 +160,7 @@ public class Province
         {
             foreach (var node in CurrentDevelopmentStage.ModifierNodes)
             {
-                if ((provincetypes.Contains(node.provinceModifierType) && node.provinceModifierType is not null) || (districttypes.Contains(node.districtModifierType) && node.districtModifierType is not null))
+                if ((provincetypes.Contains(node.provinceModifierType) && node.provinceModifierType is not null) || (Nationtypes.Contains(node.NationModifierType) && node.NationModifierType is not null))
                 {
                     (string modifiername, double value) item = new()
                     {
@@ -168,7 +168,7 @@ public class Province
                         value = (double)node.GetValue(new(Nation, this, null, (node.provinceModifierType is not null ? ScriptScopeType.Province : ScriptScopeType.Nation)))
                     };
                     if ((provincetypes.Contains(node.provinceModifierType) && node.provinceModifierType is not null && node.provinceModifierType.ToString().Contains("Factor"))
-                        || (districttypes.Contains(node.districtModifierType) && node.districtModifierType is not null && node.districtModifierType.ToString().Contains("Factor")))
+                        || (Nationtypes.Contains(node.NationModifierType) && node.NationModifierType is not null && node.NationModifierType.ToString().Contains("Factor")))
                     {
                         item.value += 1;
                     }
@@ -179,22 +179,22 @@ public class Province
         return result;
     }
 
-    public List<(string modifiername, double value)> GetStaticModifiersOfType(ProvinceModifierType? provincetype, NationModifierType? districttype, bool AlsoUseDistrictModifiers, bool UseProvinceModifiers = true, bool IncludeDevStage = false) {
+    public List<(string modifiername, double value)> GetStaticModifiersOfType(ProvinceModifierType? provincetype, NationModifierType? Nationtype, bool AlsoUseNationModifiers, bool UseProvinceModifiers = true, bool IncludeDevStage = false) {
         var result = new List<(string modifiername, double value)>();
         var modifiers = new List<StaticModifier>();
         if (UseProvinceModifiers)
             modifiers.AddRange(StaticModifiers);
-        if (AlsoUseDistrictModifiers)
+        if (AlsoUseNationModifiers)
             modifiers.AddRange(Nation.StaticModifiers);
         foreach (var modifier in modifiers) {
             foreach (var node in modifier.BaseStaticModifiersObj.ModifierNodes) {
-                if ((node.provinceModifierType == provincetype && node.provinceModifierType is not null) || (node.districtModifierType == districttype && node.districtModifierType is not null)) {
+                if ((node.provinceModifierType == provincetype && node.provinceModifierType is not null) || (node.NationModifierType == Nationtype && node.NationModifierType is not null)) {
                     (string modifiername, double value) item = new() {
                         modifiername = modifier.BaseStaticModifiersObj.Name,
                         value = (double)node.GetValue(new(Nation, this, null, (node.provinceModifierType is not null ? ScriptScopeType.Province : ScriptScopeType.Nation)))
                     }; 
                     if ((node.provinceModifierType == provincetype && node.provinceModifierType is not null && node.provinceModifierType.ToString().Contains("Factor") )
-                        || (node.districtModifierType == districttype && node.districtModifierType is not null && node.districtModifierType.ToString().Contains("Factor"))) {
+                        || (node.NationModifierType == Nationtype && node.NationModifierType is not null && node.NationModifierType.ToString().Contains("Factor"))) {
                         item.value += 1;
                     }
                     result.Add(item);
@@ -203,13 +203,13 @@ public class Province
         }
         if (IncludeDevStage && CurrentDevelopmentStage is not null) {
             foreach (var node in CurrentDevelopmentStage.ModifierNodes) {
-                if ((node.provinceModifierType == provincetype && node.provinceModifierType is not null) || (node.districtModifierType == districttype && node.districtModifierType is not null)) {
+                if ((node.provinceModifierType == provincetype && node.provinceModifierType is not null) || (node.NationModifierType == Nationtype && node.NationModifierType is not null)) {
                     (string modifiername, double value) item = new() {
                         modifiername = CurrentDevelopmentStage.PrintableName,
                         value = (double)node.GetValue(new(Nation, this, null, (node.provinceModifierType is not null ? ScriptScopeType.Province : ScriptScopeType.Nation)))
                     };
                     if ((node.provinceModifierType == provincetype && node.provinceModifierType is not null && node.provinceModifierType.ToString().Contains("Factor"))
-                        || (node.districtModifierType == districttype && node.districtModifierType is not null && node.districtModifierType.ToString().Contains("Factor"))) {
+                        || (node.NationModifierType == Nationtype && node.NationModifierType is not null && node.NationModifierType.ToString().Contains("Factor"))) {
                         item.value += 1;
                     }
                     result.Add(item);
@@ -303,7 +303,7 @@ public class Province
 
     /// <summary>
     /// Returns the governor of this province, or if governor is null, then the state
-    /// If the state's is null, then the district
+    /// If the state's is null, then the Nation
     /// </summary>
     /// <returns></returns>
     public BaseEntity GetGovernor()
@@ -317,6 +317,7 @@ public class Province
     }
 
     public bool CanManageBuildingRequests(BaseEntity entity) {
+        if (NationId == 100) return false;
         if (entity.Id == Nation.GovernorId) return true;
         if (State is not null && State.Governor is not null) {
             if (State.Governor.EntityType == EntityType.User) {
@@ -512,7 +513,7 @@ public class Province
         foreach (var id in Metadata.Adjacencies)
         {
             var _metadata = ProvinceManager.ProvincesMetadata[id];
-            if (_metadata.TerrianType == "ocean" && hasdonecoastalbonus) continue;
+            //if (_metadata.TerrianType == "ocean" && hasdonecoastalbonus) continue;
 
             if (_metadata.TerrianType == "ocean" && !hasdonecoastalbonus)
             {
@@ -584,7 +585,7 @@ public class Province
         if (Id == Nation.CapitalProvinceId)
             slots *= 1.2;
 
-        // district level
+        // Nation level
         slots *= 1 + Nation.GetModifierValue(NationModifierType.BuildingSlotsFactor);
         BuildingSlots = (int)slots;
 
@@ -603,7 +604,7 @@ public class Province
     {
         Modifiers = new();
         var value_executionstate = new ExecutionState(Nation, this);
-        //var scaleby_executionstate = new ExecutionState(District, this);
+        //var scaleby_executionstate = new ExecutionState(Nation, this);
         foreach (var staticmodifier in StaticModifiers)
         {
             foreach (var modifiernode in staticmodifier.BaseStaticModifiersObj.ModifierNodes)
@@ -637,7 +638,7 @@ public class Province
         }
     }
 
-    public Shared.Models.Districts.Province ToModel()
+    public Shared.Models.Nations.Province ToModel()
     {
         return new()
         {

@@ -16,13 +16,13 @@ public class TaxAPI : BaseAPI
 {
     public static void AddRoutes(WebApplication app)
     {
-        app.MapGet   ("api/districts/{districtid}/taxpolicies/all", GetAllForDistrictAsync).RequireCors("ApiPolicy");
+        app.MapGet   ("api/Nations/{Nationid}/taxpolicies/all", GetAllForNationAsync).RequireCors("ApiPolicy");
         app.MapPost  ("api/taxpolicies", CreateOrUpdateAsync).RequireCors("ApiPolicy").AddEndpointFilter<UserRequiredAttribute>();
     }
 
-    private static async Task GetAllForDistrictAsync(HttpContext ctx, long districtid)
+    private static async Task GetAllForNationAsync(HttpContext ctx, long Nationid)
     {
-        await ctx.Response.WriteAsync(JsonSerializer.Serialize(DBCache.GetAll<TaxPolicy>().Where(x => x.NationId == districtid).ToList()));
+        await ctx.Response.WriteAsync(JsonSerializer.Serialize(DBCache.GetAll<TaxPolicy>().Where(x => x.NationId == Nationid).ToList()));
     }
 
     public static Regex rg = new Regex(@"^[a-zA-Z0-9\s,.-]*$");
@@ -30,8 +30,8 @@ public class TaxAPI : BaseAPI
     private static async Task<IResult> CreateOrUpdateAsync(HttpContext ctx, [FromBody] TaxPolicy policy)
     {
         var user = ctx.GetUser();
-        var district = DBCache.Get<Nation>(policy.NationId);
-        if (district.GovernorId != user.Id)
+        var Nation = DBCache.Get<Nation>(policy.NationId);
+        if (Nation.GovernorId != user.Id)
             return ValourResult.Forbid("Only the Governor can create/edit tax policies!");
 
         if (policy.taxType == TaxType.ResourceMined && policy.Rate > 20.0m)
@@ -49,7 +49,7 @@ public class TaxAPI : BaseAPI
                 Collected = 0.00m,
                 taxType = policy.taxType,
                 Target = policy.taxType == TaxType.ResourceMined ? policy.Target : null,
-                NationId = district.Id
+                NationId = Nation.Id
             };
         }
 

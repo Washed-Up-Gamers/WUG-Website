@@ -1,7 +1,7 @@
-﻿@model ManageDistrictModel
+﻿@model ManageNationModel
 
 @{
-    ViewData["Title"] = "District Admin";
+    ViewData["Title"] = "Nation Admin";
 
     User user = UserManager.GetUser(Context)!;
 }
@@ -12,9 +12,9 @@
         @await Html.PartialAsync("_StatusMessage", TempData["StatusMessage"])
 
         <h3 style="text-align:center">@ViewData["Title"]</h3>
-        <h2 style="text-align:center">The District of @Model.District.Name</h2>
+        <h2 style="text-align:center">The Nation of @Model.Nation.Name</h2>
 
-        <a asp-controller="District" asp-action="View" asp-route-name="@Model.District.Name">
+        <a asp-controller="Nation" asp-action="View" asp-route-name="@Model.Nation.Name">
             <button class="btn btn-primary">Go Back</button>
         </a>
 
@@ -25,7 +25,7 @@
             <div class="col-12 align-content-center text-center" style="margin-left: auto;margin-right: auto;max-width: 500px;">
                 @Html.HiddenFor(x => x.Id)
                 <div class="row">
-                    <h4>District Info</h4>
+                    <h4>Nation Info</h4>
 
                     <div asp-validation-summary="All" class="text-danger"></div>
                 </div>
@@ -39,33 +39,33 @@
                 <br />
                 <div class="form-group">
                     <label>Name for a state (a collection of provinces)</label>
-                    <input asp-for="NameForState" class="form-control" value="@Model.District.NameForState"></input>
+                    <input asp-for="NameForState" class="form-control" value="@Model.Nation.NameForState"></input>
                     <span asp-validation-for="NameForState" class="text-danger"></span>
                 </div>
                 
                 <br />
                 <div class="form-group">
                     <label>Name for a province</label>
-                    <input asp-for="NameForProvince" class="form-control" value="@Model.District.NameForProvince"></input>
+                    <input asp-for="NameForProvince" class="form-control" value="@Model.Nation.NameForProvince"></input>
                     <span asp-validation-for="NameForProvince" class="text-danger"></span>
                 </div>
 
                 <br />
                 <div class="form-group">
-                    <label>Name for the governor of a @Model.District.NameForState</label>
-                    <input asp-for="NameForGovernorOfAState" class="form-control" value="@Model.District.NameForGovernorOfAState"></input>
+                    <label>Name for the governor of a @Model.Nation.NameForState</label>
+                    <input asp-for="NameForGovernorOfAState" class="form-control" value="@Model.Nation.NameForGovernorOfAState"></input>
                     <span asp-validation-for="NameForGovernorOfAState" class="text-danger"></span>
                 </div>
                 
                 <br />
                 <div class="form-group">
-                    <label>Name for the governor of a @Model.District.NameForProvince</label>
-                    <input asp-for="NameForGovernorOfAProvince" class="form-control" value="@Model.District.NameForGovernorOfAProvince"></input>
+                    <label>Name for the governor of a @Model.Nation.NameForProvince</label>
+                    <input asp-for="NameForGovernorOfAProvince" class="form-control" value="@Model.Nation.NameForGovernorOfAProvince"></input>
                     <span asp-validation-for="NameForGovernorOfAProvince" class="text-danger"></span>
                 </div>
 
                 <br />
-                <p>Property Taxes are paid to the group for @Model.District.Name</p>
+                <p>Property Taxes are paid to the group for @Model.Nation.Name</p>
                 <div class="form-group">
                     <label>Base daily property tax per building (not size!)</label>
                     <input asp-for="BasePropertyTax" class="form-control"/>

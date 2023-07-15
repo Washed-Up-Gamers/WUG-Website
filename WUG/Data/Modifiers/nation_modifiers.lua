@@ -1,18 +1,9 @@
-novastella_free_market = {
+united_corporations_free_market = {
 	name = "Free Market Efficiency"
 	modifiers = {
-		district.provinces.buildingslotsfactor = 0.25
-		district.provinces.buildingslotsexponent = 0.04
-		district.provinces.overpopulationmodifierexponent = -0.01
-	}
-	isgood = true
-	stackable = false
-}
-
-lanatia_lore = {
-	name = "Safe Haven for Anti-Imperial People"
-	modifiers = {
-		district.provinces.populationgrowthspeedfactor = 5
+		Nation.provinces.buildingslotsfactor = 0.25
+		Nation.provinces.buildingslotsexponent = 0.04
+		Nation.provinces.overpopulationmodifierexponent = -0.01
 	}
 	isgood = true
 	stackable = false
@@ -22,7 +13,7 @@ elysian_katonia_chips_industry = {
 	name = "Booming Chip Industry"
 	description = "Every factory producing chips in Elysian Katonia receives a +15% throughput modifier"
 	effects = {
-		-- current scope is district
+		-- current scope is Nation
 		every_scope_building = {
 			-- now scope is building
 			if = {
@@ -58,7 +49,7 @@ old_king_steel_industry = {
 	name = "Booming Steel Industry"
 	description = "Every factory producing steel in Old King receives a +15% throughput modifier"
 	effects = {
-		-- current scope is district
+		-- current scope is Nation
 		every_scope_building = {
 			-- now scope is building
 			if = {

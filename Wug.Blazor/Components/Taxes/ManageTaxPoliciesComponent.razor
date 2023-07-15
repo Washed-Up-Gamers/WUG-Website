@@ -164,7 +164,7 @@ else
 
 @code {
     [Parameter]
-    public long DistrictId { get; set; }
+    public long NationId { get; set; }
 
     [Parameter]
     public bool IsGovernor { get; set; }
@@ -182,7 +182,7 @@ else
         if (firstRender)
         {
             CurrentlyEditingTaxPolicy = new();
-            TaxPolicies = (await SVClient.GetJsonAsync<List<TaxPolicy>>($"api/districts/{DistrictId}/taxpolicies/all")).Data.OrderByDescending(x => x.Id).ToList();
+            TaxPolicies = (await SVClient.GetJsonAsync<List<TaxPolicy>>($"api/Nations/{NationId}/taxpolicies/all")).Data.OrderByDescending(x => x.Id).ToList();
 
             Loaded = true;
             StateHasChanged();
@@ -204,7 +204,7 @@ else
                 Id = 0,
                 Name = "Tax Policy Name Here",
                 Rate = 0.00m,
-                DistrictId = DistrictId,
+                NationId = NationId,
                 taxType = TaxType.Transactional,
                 Minimum = 0.00m,
                 Maximum = 99_999_999.00m,

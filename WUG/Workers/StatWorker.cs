@@ -87,34 +87,34 @@ public class StatWorker : BackgroundService
                             Value = DBCache.GetAll<Province>().Where(x => x.NationId != 100).Sum(x => x.BuildingSlots)
                         });
 
-                        foreach (var district in DBCache.GetAll<Nation>())
+                        foreach (var Nation in DBCache.GetAll<Nation>())
                         {
                             _dbctx.Stats.Add(new Stat()
                             {
                                 Date = DateTime.UtcNow,
                                 Id = IdManagers.StatIdGenerator.Generate(),
-                                TargetType = TargetType.District,
+                                TargetType = TargetType.Nation,
                                 StatType = StatType.TotalBuildingSlots,
-                                Value = district.Provinces.Sum(x => x.BuildingSlots),
-                                TargetId = district.Id
+                                Value = Nation.Provinces.Sum(x => x.BuildingSlots),
+                                TargetId = Nation.Id
                             });
                             _dbctx.Stats.Add(new Stat()
                             {
                                 Date = DateTime.UtcNow,
                                 Id = IdManagers.StatIdGenerator.Generate(),
-                                TargetType = TargetType.District,
+                                TargetType = TargetType.Nation,
                                 StatType = StatType.UsedBuildingSlots,
-                                Value = district.Provinces.Sum(x => x.BuildingSlotsUsed),
-                                TargetId = district.Id
+                                Value = Nation.Provinces.Sum(x => x.BuildingSlotsUsed),
+                                TargetId = Nation.Id
                             });
                             _dbctx.Stats.Add(new Stat()
                             {
                                 Date = DateTime.UtcNow,
                                 Id = IdManagers.StatIdGenerator.Generate(),
-                                TargetType = TargetType.District,
+                                TargetType = TargetType.Nation,
                                 StatType = StatType.Population,
-                                Value = district.Provinces.Sum(x => x.Population),
-                                TargetId = district.Id
+                                Value = Nation.Provinces.Sum(x => x.Population),
+                                TargetId = Nation.Id
                             });
                         }
 

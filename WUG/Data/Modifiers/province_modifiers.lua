@@ -1,5 +1,5 @@
-vooperian_capital = {
-	name = "Capital of the Vooperian Empire"
+united_corporations_capital = {
+	name = "Capital of The United Corporations of Adramat"
 	modifiers = {
 		province.buildingslotsfactor = 0.2
 		province.buildingslotsexponent = 0.03

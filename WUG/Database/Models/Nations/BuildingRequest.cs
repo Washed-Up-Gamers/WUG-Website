@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace WUG.Database.Models.Districts;
+namespace WUG.Database.Models.Nations;
 
 public class BuildingRequest
 {

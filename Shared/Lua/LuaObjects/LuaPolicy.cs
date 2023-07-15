@@ -14,7 +14,7 @@ public enum LuaPolicyType
 {
     Province,
     State,
-    District,
+    Nation,
     Imperial
 }
 

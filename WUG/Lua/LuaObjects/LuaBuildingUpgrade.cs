@@ -12,7 +12,7 @@ public class LuaBuildingUpgrade
     public DictNode Costs { get; set; }
     public List<SyntaxModifierNode> ModifierNodes { get; set; }
 
-    public Dictionary<string, double> GetConstructionCost(BaseEntity entity, Nation district, Province province, ProducingBuilding? building, BuildingUpgrade? upgrade, int levels, bool decreaseupgradelevel = false)
+    public Dictionary<string, double> GetConstructionCost(BaseEntity entity, Nation Nation, Province province, ProducingBuilding? building, BuildingUpgrade? upgrade, int levels, bool decreaseupgradelevel = false)
     {
         Dictionary<string, double> totalresources = new();
         Dictionary<string, decimal> changesystemvarsby = new Dictionary<string, decimal>() {
@@ -21,7 +21,7 @@ public class LuaBuildingUpgrade
         };
         for (int i = 0; i < levels; i++)
         {
-            var costs = Costs.Evaluate(new ExecutionState(district, province, changesystemvarsby, building: building, buildingUpgrade: upgrade is null ? new() : upgrade));
+            var costs = Costs.Evaluate(new ExecutionState(Nation, province, changesystemvarsby, building: building, buildingUpgrade: upgrade is null ? new() : upgrade));
             foreach ((var resource, var amount) in costs)
             {
                 if (!totalresources.ContainsKey(resource))
@@ -37,12 +37,12 @@ public class LuaBuildingUpgrade
         return totalresources;
     }
 
-    public async ValueTask<TaskResult> CanBuild(BaseEntity buildas, BaseEntity caller, Nation district, Province province, ProducingBuilding building, BuildingUpgrade? upgrade, int levels)
+    public async ValueTask<TaskResult> CanBuild(BaseEntity buildas, BaseEntity caller, Nation Nation, Province province, ProducingBuilding building, BuildingUpgrade? upgrade, int levels)
     {
         if (levels <= 0)
             return new(false, "The amount of levels you wish to upgrade must be greater than 0!");
 
-        var costs = GetConstructionCost(buildas, district, province, building, upgrade, levels);
+        var costs = GetConstructionCost(buildas, Nation, province, building, upgrade, levels);
 
         // check for resources
         foreach ((var resource, var amount) in costs)
@@ -54,13 +54,13 @@ public class LuaBuildingUpgrade
         return new(true, null);
     }
 
-    public async ValueTask<TaskResult<ProducingBuilding>> Build(BaseEntity buildas, BaseEntity caller, Nation district, Province province, int levels, ProducingBuilding building, BuildingUpgrade? upgrade)
+    public async ValueTask<TaskResult<ProducingBuilding>> Build(BaseEntity buildas, BaseEntity caller, Nation Nation, Province province, int levels, ProducingBuilding building, BuildingUpgrade? upgrade)
     {
-        var canbuild = await CanBuild(buildas, caller, district, province, building, upgrade, levels);
+        var canbuild = await CanBuild(buildas, caller, Nation, province, building, upgrade, levels);
         if (!canbuild.Success)
             return new(false, canbuild.Message);
 
-        var costs = GetConstructionCost(buildas, district, province, building, upgrade, levels);
+        var costs = GetConstructionCost(buildas, Nation, province, building, upgrade, levels);
         foreach ((var resource, var amount) in costs)
             await buildas.ChangeResourceAmount(resource, -amount, "Construction");
 
@@ -78,7 +78,7 @@ public class LuaBuildingUpgrade
             upgrade.Level += levels;
         }
 
-        district.UpdateModifiers();
+        Nation.UpdateModifiers();
 
         return new(true, $"Successfully upgraded {Name} {levels} time(s).", building);
     }

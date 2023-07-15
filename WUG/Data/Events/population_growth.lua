@@ -1,5 +1,5 @@
 mass_migration.1 = {
-	type = "District"
+	type = "Nation"
 	title = "A large number of people are moving to {scope:random_province}!"
 
 	check_feq = hourly

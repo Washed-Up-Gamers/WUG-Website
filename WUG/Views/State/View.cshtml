@@ -51,7 +51,7 @@
 
                 <div class="d-flex align-content-center align-items-center">
                     <div style="display:inline-block; margin:2em;margin-left: auto;margin-right: auto;">
-                        <h2 style="text-align:center" class="display-4">The @Model.District.NameForState of</h2>
+                        <h2 style="text-align:center" class="display-4">The @Model.Nation.NameForState of</h2>
                         <h1 style="text-align:center" class="display-3">@Model.Name</h1>
                     </div>
                 </div>
@@ -85,20 +85,20 @@
             <tbody>
                 <tr>
                     <th colspan="2" class="infobox-header">
-                        <div>@Model.Name, @Model.District.Name</div>
+                        <div>@Model.Name, @Model.Nation.Name</div>
                     </th>
                 </tr>
                 <tr>
                     <td colspan="2" class="infobox-subheader">
-                        <div>@Model.District.NameForState</div>
+                        <div>@Model.Nation.NameForState</div>
                     </td>
                 </tr>
                 <tr class="mergedrow dividertop">
-                    <th class="infobox-row-name">District</th>
-                    <td class="infobox-row-value"><a href="/District/View/@Model.District.Name">@Model.District.Name</a></td>
+                    <th class="infobox-row-name">Nation</th>
+                    <td class="infobox-row-value"><a href="/Nation/View/@Model.Nation.Name">@Model.Nation.Name</a></td>
                 </tr>
                 <tr class="mergedrow">
-                    <th class="infobox-row-name">@Model.District.NameForGovernorOfAState</th>
+                    <th class="infobox-row-name">@Model.Nation.NameForGovernorOfAState</th>
                     @if (Model.Governor is null) {
                         <td class="infobox-row-value">None</td>
                     }
@@ -132,7 +132,7 @@
                     <td class="infobox-row-value">@($"¢{Model.PropertyTaxPerSize ?? 0:n0}")</td>
                 </tr>
                 <tr class="mergedrow dividertop">
-                    <th class="infobox-row-name">@Model.District.NameForProvince.Pluralize()</th>
+                    <th class="infobox-row-name">@Model.Nation.NameForProvince.Pluralize()</th>
                     <td class="infobox-row-value">
                         @foreach (var province in Model.Provinces.OrderByDescending(x => x.Population)) {
                             <span><a href="/Province/View/@province.Id">@province.Name</a></span>

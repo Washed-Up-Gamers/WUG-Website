@@ -5,7 +5,7 @@ using System.Diagnostics;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
-using WUG.Database.Models.Districts;
+using WUG.Database.Models.Nations;
 using WUG.Helpers;
 using WUG.Database.Models.News;
 

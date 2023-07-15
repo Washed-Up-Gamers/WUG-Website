@@ -7,7 +7,7 @@ using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using Shared.Models.Items;
-using Shared.Models.Districts;
+using Shared.Models.Nations;
 
 namespace Shared.Models.Entities;
 
@@ -40,9 +40,9 @@ public abstract class BaseEntity : Item
 
     public string ImageUrl { get; set; }
 
-    public long? DistrictId { get; set; }
+    public long? NationId { get; set; }
 
-    //public District District => DBCache.Get<District>(DistrictId)!;
+    //public Nation Nation => DBCache.Get<Nation>(NationId)!;
 
     public Dictionary<long, SVItemOwnership> SVItemsOwnerships { get; set; }
 

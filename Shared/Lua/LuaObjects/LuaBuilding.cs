@@ -1,6 +1,6 @@
 ﻿using Shared.Lua;
 using Shared.Lua.Scripting;
-using Shared.Models.Districts;
+using Shared.Models.Nations;
 
 namespace Shared.Lua.LuaObjects;
 

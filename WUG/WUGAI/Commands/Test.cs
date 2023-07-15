@@ -13,6 +13,22 @@ class TestCommandsModule : BaseCommandModule
         ctx.RespondAsync("Pong!");
     }
 
+    [Command("provincestartingbalancepayment")]
+    public async Task provincestartingbalancepayment(CommandContext ctx)
+    {
+        if (ctx.User.Id != 259004891148582914)
+        {
+            await ctx.RespondAsync("Only Jacob can use this command!");
+            return;
+        }
+        
+        foreach (var nation in DBCache.GetAll<Nation>()) {
+            nation.Group.Money += 1_500.0m * nation.Provinces.Count();
+        }
+
+        await ctx.RespondAsync($"Did");
+    }
+
     [Command("createresource")]
     public async Task CreateResource(CommandContext ctx, string resource, int amount)
     {

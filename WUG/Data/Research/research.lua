@@ -26,7 +26,7 @@ production_category = {
 				entity.factories.throughputfactor = 0.02
 			}
 			color = "BD5D3F"
-			-- who can research this research (district, nondistrict, or anyone)
+			-- who can research this research (Nation, nonNation, or anyone)
 			who_can_research = anyone
 		}
 		factory_efficiency = {
@@ -69,11 +69,11 @@ civil_category = {
 				civil_research_points = 1500
 			}
 			modifiers = {
-				district.provinces.buildingslotsfactor = 0.05
+				Nation.provinces.buildingslotsfactor = 0.05
 			}
 			color = "7FB5B5"
 			isinfinite = false
-			who_can_research = district
+			who_can_research = Nation
 			children = {
 				more_building_slots_ii = {
 					name = "More Building Slots II"
@@ -81,10 +81,10 @@ civil_category = {
 						civil_research_points = 5000
 					}
 					modifiers = {
-						district.provinces.buildingslotsfactor = 0.05
+						Nation.provinces.buildingslotsfactor = 0.05
 					}
 					color = "7FB5B5"
-					who_can_research = district
+					who_can_research = Nation
 					isinfinite = false
 				}
 				less_overpopulation_i = {
@@ -93,10 +93,10 @@ civil_category = {
 						civil_research_points = 5000
 					}
 					modifiers = {
-						district.provinces.overpopulationmodifierexponent = -0.005
+						Nation.provinces.overpopulationmodifierexponent = -0.005
 					}
 					color = "7FB5B5"
-					who_can_research = district
+					who_can_research = Nation
 					isinfinite = false
 					children = {
 						less_overpopulation_ii = {
@@ -105,10 +105,10 @@ civil_category = {
 								civil_research_points = 12500
 							}
 							modifiers = {
-								district.provinces.overpopulationmodifierexponent = -0.005
+								Nation.provinces.overpopulationmodifierexponent = -0.005
 							}
 							color = "7FB5B5"
-							who_can_research = district
+							who_can_research = Nation
 							isinfinite = false
 							children = {
 								less_overpopulation_iii = {
@@ -117,10 +117,10 @@ civil_category = {
 										civil_research_points = 35000
 									}
 									modifiers = {
-										district.provinces.overpopulationmodifierexponent = -0.005
+										Nation.provinces.overpopulationmodifierexponent = -0.005
 									}
 									color = "7FB5B5"
-									who_can_research = district
+									who_can_research = Nation
 									isinfinite = false
 								}
 							}

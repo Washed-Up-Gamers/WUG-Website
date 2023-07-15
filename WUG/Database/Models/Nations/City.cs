@@ -2,17 +2,17 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace WUG.Database.Models.Districts;
+namespace WUG.Database.Models.Nations;
 
 public class City
 {
     [Key]
     public long Id { get; set; }
     public string Name { get; set; }
-    public long DistrictId { get; set; }
+    public long NationId { get; set; }
 
     [NotMapped]
-    public Nation District => DBCache.Get<Nation>(DistrictId);
+    public Nation Nation => DBCache.Get<Nation>(NationId);
 
     public long ProvinceId { get; set; }
 
@@ -23,9 +23,9 @@ public class City
 
     //[NotMapped]
     // this is generated upon server start
-    //public List<DistrictModifier> Modifiers { get; set; }
+    //public List<NationModifier> Modifiers { get; set; }
 
-    //public DistrictModifier GetModifier(DistrictModifierType type) => Modifiers.First(x => x.ModifierType == type);
+    //public NationModifier GetModifier(NationModifierType type) => Modifiers.First(x => x.ModifierType == type);
 
     
 }

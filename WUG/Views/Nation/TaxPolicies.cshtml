@@ -1,4 +1,4 @@
-@model WUG.Database.Models.Districts.Nation
+@model WUG.Database.Models.Nations.Nation
 @using WUG.Blazor.Components.Taxes
 
 @{
@@ -20,14 +20,14 @@
 
             <br />
 
-            <a asp-controller="District" asp-action="View" asp-route-name="@Model.Name">
-                <button class="btn btn-primary" style="float:left;">Go Back To District Page</button>
+            <a asp-controller="Nation" asp-action="View" asp-route-name="@Model.Name">
+                <button class="btn btn-primary" style="float:left;">Go Back To Nation Page</button>
             </a>
 
             <br />
             <br/>
 
-            <component type="typeof(ManageTaxPoliciesComponent)" render-mode="WebAssemblyPrerendered" param-DistrictId="@Model.Id" param-IsGovernor="@(Model.GovernorId == user.Id)"/>
+            <component type="typeof(ManageTaxPoliciesComponent)" render-mode="WebAssemblyPrerendered" param-NationId="@Model.Id" param-IsGovernor="@(Model.GovernorId == user.Id)"/>
 
         <br />
         <br />

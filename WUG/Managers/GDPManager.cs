@@ -13,15 +13,13 @@ public static class GDPManager
         }
         foreach (var pair in building.Recipe.Outputs)
         {
-            if (PriceManager.ContainsKey(pair.Key))
-            {
-                total += (decimal)pair.Value * (decimal)building.GetRateForProduction() * CurrentPricesFromNVSE[pair.Key];
-            }
+            if (PriceManager.GetResourcePrice(pair.Key) != 0.0m)
+                total += (decimal)pair.Value * (decimal)building.GetRateForProduction() * PriceManager.GetResourcePrice(pair.Key);
         }
         return total;
     }
 
-    public static decimal GetGDPOfNation(Nation nation)
+    public static decimal GetGDPOfANation(Nation nation)
     {
         var total = 0.0m;
         foreach (var province in nation.Provinces)
@@ -31,6 +29,19 @@ public static class GDPManager
                 total += GetGDPOfBuilding(building);
             }
         }
-        return total * 24.0m * 365.24m;
+        return total * 24.0m * 30.0m;
+    }
+
+    public static decimal GetGDPOfAState(State state)
+    {
+        var total = 0.0m;
+        foreach (var province in state.Provinces)
+        {
+            foreach (var building in DBCache.ProvincesBuildings[province.Id])
+            {
+                total += GetGDPOfBuilding(building);
+            }
+        }
+        return total * 24.0m * 30.0m;
     }
 }

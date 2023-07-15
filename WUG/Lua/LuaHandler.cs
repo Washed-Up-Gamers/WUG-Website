@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using WUG.Scripting.LuaObjects;
 using WUG.Scripting;
 using System.Text.Json.Serialization;
-using WUG.Database.Models.Districts;
+using WUG.Database.Models.Nations;
 
 namespace WUG.Scripting.Parser;
 
@@ -232,11 +232,11 @@ public static class LuaHandler
             string key = item.Name;
             var levels = key.Split(".").ToList();
             var node = new SyntaxModifierNode();
-            if (levels[0] == "district")
+            if (levels[0] == "Nation")
             {
-                node.districtModifierType = levels[0] switch
+                node.NationModifierType = levels[0] switch
                 {
-                    "district" => levels[1] switch
+                    "Nation" => levels[1] switch
                     {
                         "provinces" => levels[2] switch
                         {
@@ -362,7 +362,7 @@ public static class LuaHandler
         return dict;
     }
 
-    public static Dictionary<string, long> DistrictNamesToIds = new() {
+    public static Dictionary<string, long> NationNamesToIds = new() {
         { "elysian_katonia", 104 },
         { "lanatia", 105 },
         { "landing_cove", 106 },
@@ -447,7 +447,7 @@ public static class LuaHandler
 
                 if (node.scopeType == ScriptScopeType.Nation)
                 {
-                    node.ChangeTo = DistrictNamesToIds[node.ChangeTo].ToString();
+                    node.ChangeTo = NationNamesToIds[node.ChangeTo].ToString();
                 }
 
                 if (parentname == "effects")

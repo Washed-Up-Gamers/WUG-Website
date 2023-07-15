@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 using System.Xml.Linq;
 using Shared.Lua;
 using Shared.Lua.LuaObjects;
-using Shared.Models.Districts;
+using Shared.Models.Nations;
 
 namespace Shared.Lua.Scripting;
 
@@ -358,7 +358,7 @@ public class SystemVar : SyntaxNode
         var levels = CleanUp(Value).Split(".").ToList();
         decimal value = levels[0].ToLower() switch
         {
-            "district" => levels[1].ToLower() switch
+            "Nation" => levels[1].ToLower() switch
             {
                 "population" => state.Nation.TotalPopulation
             },
@@ -551,10 +551,10 @@ public class ChangeScopeNode : EffectNode
 
         if (scopeType == ScriptScopeType.Nation)
         {
-            var district = await Nation.FindAsync(long.Parse(ChangeTo));
-            if (district is null)
-                HandleError("Could not find district", $"key: {ChangeTo}");
-            newstate.Nation = district;
+            var Nation = await Nation.FindAsync(long.Parse(ChangeTo));
+            if (Nation is null)
+                HandleError("Could not find Nation", $"key: {ChangeTo}");
+            newstate.Nation = Nation;
             newstate.ParentScopeType = scopeType;
         }
 

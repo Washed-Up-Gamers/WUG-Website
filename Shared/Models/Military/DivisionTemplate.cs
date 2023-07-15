@@ -19,7 +19,7 @@ public enum DivisionModifierType
 public class DivisionTemplate
 {
     public long Id { get; set; }
-    public long DistrictId { get; set; }
+    public long NationId { get; set; }
     public string Name { get; set; }
     public List<RegimentTemplate> RegimentsTemplates { get; set; }
 

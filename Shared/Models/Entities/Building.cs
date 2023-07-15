@@ -1,4 +1,4 @@
-using Shared.Models.Districts;
+using Shared.Models.Nations;
 using System.Text.Json.Serialization;
 using Shared.Managers;
 
@@ -13,7 +13,7 @@ public abstract class BuildingBase : Item, ITickable
 {
     public long Id { get; set; }
     public string? Name { get; set; }
-    public long DistrictId { get; set; }
+    public long NationId { get; set; }
     public int Size { get; set; }
     public string RecipeId { get; set; }
     public abstract BuildingType BuildingType { get; }
@@ -25,7 +25,7 @@ public abstract class BuildingBase : Item, ITickable
     public async ValueTask<BaseEntity> GetOwnerAsync() => await BaseEntity.FindAsync(OwnerId);
     public async ValueTask<Province> GetProvinceAsync() => await Province.FindAsync(ProvinceId);
     public async ValueTask<LuaBuilding> GetLuaBuildingAsync() => await LuaBuilding.FindAsync(LuaBuildingObjId);
-    public async ValueTask<Nation> GetDistrictAsync() => await Nation.FindAsync(DistrictId);
+    public async ValueTask<Nation> GetNationAsync() => await Nation.FindAsync(NationId);
     public async ValueTask<Recipe> GetRecipeAsync() => await Recipe.FindAsync(RecipeId);
 
     public bool SuccessfullyTicked { get; set; }
@@ -83,7 +83,7 @@ public abstract class ProducingBuilding : BuildingBase
     }
 
     public BaseEntity Owner { get; set; }
-    public Nation District { get; set; }
+    public Nation Nation { get; set; }
     public Province Province { get; set; }
     public Recipe Recipe { get; set; }
 }

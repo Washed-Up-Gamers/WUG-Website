@@ -5,7 +5,7 @@ public class EditGroupModel {
     public GroupTypes GroupType { get; set; }
     public string Description { get; set; } 
     public string? ImageUrl { get; set; }
-    public long? DistrictId { get; set; }
+    public long? NationId { get; set; }
     public bool Open { get; set; }
 
     public Group Group { get; set; }

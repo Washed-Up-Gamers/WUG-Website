@@ -10,10 +10,10 @@ namespace WUG.Database.Models.Entities;
 
 public enum EntityType
 {
-    User,
-    Group,
-    Corporation,
-    CreditAccount
+    User = 0,
+    Group = 1,
+    Corporation = 2,
+    CreditAccount = 3
 }
 
 public interface IHasOwner
@@ -181,7 +181,7 @@ public abstract class BaseEntity
 
     public async ValueTask DoIncomeTax(WashedUpDB dbctx)
     {
-        // districts do not pay income tax
+        // Nations do not pay income tax
         if (EntityType == EntityType.Group && DBCache.Get<Nation>(Id) is not null)
             return;
 
@@ -211,7 +211,7 @@ public abstract class BaseEntity
         if (NationId is not null)
         {
 
-            // do district level taxes
+            // do Nation level taxes
             policies = EntityType switch
             {
                 EntityType.Group => DBCache.GetAll<TaxPolicy>().Where(x => x.NationId == NationId && x.taxType == TaxType.GroupIncome).OrderBy(x => x.Minimum).ToList(),
@@ -261,7 +261,7 @@ public abstract class BaseEntity
             taxtrans.NonAsyncExecute(true);
         }
 
-        // do district level balance tx
+        // do Nation level balance tx
         TaxPolicy? _policy = DBCache.GetAll<TaxPolicy>().FirstOrDefault(x => x.NationId == NationId && x.taxType == TaxType.UserBalance);
         if (_policy is not null) {
             totaldue = _policy.GetTaxAmount(Money);
@@ -300,6 +300,30 @@ public abstract class BaseEntity
         }
         return groups;
     }
+
+    public List<Group> GetGroupsOwned()
+    {
+        var groups = new List<Group>();
+        var groupstolookin = DBCache.GetAll<Group>().Where(x => x.OwnerId == Id).ToList();
+
+        while (groupstolookin.Count > 0)
+        {
+            var group = groupstolookin.First();
+            groupstolookin.Remove(group);
+
+            groups.Add(group);
+            var toadd = DBCache.GetAll<Group>().Where(x => x.OwnerId == group.Id);
+
+            foreach (var grouptoadd in toadd)
+            {
+                if (groupstolookin.Contains(grouptoadd) || groups.Contains(grouptoadd))
+                    continue;
+                groupstolookin.Add(grouptoadd);
+            }
+        }
+        return groups;
+    }
+
 
     public static async Task<BaseEntity?> FindByApiKey(string apikey, WashedUpDB dbctx)
     {

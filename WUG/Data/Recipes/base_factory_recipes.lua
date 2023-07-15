@@ -193,10 +193,10 @@ recipe_televisions_factory_base = {
 recipe_cars_factory_base = {
 	name = "Car Production"
 	inputs = {
-		computer_chips = 4
+		computer_chips = 8
 		steel = 5
-		plastic = 40
-		aluminium = 80
+		plastic = 30
+		aluminium = 60
 	}
 	outputs = {
 		cars = 1

@@ -52,7 +52,7 @@
                 </div>
 
                 <br />
-                <p>Property Taxes are paid to the @Model.Nation.NameForGovernorOfAProvince of a @Model.Nation.NameForProvince.ToLower(), or to the District if the @Model.Nation.NameForGovernorOfAProvince is not set</p>
+                <p>Property Taxes are paid to the @Model.Nation.NameForGovernorOfAProvince of a @Model.Nation.NameForProvince.ToLower(), or to the Nation if the @Model.Nation.NameForGovernorOfAProvince is not set</p>
                 <div class="form-group">
                     <label>Base daily property tax per building (not size!)</label>
                     <input asp-for="BasePropertyTax" class="form-control" value='@((int?)Model.BasePropertyTax)'/>
@@ -106,8 +106,8 @@
         @if (user.Id == Model.Nation.GovernorId)
         {
             <center>
-                <a href="/District/@Model.NationId/SetAsCapital/@Model.Id">
-                    <button type="submit" class="btn btn-outline-primary">Set as District Capital</button>
+                <a href="/Nation/@Model.NationId/SetAsCapital/@Model.Id">
+                    <button type="submit" class="btn btn-outline-primary">Set as Nation Capital</button>
                 </a>
             </center>
         }

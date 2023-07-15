@@ -2,7 +2,7 @@ using System.Threading.Tasks;
 using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using Shared.Models.Districts;
+using Shared.Models.Nations;
 
 namespace Shared.Managers;
 

@@ -7,7 +7,7 @@ public enum GroupTypes
     Corporation = 1,
     NonProfit = 2,
     PoliticalParty = 3,
-    District = 4,
+    Nation = 4,
     State = 5
 }
 

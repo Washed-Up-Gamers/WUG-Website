@@ -31,7 +31,7 @@ building_infrastructure = {
 		}
 	}
 
-	-- only the governor of this province (or district if governor is null) can build this building
+	-- only the governor of this province (or Nation if governor is null) can build this building
 	onlygovernorcanbuild = true
 	usebuildingslots = false
 	type = "Infrastructure"

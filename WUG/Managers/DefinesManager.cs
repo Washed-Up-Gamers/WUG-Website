@@ -1,15 +1,15 @@
 ﻿using System.Text;
 using System.IO;
 using WUG.Scripting.Parser;
-using WUG.Database.Models.Districts;
+using WUG.Database.Models.Nations;
 
 namespace WUG.Database.Managers;
 
-public enum NDistrict
+public enum NNation
 {
     BASE_MOBILIZATION_SPEED,
-    DISTRICT_FUNDING_BASE,
-    DISTRICT_FUNDING_PER_CITIZEN
+    Nation_FUNDING_BASE,
+    Nation_FUNDING_PER_CITIZEN
 }
 
 public enum NPops
@@ -128,7 +128,7 @@ public class Define<T> where T : struct
 
 public static class Defines
 {
-    public static Define<NDistrict> NDistrict = new();
+    public static Define<NNation> NNation = new();
     public static Define<NPops> NPops = new();
     public static Define<NProduction> NProduction = new();
     public static Define<Military> NMilitary = new();
@@ -147,9 +147,9 @@ public static class Defines
             //File.WriteAllText("../../../../Database/LuaDump.lua", text);
             lua.DoString(text);
 
-            var table = (LuaTable)lua["NDistrict"];
+            var table = (LuaTable)lua["NNation"];
             foreach (string key in table.Keys)
-                NDistrict[Enum.Parse<NDistrict>(key)] = Convert.ToDouble(table[key]);
+                NNation[Enum.Parse<NNation>(key)] = Convert.ToDouble(table[key]);
 
             table = (LuaTable)lua["NPops"];
             foreach (string key in table.Keys)

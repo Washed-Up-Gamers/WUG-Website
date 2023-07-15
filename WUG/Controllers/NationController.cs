@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using WUG.Helpers;
 using WUG.Extensions;
-using WUG.Database.Models.Districts;
+using WUG.Database.Models.Nations;
 using System.Xml.Linq;
 using WUG.Database.Managers;
 using WUG.Scripting.Parser;
@@ -14,99 +14,99 @@ using WUG.Database.Models.Government;
 namespace WUG.Controllers;
 
 [ApiExplorerSettings(IgnoreApi = true)]
-public class DistrictController : SVController
+public class NationController : SVController
 {
-    private readonly ILogger<DistrictController> _logger;
+    private readonly ILogger<NationController> _logger;
     private readonly WashedUpDB _dbctx;
 
-    public DistrictController(ILogger<DistrictController> logger,
+    public NationController(ILogger<NationController> logger,
         WashedUpDB dbctx)
     {
         _logger = logger;
         _dbctx = dbctx;
     }
 
-    [HttpGet("/District/View/{name}")]
+    [HttpGet("/Nation/View/{name}")]
     public IActionResult View(string name)
     {
-        Nation district = DBCache.GetAll<Nation>().FirstOrDefault(x => x.Name == name);
+        Nation Nation = DBCache.GetAll<Nation>().FirstOrDefault(x => x.Name == name);
 
-        return View(district);
+        return View(Nation);
     }
 
-    [HttpGet("/District/Manage/{id}")]
+    [HttpGet("/Nation/Manage/{id}")]
     [UserRequired]
     public IActionResult Manage(long id)
     {
         User user = HttpContext.GetUser();
 
-        Nation district = DBCache.Get<Nation>(id);
-        if (district is null)
+        Nation Nation = DBCache.Get<Nation>(id);
+        if (Nation is null)
             return Redirect("/");
 
-        if (district.GovernorId != user.Id)
-            return RedirectBack("You must be governor of the district to change the details of the district!");
+        if (Nation.GovernorId != user.Id)
+            return RedirectBack("You must be governor of the Nation to change the details of the Nation!");
 
-        return View(new ManageDistrictModel()
+        return View(new ManageNationModel()
         {
-            District = district,
+            Nation = Nation,
             Id = id,
-            Description = district.Description,
-            NameForProvince = district.NameForProvince,
-            NameForState = district.NameForState,
-            BasePropertyTax = district.BasePropertyTax,
-            PropertyTaxPerSize = district.PropertyTaxPerSize,
-            NameForGovernorOfAProvince = district.NameForGovernorOfAProvince,
-            NameForGovernorOfAState = district.NameForGovernorOfAState
+            Description = Nation.Description,
+            NameForProvince = Nation.NameForProvince,
+            NameForState = Nation.NameForState,
+            BasePropertyTax = Nation.BasePropertyTax,
+            PropertyTaxPerSize = Nation.PropertyTaxPerSize,
+            NameForGovernorOfAProvince = Nation.NameForGovernorOfAProvince,
+            NameForGovernorOfAState = Nation.NameForGovernorOfAState
         });
     }
 
-    [HttpPost("/District/Manage/{id}")]
+    [HttpPost("/Nation/Manage/{id}")]
     [ValidateAntiForgeryToken]
     [UserRequired]
-    public IActionResult Manage(ManageDistrictModel model)
+    public IActionResult Manage(ManageNationModel model)
     {
-        Nation district = DBCache.Get<Nation>(model.Id);
-        if (district is null)
+        Nation Nation = DBCache.Get<Nation>(model.Id);
+        if (Nation is null)
             return Redirect("/");
 
         var user = HttpContext.GetUser();
-        if (district.GovernorId != user.Id)
-            return RedirectBack("You must be governor of the district to change the details of the district!");
+        if (Nation.GovernorId != user.Id)
+            return RedirectBack("You must be governor of the Nation to change the details of the Nation!");
 
         if (model.BasePropertyTax > 1000)
-            return RedirectBack("District's Base Property Tax must be 1,000 or less!");
+            return RedirectBack("Nation's Base Property Tax must be 1,000 or less!");
         if (model.PropertyTaxPerSize > 1000)
-            return RedirectBack("District's Property Tax per size must be 1,000 or less!");
+            return RedirectBack("Nation's Property Tax per size must be 1,000 or less!");
 
-        district.Description = model.Description;
-        district.TitleForProvince = model.NameForProvince?.ToTitleCase();
-        district.TitleForState = model.NameForState?.ToTitleCase();
-        district.TitleForGovernorOfProvince = model.NameForGovernorOfAProvince is null ? null : model.NameForGovernorOfAProvince.ToTitleCase();
-        district.TitleForGovernorOfState = model.NameForGovernorOfAState is null ? null : model.NameForGovernorOfAState.ToTitleCase();
-        district.BasePropertyTax = model.BasePropertyTax;
-        district.PropertyTaxPerSize = model.PropertyTaxPerSize;
+        Nation.Description = model.Description;
+        Nation.TitleForProvince = model.NameForProvince?.ToTitleCase();
+        Nation.TitleForState = model.NameForState?.ToTitleCase();
+        Nation.TitleForGovernorOfProvince = model.NameForGovernorOfAProvince is null ? null : model.NameForGovernorOfAProvince.ToTitleCase();
+        Nation.TitleForGovernorOfState = model.NameForGovernorOfAState is null ? null : model.NameForGovernorOfAState.ToTitleCase();
+        Nation.BasePropertyTax = model.BasePropertyTax;
+        Nation.PropertyTaxPerSize = model.PropertyTaxPerSize;
 
         StatusMessage = "Successfully saved your changes.";
-        return Redirect($"/District/View/{district.Name}");
+        return Redirect($"/Nation/View/{Nation.Name}");
     }
 
-    [HttpGet("/District/{districtid}/SetAsCapital/{provinceid}")]
+    [HttpGet("/Nation/{Nationid}/SetAsCapital/{provinceid}")]
     [UserRequired]
-    public IActionResult SetAsCapital(long districtid, long provinceid)
+    public IActionResult SetAsCapital(long Nationid, long provinceid)
     {
-        Nation district = DBCache.Get<Nation>(districtid);
-        if (district is null)
+        Nation Nation = DBCache.Get<Nation>(Nationid);
+        if (Nation is null)
             return Redirect("/");
 
         var user = HttpContext.GetUser();
-        if (district.GovernorId != user.Id)
-            return RedirectBack("You must be governor of the district to change the details of the district!");
+        if (Nation.GovernorId != user.Id)
+            return RedirectBack("You must be governor of the Nation to change the details of the Nation!");
 
-        var prevcapital = district.CapitalProvinceId;
-        district.CapitalProvinceId = provinceid;
+        var prevcapital = Nation.CapitalProvinceId;
+        Nation.CapitalProvinceId = provinceid;
 
-        foreach (var province in district.Provinces)
+        foreach (var province in Nation.Provinces)
         {
             if (province.Id == prevcapital)
             {
@@ -118,65 +118,65 @@ public class DistrictController : SVController
         DBCache.Get<Province>(provinceid).UpdateModifiers();
         DBCache.Get<Province>(provinceid).UpdateModifiersAfterBuildingTick();
 
-        StatusMessage = $"Successfully set {DBCache.Get<Province>(provinceid).Name} as the Capital of {district.Name}.";
+        StatusMessage = $"Successfully set {DBCache.Get<Province>(provinceid).Name} as the Capital of {Nation.Name}.";
         return Redirect($"/Province/Edit/{provinceid}");
     }
 
-    [HttpPost("/District/ChangeGovernor/{id}")]
+    [HttpPost("/Nation/ChangeGovernor/{id}")]
     [ValidateAntiForgeryToken]
     [UserRequired]
     public async Task<IActionResult> ChangeGovernor(long id, long GovernorId) {
-        Nation? district = DBCache.Get<Nation>(id);
-        if (district is null)
+        Nation? Nation = DBCache.Get<Nation>(id);
+        if (Nation is null)
             return Redirect("/");
 
         var user = HttpContext.GetUser();
         if (!(await user.IsGovernmentAdmin()))
-            return RedirectBack("You must be a government admin to change the governor of a district!");
+            return RedirectBack("You must be a government admin to change the governor of a Nation!");
 
-        var oldgovernor = DBCache.Get<User>(district.GovernorId);
+        var oldgovernor = DBCache.Get<User>(Nation.GovernorId);
         var newgovernor = DBCache.Get<User>(GovernorId);
         if (newgovernor is null)
             return RedirectBack("User not found!");
 
         if (oldgovernor is not null) {
-            var roles = district.Group.GetMemberRoles(oldgovernor);
+            var roles = Nation.Group.GetMemberRoles(oldgovernor);
             if (roles.Any(x => x.Name == "Governor")) {
-                district.Group.RemoveEntityFromRole(DBCache.Get<Group>(100), oldgovernor, district.Group.Roles.First(x => x.Name == "Governor"), true);
+                Nation.Group.RemoveEntityFromRole(DBCache.Get<Group>(100), oldgovernor, Nation.Group.Roles.First(x => x.Name == "Governor"), true);
             }
         }
-        district.GovernorId = GovernorId;
-        if (!district.Group.MembersIds.Contains(newgovernor.Id)) {
-            district.Group.MembersIds.Add(newgovernor.Id);
+        Nation.GovernorId = GovernorId;
+        if (!Nation.Group.MembersIds.Contains(newgovernor.Id)) {
+            Nation.Group.MembersIds.Add(newgovernor.Id);
         }
-        district.Group.AddEntityToRole(DBCache.Get<Group>(100), newgovernor, district.Group.Roles.First(x => x.Name == "Governor"), true);
+        Nation.Group.AddEntityToRole(DBCache.Get<Group>(100), newgovernor, Nation.Group.Roles.First(x => x.Name == "Governor"), true);
 
-        return RedirectBack($"Successfully changed the governorship of this district to {BaseEntity.Find(GovernorId).Name}");
+        return RedirectBack($"Successfully changed the governorship of this Nation to {BaseEntity.Find(GovernorId).Name}");
     }
 
 
-    [HttpPost("/District/ChangeSenator/{id}")]
+    [HttpPost("/Nation/ChangeSenator/{id}")]
     [ValidateAntiForgeryToken]
     [UserRequired]
     public async Task<IActionResult> ChangeSenator(long id, long SenatorId)
     {
-        Nation? district = DBCache.Get<Nation>(id);
-        if (district is null)
+        Nation? Nation = DBCache.Get<Nation>(id);
+        if (Nation is null)
             return Redirect("/");
 
         var user = HttpContext.GetUser();
         if (!(await user.IsGovernmentAdmin()))
-            return RedirectBack("You must be a government admin to change the senator of a district!");
+            return RedirectBack("You must be a government admin to change the senator of a Nation!");
 
         if (DBCache.Get<User>(SenatorId) is null)
             return RedirectBack("User not found!");
 
-        var senobj = DBCache.GetAll<CouncilMember>().FirstOrDefault(x => x.DistrictId == district.Id);
+        var senobj = DBCache.GetAll<CouncilMember>().FirstOrDefault(x => x.NationId == Nation.Id);
         if (senobj is null)
         {
-            DBCache.AddNew(district.Id, new CouncilMember()
+            DBCache.AddNew(Nation.Id, new CouncilMember()
             {
-                DistrictId = district.Id,
+                NationId = Nation.Id,
                 UserId = SenatorId
             });
         }
@@ -185,25 +185,25 @@ public class DistrictController : SVController
             senobj.UserId = SenatorId;
         }
 
-        return RedirectBack($"Successfully changed the senatorship of this district to {BaseEntity.Find(SenatorId).Name}");
+        return RedirectBack($"Successfully changed the senatorship of this Nation to {BaseEntity.Find(SenatorId).Name}");
     }
 
     [UserRequired]
     public IActionResult ManageStates(long Id) {
-        Nation district = DBCache.Get<Nation>(Id);
+        Nation Nation = DBCache.Get<Nation>(Id);
         User user = HttpContext.GetUser();
 
-        if (district is null)
+        if (Nation is null)
             return Redirect("/");
 
-        if (user.Id != district.GovernorId)
+        if (user.Id != Nation.GovernorId)
             return Redirect("/");
 
         return View(new ManageStatesModel() {
-            States = district.States,
-            District = district,
+            States = Nation.States,
+            Nation = Nation,
             CreateStateModel = new() {
-                DistrictId = district.Id
+                NationId = Nation.Id
             }
         });
     }
@@ -214,10 +214,10 @@ public class DistrictController : SVController
     public async Task<IActionResult> CreateState(CreateStateModel model) {
         User user = HttpContext.GetUser();
 
-        Nation district = DBCache.Get<Nation>(model.DistrictId);
-        if (district is null)
+        Nation Nation = DBCache.Get<Nation>(model.NationId);
+        if (Nation is null)
             return Redirect("/");
-        if (user.Id != district.GovernorId)
+        if (user.Id != Nation.GovernorId)
             return Redirect("/");
 
         if (model.MapColor is null)
@@ -229,9 +229,9 @@ public class DistrictController : SVController
             Name = model.Name,
             Description = model.Description,
             MapColor = model.MapColor,
-            DistrictId = district.Id
+            NationId = Nation.Id
         };
-        Group stategroup = new(model.Name, district.GroupId) {
+        Group stategroup = new(model.Name, Nation.GroupId) {
             Id = IdManagers.GroupIdGenerator.Generate(),
             GroupType = GroupTypes.State
         };
@@ -260,32 +260,32 @@ public class DistrictController : SVController
     [UserRequired]
     public IActionResult TaxPolicies(long Id)
     {
-        Nation district = DBCache.Get<Nation>(Id);
+        Nation Nation = DBCache.Get<Nation>(Id);
         User user = HttpContext.GetUser();
 
-        if (district is null) {
+        if (Nation is null) {
             return Redirect("/");
         }
 
-        if (user.Id != district.GovernorId)
+        if (user.Id != Nation.GovernorId)
             return Redirect("/");
 
-        return View(district);
+        return View(Nation);
     }
 
     [HttpPost]
     [UserRequired]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> EditPolicies(DistrictPolicyModel model)
+    public async Task<IActionResult> EditPolicies(NationPolicyModel model)
     {
         User user = HttpContext.GetUser();
 
-        Nation district = DBCache.Get<Nation>(model.DistrictId);
-        if (district is null) {
+        Nation Nation = DBCache.Get<Nation>(model.NationId);
+        if (Nation is null) {
             return Redirect("/");
         }
 
-        if (user.Id != district.GovernorId)
+        if (user.Id != Nation.GovernorId)
         {
             return Redirect("/");
         }
@@ -293,14 +293,14 @@ public class DistrictController : SVController
         // update or create ubi policies
         foreach(UBIPolicy pol in model.UBIPolicies)
         {
-            UBIPolicy? oldpol = DBCache.GetAll<UBIPolicy>().FirstOrDefault(x => x.NationId == district.Id && x.ApplicableRank == pol.ApplicableRank);
+            UBIPolicy? oldpol = DBCache.GetAll<UBIPolicy>().FirstOrDefault(x => x.NationId == Nation.Id && x.ApplicableRank == pol.ApplicableRank);
             if (oldpol is not null) 
             {
                 oldpol.Rate = pol.Rate;
             }
             else {
                 pol.Id = IdManagers.GeneralIdGenerator.Generate();
-                pol.NationId = model.DistrictId;
+                pol.NationId = model.NationId;
                 DBCache.Put(pol.Id, pol);
                 DBCache.dbctx.UBIPolicies.Add(pol);
             }
@@ -312,7 +312,7 @@ public class DistrictController : SVController
             TaxPolicy? oldpol = DBCache.Get<TaxPolicy>(pol.Id);
             if (oldpol is not null) 
             {
-                if (oldpol.NationId != district.Id) {
+                if (oldpol.NationId != Nation.Id) {
                     continue;
                 }
                 oldpol.Rate = pol.Rate;
@@ -321,7 +321,7 @@ public class DistrictController : SVController
             }
             else {
                 pol.Id = IdManagers.GeneralIdGenerator.Generate();
-                pol.NationId = model.DistrictId;
+                pol.NationId = model.NationId;
                 DBCache.Put(pol.Id, pol);
                 DBCache.dbctx.TaxPolicies.Add(pol);
             }
@@ -330,17 +330,17 @@ public class DistrictController : SVController
         //await _dbctx.SaveChangesAsync();
 
         StatusMessage = $"Successfully edited policies.";
-        return Redirect($"/District/EditPolicies?Id={district.Id}");
+        return Redirect($"/Nation/EditPolicies?Id={Nation.Id}");
     }
 
     [UserRequired]
     [HttpGet]
-    public IActionResult MoveDistrict(long id)
+    public IActionResult MoveNation(long id)
     {
-        Nation district = DBCache.Get<Nation>(id);
+        Nation Nation = DBCache.Get<Nation>(id);
 
-        if (district is null)
-            return RedirectBack($"Error: Could not find {district.Name}!");
+        if (Nation is null)
+            return RedirectBack($"Error: Could not find {Nation.Name}!");
 
         User user = HttpContext.GetUser();
 
@@ -352,11 +352,11 @@ public class DistrictController : SVController
                 return RedirectBack($"Error: You must wait another {60 - daysWaited} days to move again!");
         }
 
-        user.NationId = district.Id;
+        user.NationId = Nation.Id;
 
         if (user.NationId is not null)
             user.LastMoved = DateTime.UtcNow;
 
-        return RedirectBack($"You have moved to {district.Name}!");
+        return RedirectBack($"You have moved to {Nation.Name}!");
     }
 }

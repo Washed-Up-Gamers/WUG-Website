@@ -1,4 +1,4 @@
-﻿namespace Shared.Models.Districts;
+﻿namespace Shared.Models.Nations;
 public class StaticModifier
 {
     public bool Decay { get; set; }

@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS dataprotectionkeys (
 );
 
 
-CREATE TABLE IF NOT EXISTS districts (
+CREATE TABLE IF NOT EXISTS Nations (
     id VARCHAR(36) NOT NULL,
     name VARCHAR(64) NULL,
     description VARCHAR(512) NULL,
@@ -14,13 +14,13 @@ CREATE TABLE IF NOT EXISTS districts (
     senatorid VARCHAR(38) NULL,
     governorid VARCHAR(38) NULL,
     flagurl VARCHAR(128) NULL,
-    CONSTRAINT pk_districts PRIMARY KEY (id)
+    CONSTRAINT pk_Nations PRIMARY KEY (id)
 );
 
 
 CREATE TABLE IF NOT EXISTS elections (
     id VARCHAR(36) NOT NULL,
-    districtid VARCHAR(64) NULL,
+    Nationid VARCHAR(64) NULL,
     start_date timestamp with time zone NOT NULL,
     end_date timestamp with time zone NOT NULL,
     winnerid VARCHAR(38) NULL,
@@ -80,7 +80,7 @@ CREATE TABLE IF NOT EXISTS groups (
     name VARCHAR(64) NOT NULL,
     description VARCHAR(2048) NULL,
     image_url VARCHAR(512) NULL,
-    districtid VARCHAR(38) NULL,
+    Nationid VARCHAR(38) NULL,
     credits DECIMAL(20,10) NOT NULL,
     taxablecredits DECIMAL(20,10) NOT NULL,
     creditsnapshots numeric[] NULL,
@@ -98,7 +98,7 @@ CREATE TABLE IF NOT EXISTS taxpolicies (
     id VARCHAR(36) NOT NULL,
     name VARCHAR(64) NULL,
     rate DECIMAL(20,10) NOT NULL,
-    districtid VARCHAR(38) NULL,
+    Nationid VARCHAR(38) NULL,
     taxtype integer NOT NULL,
     minimum DECIMAL(20,10) NOT NULL,
     maximum DECIMAL(20,10) NOT NULL,
@@ -145,7 +145,7 @@ CREATE TABLE IF NOT EXISTS ubipolicies (
     rate DECIMAL(20,10) NOT NULL,
     anyone boolean NOT NULL,
     applicablerank integer NULL,
-    districtid VARCHAR(38) NULL,
+    Nationid VARCHAR(38) NULL,
     CONSTRAINT pk_ubipolicies PRIMARY KEY (id)
 );
 
@@ -170,7 +170,7 @@ CREATE TABLE IF NOT EXISTS users (
     rank integer NOT NULL,
     created timestamp with time zone NOT NULL,
     image_url VARCHAR(128) NULL,
-    districtid VARCHAR(38) NULL,
+    Nationid VARCHAR(38) NULL,
     CONSTRAINT pk_users PRIMARY KEY (id)
 );
 
@@ -191,9 +191,9 @@ CREATE TABLE IF NOT EXISTS counties (
     name VARCHAR(64) NULL,
     description VARCHAR(512) NULL,
     population integer NOT NULL,
-    districtid VARCHAR(38) NOT NULL,
+    Nationid VARCHAR(38) NOT NULL,
     CONSTRAINT pk_counties PRIMARY KEY (id),
-    CONSTRAINT fk_counties_districts_districtid FOREIGN KEY (districtid) REFERENCES districts (id) ON DELETE CASCADE
+    CONSTRAINT fk_counties_Nations_Nationid FOREIGN KEY (Nationid) REFERENCES Nations (id) ON DELETE CASCADE
 );
 
 
@@ -206,7 +206,7 @@ CREATE TABLE IF NOT EXISTS forumlike (
 );
 
 
-CREATE INDEX ix_counties_districtid ON counties (districtid);
+CREATE INDEX ix_counties_Nationid ON counties (Nationid);
 
 
 CREATE INDEX ix_forumlike_postid ON forumlike (postid);

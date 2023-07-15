@@ -1,5 +1,5 @@
 global using WUG.Database;
-global using WUG.Database.Models.Districts;
+global using WUG.Database.Models.Nations;
 global using WUG.Database.Models.Economy;
 global using WUG.Database.Models.Entities;
 global using WUG.Database.Models.Factories;
@@ -11,21 +11,22 @@ global using Shared.Models.Permissions;
 global using WUG.Database.Models.Buildings;
 global using WUG.Database.Models.Users;
 global using WUG.Database.Models.OAuth2;
-global using WUG.Models.Districts;
+global using WUG.Models.Nations;
 global using WUG.Managers;
 global using WUG.WUGVAI;
 global using System.Net.Http.Json;
 global using WUG.Http;
 global using Shared.Models.TradeDeals;
-global using ProvinceModifierType = Shared.Models.Districts.ProvinceModifierType;
-global using NationModifierType = Shared.Models.Districts.Modifiers.NationModifierType;
+global using ProvinceModifierType = Shared.Models.Nations.ProvinceModifierType;
+global using NationModifierType = Shared.Models.Nations.Modifiers.NationModifierType;
 global using DivisionModifierType = Shared.Models.Military.DivisionModifierType;
-global using ProvinceMetadata = Shared.Models.Districts.ProvinceMetadata;
+global using ProvinceMetadata = Shared.Models.Nations.ProvinceMetadata;
 global using DisCatSharp.Enums;
 global using DisCatSharp;
 global using DisCatSharp.Entities;
 global using DisCatSharp.CommandsNext;
 global using DisCatSharp.CommandsNext.Attributes;
+global using WUG.Database.Models.Notifications;
 using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json;
@@ -182,7 +183,7 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
-// ensure districts & Vooperia are created
+// ensure Nations & Vooperia are created
 await WashedUpDB.Startup();
 //await ResourceManager.Load();
 
@@ -190,11 +191,13 @@ await GameDataManager.Load();
 
 ProvinceManager.LoadMap();
 
+await PriceManager.UpdatePricesAsync();
+
 builder.Services.AddHostedService<EconomyWorker>();
 builder.Services.AddHostedService<TransactionWorker>();
 builder.Services.AddHostedService<ItemTradeWorker>();
 builder.Services.AddHostedService<TimeWorker>();
-builder.Services.AddHostedService<DistrictUpdateWorker>();
+builder.Services.AddHostedService<NationUpdateWorker>();
 builder.Services.AddHostedService<VoopAIWorker>();
 builder.Services.AddHostedService<StatWorker>();
 builder.Services.AddHostedService<SecurityHistoryWorker>();
@@ -221,6 +224,7 @@ builder.Services.AddSession(options =>
     options.IdleTimeout = TimeSpan.FromDays(90);
     options.Cookie.MaxAge = TimeSpan.FromDays(90);
     options.Cookie.IsEssential = true;
+    options.Cookie.Name = ".wug.Session";
 });
 
 builder.Services.AddSignalR();
@@ -265,7 +269,7 @@ EntityAPI.AddRoutes(app);
 DevAPI.AddRoutes(app);
 BuildingAPI.AddRoutes(app);
 RecipeAPI.AddRoutes(app);
-DistrictAPI.AddRoutes(app);
+NationAPI.AddRoutes(app);
 UserAPI.AddRoutes(app);
 TaxAPI.AddRoutes(app);
 GroupAPI.AddRoutes(app);

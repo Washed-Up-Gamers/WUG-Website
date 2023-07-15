@@ -1,4 +1,4 @@
-﻿namespace Shared.Models.Districts;
+﻿namespace Shared.Models.Nations;
 
 public class State : Item
 {
@@ -7,7 +7,7 @@ public class State : Item
     public string? Description { get; set; }
     public string MapColor { get; set; }
     public long GroupId { get; set; }
-    public long DistrictId { get; set; }
+    public long NationId { get; set; }
     public long? GovernorId { get; set; }
 
     /// <summary>

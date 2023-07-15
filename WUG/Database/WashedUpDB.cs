@@ -3,7 +3,7 @@ using WUG.Database.Models.Users;
 using WUG.Database.Models.Economy;
 using WUG.Database.Models.Items;
 using WUG.Database.Models.Factories;
-using WUG.Database.Models.Districts;
+using WUG.Database.Models.Nations;
 using WUG.Database.Models.Government;
 using System;
 using Microsoft.AspNetCore.DataProtection.EntityFrameworkCore;
@@ -161,13 +161,14 @@ public class WashedUpDB : DbContext, IDataProtectionKeyContext
     public DbSet<DataProtectionKey> DataProtectionKeys { get; set; }
     public DbSet<Recipe> Recipes { get; set; }
     public DbSet<ItemTrade> ItemTrades { get; set; }
+    public DbSet<Notification> Notifications { get; set; }
 
     public DbSet<BuildingRecord> BuildingRecords { get; set; }
 
     public DbSet<UpdateTimeStuff> UpdateTimeStuffs { get; set; }
     public DbSet<CurrentTime> CurrentTimes { get; set; }
 
-    //public DbSet<DistrictStaticModifier> DistrictStaticModifiers { get; set; }
+    //public DbSet<NationStaticModifier> NationStaticModifiers { get; set; }
     public DbSet<CouncilMember> Senators { get; set; }
     public DbSet<NewsPost> NewsPosts { get; set; }
     public DbSet<City> Cities { get; set; }
@@ -206,6 +207,7 @@ public class WashedUpDB : DbContext, IDataProtectionKeyContext
             UnitedNations.Id = 100;
             UnitedNations.GroupType = GroupTypes.NonProfit;
             UnitedNations.Money = 1_500_000.0m;
+            UnitedNations.Flags.Add(GroupFlag.SeparateEntityFromOwner);
             DBCache.AddNew(UnitedNations.Id, UnitedNations);
         }
 
@@ -215,31 +217,41 @@ public class WashedUpDB : DbContext, IDataProtectionKeyContext
             UNSE.Id = 99;
             UNSE.GroupType = GroupTypes.NonProfit;
             UNSE.Money = 0.0m;
+            UNSE.Flags.Add(GroupFlag.SeparateEntityFromOwner);
             DBCache.AddNew(UNSE.Id, UNSE);
         }
 
-        Dictionary<string, long> Nations = new()
-        {
-            { "United States of Qortos", 101 },
-            { "Azurite Empire", 102 }
+        List<NationObject> Nations = new() {
+            new("United States of Qortos", 101, 3),
+            new("Isurium", 102, 6),
+            new("Archelon Republic", 103, 1),
+            new("The Astarian Egis", 104, 4),
+            new("The Procrastin Nation", 105, 2),
+            new("Oglar", 106, 3),
+            new("Fraisia", 107, 4),
+            new("Arkoros", 108, 1),
+            new("The Sublime State of the Fíkret", 109, 6),
+            new("United Corporations of Adramat", 110, 0)
         };
 
-        foreach(var pair in Nations) {
-            if (DBCache.FindEntity(pair.Value) is null) {
+        foreach(var item in Nations) {
+            if (DBCache.FindEntity(item.Id) is null) {
 
                 // owner is Vooperia
-                Group nation = new(pair.Key, 100)
+                Group nation = new(item.Name, 100)
                 {
-                    Id = pair.Value
+                    Id = item.Id
                 };
 
-                nation.Money = 500_000.0m;
+                nation.Flags.Add(GroupFlag.SeparateEntityFromOwner);
 
+                nation.Money = 50_000.0m;
+                nation.Money += 40_000.0m * item.Citizens;
 
                 Nation nation_object = new()
                 {
-                    Id = pair.Value,
-                    Name = pair.Key,
+                    Id = item.Id,
+                    Name = item.Name,
                     GroupId = nation.Id,
                     ProvinceSlotsLeft = 0
                 };
@@ -250,14 +262,14 @@ public class WashedUpDB : DbContext, IDataProtectionKeyContext
             }
         }
 
-        foreach (var district in DBCache.GetAll<Nation>()) {
-            if (district.Group.GroupType != GroupTypes.District)
-                district.Group.GroupType = GroupTypes.District;;
-            if (!district.Group.Roles.Any(x => x.Name == "Governor")) {
+        foreach (var Nation in DBCache.GetAll<Nation>()) {
+            if (Nation.Group.GroupType != GroupTypes.Nation)
+                Nation.Group.GroupType = GroupTypes.Nation;;
+            if (!Nation.Group.Roles.Any(x => x.Name == "Governor")) {
                 var role = new GroupRole() {
                     Name = "Governor",
                     Color = "ffffff",
-                    GroupId = district.GroupId,
+                    GroupId = Nation.GroupId,
                     PermissionValue = GroupPermissions.FullControl.Value,
                     Id = IdManagers.GeneralIdGenerator.Generate(),
                     Authority = 99999999,
@@ -272,5 +284,19 @@ public class WashedUpDB : DbContext, IDataProtectionKeyContext
             if (state.Group.GroupType != GroupTypes.State)
                 state.Group.GroupType = GroupTypes.State;
         }
+    }
+}
+
+public class NationObject
+{
+    public string Name { get; set; }
+    public long Id { get; set; }
+    public long Citizens { get; set; }
+
+    public NationObject(string name, long id, long citizens)
+    {
+        Name = name;
+        Id = id;
+        Citizens = citizens;
     }
 }

@@ -46,7 +46,7 @@
 
 <div class="container" style="max-width:100vw;">
     <center>
-        <h2>Districts of SpookVooper</h2>
+        <h2>Nations of SpookVooper</h2>
     </center>
     <center>
         @{
@@ -84,21 +84,21 @@
                 {
                     @foreach (var province in Model)
                     {
-                        <a href="/District/View/@province.District?.Name">
-                            <path d="@province.D" id="@province.Id" style="fill:#@(province.District?.Color ?? "(255, 255, 255");stroke: #@(province.District?.Color ?? "(255, 255, 255") !important" class="province"></path>
+                        <a href="/Nation/View/@province.Nation?.Name">
+                            <path d="@province.D" id="@province.Id" style="fill:#@(province.Nation?.Color ?? "(255, 255, 255");stroke: #@(province.Nation?.Color ?? "(255, 255, 255") !important" class="province"></path>
                         </a>
                     }
                 }
                 else
                 {
-                    @foreach (var district in MapController.DistrictMaps)
+                    @foreach (var Nation in MapController.NationMaps)
                     {
-                        @foreach (var province in district.Provinces)
+                        @foreach (var province in Nation.Provinces)
                         {
-                            @if (province.DistrictId == 100)
+                            @if (province.NationId == 100)
                                 continue;
                             <a href="/Province/View/@province.Id">
-                                <path d="@province.D" id="@province.Id" style="fill:# @(province.District?.Color ?? "(255, 255, 255");stroke: black;stroke-width: 0.5px;" class="province"></path>
+                                <path d="@province.D" id="@province.Id" style="fill:# @(province.Nation?.Color ?? "(255, 255, 255");stroke: black;stroke-width: 0.5px;" class="province"></path>
                             </a>
                         }
                     }
@@ -108,15 +108,15 @@
             {
                 @foreach (var province in Model)
                 {
-                    @if (province.DistrictId == 100)
+                    @if (province.NationId == 100)
                         continue;
-                    <path d="@province.D" id="@province.Id" style="fill:#@(province.District?.Color ?? "(255, 255, 255");stroke: #@(province.District?.Color ?? "(255, 255, 255") !important" class="province"></path>
+                    <path d="@province.D" id="@province.Id" style="fill:#@(province.Nation?.Color ?? "(255, 255, 255");stroke: #@(province.Nation?.Color ?? "(255, 255, 255") !important" class="province"></path>
                 }
-                @foreach(var district in MapController.DistrictMaps)
+                @foreach(var Nation in MapController.NationMaps)
                 {
-                    @foreach (var province in district.Provinces)
+                    @foreach (var province in Nation.Provinces)
                     {
-                        @if (province.DistrictId == 100)
+                        @if (province.NationId == 100)
                             continue;
                         var dbprovince = DBCache.Get<Province>(province.Id);
                         var buildingobj = GameDataManager.BaseBuildingObjs.Values.First(x => x.MustHaveResource == resourcetomap);

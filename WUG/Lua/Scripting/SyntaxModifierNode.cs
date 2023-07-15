@@ -9,7 +9,7 @@ namespace WUG.Scripting;
 
 public class SyntaxModifierNode : SyntaxNode
 {
-    public NationModifierType? districtModifierType { get; set; }
+    public NationModifierType? NationModifierType { get; set; }
     public ProvinceModifierType? provinceModifierType { get; set; }
     public BuildingModifierType? buildingModifierType { get; set; }
     public EntityModifierType? entityModifierType { get; set; }
@@ -26,8 +26,8 @@ public class SyntaxModifierNode : SyntaxNode
     }
 
     public string GetHumanReadableName() {
-        if (districtModifierType is not null) {
-            return districtModifierType switch {
+        if (NationModifierType is not null) {
+            return NationModifierType switch {
                 NationModifierType.AllProducingBuildingThroughputFactor => "Buildings' Throughput",
                 NationModifierType.BuildingSlotsExponent => "Exponent for Building Slots from Population",
                 NationModifierType.BuildingSlotsFactor => "Building Slots",
@@ -67,8 +67,8 @@ public class SyntaxModifierNode : SyntaxNode
     }
 
     public string GetColorClassForModifier(decimal value) {
-        if (districtModifierType is not null) {
-            return districtModifierType switch {
+        if (NationModifierType is not null) {
+            return NationModifierType switch {
                 NationModifierType.AllProducingBuildingThroughputFactor => GetColorClass(false, value),
                 NationModifierType.BuildingSlotsExponent => GetColorClass(false, value),
                 NationModifierType.BuildingSlotsFactor => GetColorClass(false, value),
@@ -112,7 +112,7 @@ public class SyntaxModifierNode : SyntaxNode
         var sign = "+";
         if (value < 0.0m) sign = "";
         string valuestring = "";
-        if ((districtModifierType is not null && districtModifierType.ToString().Contains("Factor"))
+        if ((NationModifierType is not null && NationModifierType.ToString().Contains("Factor"))
             || (provinceModifierType is not null && provinceModifierType.ToString().Contains("Factor"))
             || (entityModifierType is not null && entityModifierType.ToString().Contains("Factor"))
             || (buildingModifierType is not null && buildingModifierType.ToString().Contains("Factor")))

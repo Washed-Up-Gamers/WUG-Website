@@ -9,15 +9,15 @@ using System.Text.Json;
 namespace WUG.API;
 
 [EnableCors("ApiPolicy")]
-public class DistrictAPI : BaseAPI
+public class NationAPI : BaseAPI
 {
     public static void AddRoutes(WebApplication app)
     {
-        app.MapGet   ("api/districts/{id}", GetDistrictAsync).RequireCors("ApiPolicy");
+        app.MapGet   ("api/nations/{id}", GetNationAsync).RequireCors("ApiPolicy");
         app.MapGet   ("api/getallprovinces", GetAllProvincesAsync).RequireCors("ApiPolicy");
     }
 
-    private static async Task GetDistrictAsync(HttpContext ctx, long id)
+    private static async Task GetNationAsync(HttpContext ctx, long id)
     {
         await ctx.Response.WriteAsJsonAsync(DBCache.Get<Nation>(id));
     }

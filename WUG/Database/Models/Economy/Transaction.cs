@@ -243,7 +243,7 @@ public class Transaction
         }
 
         else if (transactionType == TransactionType.TaxPayment) {
-            // we do this so that districts, states, and province groups can have a "profit" for banks and loan brokers to use.
+            // we do this so that Nations, states, and province groups can have a "profit" for banks and loan brokers to use.
             ToEntity.TaxAbleBalance += Amount;
             ToEntity.IncomeToday += Amount;
         }
@@ -407,7 +407,7 @@ public class Transaction
         }
 
         else if (transactionType == TransactionType.TaxPayment) {
-            // we do this so that districts, states, and province groups can have a "profit" for banks and loan brokers to use.
+            // we do this so that Nations, states, and province groups can have a "profit" for banks and loan brokers to use.
             toEntity.TaxAbleBalance += Amount;
         }
 

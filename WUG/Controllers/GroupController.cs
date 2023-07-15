@@ -139,7 +139,7 @@ public class GroupController : SVController
         Group group = new Group(model.Name, user.Id) {
             Description = model.Description,
             GroupType = model.GroupType,
-            NationId = model.DistrictId,
+            NationId = model.NationId,
             ImageUrl = model.ImageUrl,
             OwnerId = user.Id
         };
@@ -162,7 +162,7 @@ public class GroupController : SVController
             Description = group.Description,
             Open = group.Open,
             Id = group.Id,
-            DistrictId = group.NationId,
+            NationId = group.NationId,
             ImageUrl = group.ImageUrl,
             GroupType = group.GroupType
         });
@@ -311,7 +311,7 @@ public class GroupController : SVController
             prevgroup.Name = model.Name;
             prevgroup.ImageUrl = model.ImageUrl;
             prevgroup.Open = model.Open;
-            prevgroup.NationId = model.DistrictId;
+            prevgroup.NationId = model.NationId;
             prevgroup.Description = model.Description;
         }
 
@@ -605,7 +605,7 @@ public class GroupController : SVController
         if (group == null)
             return RedirectBack($"Could not find the group!");
 
-        if (group.GroupType is GroupTypes.District or GroupTypes.State or GroupTypes.Province or GroupTypes.NonProfit or GroupTypes.PoliticalParty || group.Id == 100)
+        if (group.GroupType is GroupTypes.Nation or GroupTypes.State or GroupTypes.Province or GroupTypes.NonProfit or GroupTypes.PoliticalParty || group.Id == 100)
             return RedirectBack($"Only companies can IPO!");
 
         if (group.HasPermission(user, GroupPermissions.Eco))
@@ -667,6 +667,10 @@ public class GroupController : SVController
 
             DBCache.AddNew(security.Id, security);
             DBCache.SecuritiesByTicker.TryAdd(security.Ticker, security);
+
+            while (DBCache.ItemQueue.Any(x => x.Type == typeof(Security) && ((Security)x.Item).Id == security.Id)) {
+                await Task.Delay(250);
+            }
 
             var ownership = new SecurityOwnership()
             {
