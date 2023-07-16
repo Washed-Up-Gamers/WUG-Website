@@ -22,7 +22,7 @@ public class AccountController : SVController {
     private static string Redirecturl = "https://localhost:7186/callback";
 #else
     private static string Redirecturl = "https://wug.superjacobl.com/callback";
-    //private static string Redirecturl = "https://spookvooper.com/callback";
+    //private static string Redirecturl = "https://wug.superjacobl.com/callback";
 #endif
 	private readonly ILogger<AccountController> _logger;
     

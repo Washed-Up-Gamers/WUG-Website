@@ -1012,7 +1012,6 @@ input:checked + .slider {
 }
 
 .login-background {
-  background-image: url(/media/Spookvooper.jpg);
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center;
