@@ -157,5 +157,6 @@ public enum ProvinceModifierType
     DevelopmentValue,
     ConsumerGoodsConsumptionFactor,
     ConsumerGoodsModifierFactor,
-    InfrastructureThroughputFactor
+    InfrastructureThroughputFactor,
+    PowerPlantThroughputFactor
 }

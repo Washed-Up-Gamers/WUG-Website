@@ -108,7 +108,8 @@ public class LuaBuilding
                 BuildingType.Mine => new Mine(),
                 BuildingType.Factory => new Factory(),
                 BuildingType.Farm => new Farm(),
-                BuildingType.Infrastructure => new Infrastructure()
+                BuildingType.Infrastructure => new Infrastructure(),
+                BuildingType.PowerPlant => new PowerPlant()
             };
             building.StaticModifiers = new();
             building.Modifiers = new();
@@ -117,6 +118,7 @@ public class LuaBuilding
             building.NationId = Nation.Id;
             building.ProvinceId = province.Id;
             building.RecipeId = Recipes.First().Id;
+            building.PrevRecipeId = "";
             building.LuaBuildingObjId = Name;
             building.Size = levels;
             building.Name = IdManagers.GeneralIdGenerator.Generate().ToString();
@@ -124,33 +126,38 @@ public class LuaBuilding
                 case BuildingType.Mine:
                     building.Quantity = Defines.NProduction["BASE_MINE_QUANTITY"];
                     var mine = (Mine)building;
-                    DBCache.Put(mine.Id, mine);
+                    DBCache.AddNew(mine.Id, mine);
                     DBCache.ProvincesBuildings[province.Id].Add(mine);
-                    DBCache.dbctx.Mines.Add(mine);
                     DBCache.ProducingBuildingsById[building.Id] = mine;
                     break;
                 case BuildingType.Factory:
                     building.Quantity = Defines.NProduction["BASE_FACTORY_QUANTITY"];
                     var factory = (Factory)building;
-                    DBCache.Put(factory.Id, factory);
+                    DBCache.AddNew(factory.Id, factory);
                     DBCache.ProvincesBuildings[province.Id].Add(factory);
-                    DBCache.dbctx.Factories.Add(factory);
                     DBCache.ProducingBuildingsById[building.Id] = factory;
                     break;
                 case BuildingType.Farm:
                     building.Quantity = Defines.NProduction["BASE_FARM_QUANTITY"];
                     var farm = (Farm)building;
-                    DBCache.Put(farm.Id, farm);
+                    DBCache.AddNew(farm.Id, farm);
                     DBCache.ProvincesBuildings[province.Id].Add(farm);
-                    DBCache.dbctx.Farms.Add(farm);
                     DBCache.ProducingBuildingsById[building.Id] = farm;
+                    break;
+                case BuildingType.PowerPlant:
+                    building.Quantity = 1;
+                    var powerplant = (PowerPlant)building;
+                    powerplant.SellingPrice = 3.0m;
+                    powerplant.PowerBrought = 0.0;
+                    DBCache.AddNew(powerplant.Id, powerplant);
+                    DBCache.ProvincesBuildings[province.Id].Add(powerplant);
+                    DBCache.ProducingBuildingsById[building.Id] = powerplant;
                     break;
                 case BuildingType.Infrastructure:
                     building.Quantity = 1;
                     var infrastructure = (Infrastructure)building;
-                    DBCache.Put(infrastructure.Id, infrastructure);
+                    DBCache.AddNew(infrastructure.Id, infrastructure);
                     DBCache.ProvincesBuildings[province.Id].Add(infrastructure);
-                    DBCache.dbctx.Infrastructures.Add(infrastructure);
                     DBCache.ProducingBuildingsById[building.Id] = infrastructure;
                     await building.Tick();
                     await building.TickRecipe();

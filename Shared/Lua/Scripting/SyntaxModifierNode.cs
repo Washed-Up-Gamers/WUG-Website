@@ -10,7 +10,7 @@ namespace Shared.Lua.Scripting;
 
 public class SyntaxModifierNode : SyntaxNode
 {
-    public NationModifierType? NationModifierType { get; set; }
+    public NationModifierType? nationModifierType { get; set; }
     public ProvinceModifierType? provinceModifierType { get; set; }
     public EntityModifierType? entityModifierType { get; set; }
     public BuildingModifierType? buildingModifierType { get; set; }
@@ -29,9 +29,9 @@ public class SyntaxModifierNode : SyntaxNode
 
     public string GetHumanReadableName()
     {
-        if (NationModifierType is not null)
+        if (nationModifierType is not null)
         {
-            return NationModifierType switch
+            return nationModifierType switch
             {
                 NationModifierType.AllProducingBuildingThroughputFactor => "Buildings' Throughput",
                 NationModifierType.BuildingSlotsExponent => "Exponent for Building Slots from Population",
@@ -73,9 +73,9 @@ public class SyntaxModifierNode : SyntaxNode
 
     public string GetColorClassForModifier(decimal value)
     {
-        if (NationModifierType is not null)
+        if (nationModifierType is not null)
         {
-            return NationModifierType switch
+            return nationModifierType switch
             {
                 NationModifierType.AllProducingBuildingThroughputFactor => GetColorClass(false, value),
                 NationModifierType.BuildingSlotsExponent => GetColorClass(false, value),
@@ -121,7 +121,7 @@ public class SyntaxModifierNode : SyntaxNode
         var sign = "+";
         if (value < 0.0m) sign = "";
         string valuestring = "";
-        if (NationModifierType is not null && NationModifierType.ToString().Contains("Factor")
+        if (nationModifierType is not null && nationModifierType.ToString().Contains("Factor")
             || provinceModifierType is not null && provinceModifierType.ToString().Contains("Factor")
             || entityModifierType is not null && entityModifierType.ToString().Contains("Factor"))
             valuestring = $"{value * 100:n2}%";

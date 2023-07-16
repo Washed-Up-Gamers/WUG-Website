@@ -31,6 +31,8 @@ public class BaseRecipe
     public bool Editable { get; set; }
     public bool Inputcost_Scaleperlevel { get; set; }
     public string Name { get; set; }
+    public double PowerDemand { get; set; }
+    public double PowerOutput { get; set; }
     public BuildingType? TypeOfBuilding { get; set; }
     public List<SyntaxModifierNode>? ModifierNodes { get; set; }
     public Dictionary<string, LuaRecipeEdit> LuaRecipeEdits { get; set; }

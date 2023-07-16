@@ -186,6 +186,7 @@ public class ProvinceManager
                     Name = $"Province {state.Id}"
                 };
                 createdNewProvinces = true;
+                DBCache.ProvincesBuildings[dbprovince.Id] = new();
                 DBCache.AddNew(dbprovince.Id, dbprovince);
                 //dbctx.Provinces.Add(dbprovince);
                 //Nation.Provinces.Add(dbprovince);

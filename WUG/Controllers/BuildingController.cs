@@ -128,7 +128,8 @@ public class BuildingController : SVController
             Description = building.Description,
             RecipeId = building.RecipeId,
             BuildingId = building.Id,
-            createBuildingRequestModel = model
+            createBuildingRequestModel = model,
+            SellingPrice = building.BuildingType is BuildingType.PowerPlant ? ((PowerPlant)building).SellingPrice : null
         };
 
         // only groups/corporations can have building employees
@@ -222,6 +223,14 @@ public class BuildingController : SVController
         building.Name = model.Name;
         building.Description = model.Description;
         building.RecipeId = model.RecipeId;
+
+        if (building.BuildingType is BuildingType.PowerPlant) {
+            var powerplant = (PowerPlant)building;
+            if ((model.SellingPrice ?? 3.0m) > 50.0m)
+                return RedirectBack("You can not sell the selling price of power to higher than $50!");
+            
+            powerplant.SellingPrice = (decimal)(model.SellingPrice ?? 3.0m);
+        }
 
         if (model.GroupRoleIdForEmployee is null || model.GroupRoleIdForEmployee == 0)
             model.GroupRoleIdForEmployee = null;

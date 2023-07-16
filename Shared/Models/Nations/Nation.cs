@@ -103,7 +103,7 @@ public class Nation : Item
         foreach (var staticmodifier in StaticModifiers) {
             foreach (var modifiernode in staticmodifier.BaseStaticModifiersObj.ModifierNodes) {
                 var value = (double)modifiernode.GetValue(value_executionstate, staticmodifier.ScaleBy);
-                UpdateOrAddModifier((NationModifierType)modifiernode.NationModifierType!, value);
+                UpdateOrAddModifier((NationModifierType)modifiernode.nationModifierType!, value);
             }
         }
     }

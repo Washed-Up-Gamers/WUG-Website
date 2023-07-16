@@ -82,6 +82,30 @@ recipe_coal_mining_base = {
     editable = false
 }
 
+recipe_lithium_mining_base = {
+	name = "Lithium Mining"
+    inputs = {
+        tools = 0.1
+    }
+	outputs = {
+		lithium = 1
+	}
+	perhour = 20
+    editable = false
+}
+
+recipe_cadmium_mining_base = {
+	name = "Cadmium Mining"
+    inputs = {
+        tools = 0.1
+    }
+	outputs = {
+		cadmium = 1
+	}
+	perhour = 5
+    editable = false
+}
+
 recipe_gold_mining_base = {
 	name = "Gold Mining"
     inputs = {
@@ -91,6 +115,18 @@ recipe_gold_mining_base = {
 		gold = 1
 	}
 	perhour = 7.5
+    editable = false
+}
+
+recipe_potassium_mining_base = {
+	name = "Potassium Mining"
+    inputs = {
+        tools = 0.05
+    }
+	outputs = {
+		potassium = 1
+	}
+	perhour = 10
     editable = false
 }
 
@@ -109,11 +145,23 @@ recipe_pothium_mining_base = {
 recipe_oil_well_mining_base = {
 	name = "Oil Production"
     inputs = {
-        tools = 0.1
+        tools = 0.05
     }
 	outputs = {
 		oil = 1
 	}
 	perhour = 6
+    editable = false
+}
+
+recipe_natural_gas_well_mining_base = {
+	name = "Natural Gas Production"
+    inputs = {
+        tools = 0.025
+    }
+	outputs = {
+		natural_gas = 1
+	}
+	perhour = 25
     editable = false
 }

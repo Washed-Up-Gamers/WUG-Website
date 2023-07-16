@@ -4,6 +4,7 @@ using WUG.Database.Models.Economy;
 using WUG.Database.Models.Users;
 using WUG.Web;
 using System.Diagnostics;
+using WUG.Database.Models.PowerGrid;
 
 namespace WUG.Workers;
 
@@ -38,6 +39,7 @@ public class NationUpdateWorker : BackgroundService
                             nation.ProvincesByMigrationAttraction = nation.Provinces.OrderByDescending(x => x.MigrationAttraction).ToList();
                             nation.UpdateModifiers();
                         }
+
                         Stopwatch sw = Stopwatch.StartNew();
                         for (int i = 0; i < 1; i++)
                         {
@@ -65,6 +67,11 @@ public class NationUpdateWorker : BackgroundService
                             foreach (var nation in DBCache.GetAll<Nation>())
                                 nation.ProvinceSlotsLeft += 1;
                         }
+
+                        foreach (var powergrid in DBCache.GetAll<PowerGrid>()) {
+                            await powergrid.Tick();
+                        }
+
                         //await Task.Delay(1000 * 60 * 60);
                         await Task.Delay(1000 * 60 * 60);
                     }
@@ -83,7 +90,7 @@ public class NationUpdateWorker : BackgroundService
 
             while (!task.IsCompleted)
             {
-                _logger.LogInformation("Nation Updating Worker running at: {time}", DateTimeOffset.Now);
+                //_logger.LogInformation("Nation Updating Worker running at: {time}", DateTimeOffset.Now);
                 await Task.Delay(60000);
             }
 

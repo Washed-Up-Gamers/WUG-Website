@@ -136,6 +136,15 @@
                     <select asp-for="GroupRoleIdForEmployee" asp-items="Model.GroupRolesForEmployee" class="form-select form-control"></select>
                     <span asp-validation-for="GroupRoleIdForEmployee" class="text-danger"></span>
                 </div>
+                <br />
+
+                @if (Model.Building.BuildingType is BuildingType.PowerPlant or BuildingType.Battery) {
+                    <div class="form-group">
+                        <label>Selling Price for Power (per MWh)</label>
+                        <input asp-for="SellingPrice" class="form-control" />
+                        <span asp-validation-for="SellingPrice" class="text-danger"></span>
+                    </div>
+                }
 
                 <br />
                 <div class="form-group">
@@ -285,6 +294,19 @@
                     <th class="infobox-row-name">Recipe</th>
                     <td class="infobox-row-value">@Model.Building.Recipe.Name</td>
                 </tr>
+                @if (Model.Building.BuildingType is BuildingType.PowerPlant)
+                {
+                    <tr class="mergedrow">
+                        <th class="infobox-row-name">Power Generation</th>
+                        <td class="infobox-row-value">@($"{Model.Building.GetRateForProduction() * Model.Building.Recipe.PowerOutput:n0}MW")</td>
+                    </tr>
+                }
+                else {
+                    <tr class="mergedrow">
+                        <th class="infobox-row-name">Power Consumption</th>
+                        <td class="infobox-row-value">@($"{Model.Building.GetRateForProduction() / Model.Building.Recipe.PerHour * Model.Building.Recipe.PowerDemand * ( 1.0 / (1.0 - Model.Building.ThroughputLossFromPowerGrid)):n0}MW")</td>
+                    </tr>
+                }
                 <tr class="mergedrow dividertop">
                     <td colspan="2" class="infobox-subheader">
                         <div>Resources consumed daily</div>
@@ -409,7 +431,8 @@
                         BuildingType.Mine => ProvinceModifierType.MineThroughputFactor,
                         BuildingType.Factory => ProvinceModifierType.FactoryThroughputFactor,
                         BuildingType.Farm => ProvinceModifierType.FarmThroughputFactor,
-                        BuildingType.Infrastructure => ProvinceModifierType.InfrastructureThroughputFactor
+                        BuildingType.Infrastructure => ProvinceModifierType.InfrastructureThroughputFactor,
+                        BuildingType.PowerPlant => ProvinceModifierType.PowerPlantThroughputFactor
                     };
 
                     double runningtotalforstacking = 1;
@@ -419,7 +442,7 @@
                         runningtotalforstacking += value;
                         <tr>
                             <td>Province's Infrastructure</td>
-                            <td>+@($"{value:n3}")</td>
+                            <td>x@($"{value:n3}")</td>
                             <td>@($"{runningtotal * runningtotalforstacking:n3}")x</td>
                         </tr>
                     }
@@ -467,7 +490,8 @@
                         BuildingType.Mine => NationModifierType.MineThroughputFactor,
                         BuildingType.Factory => NationModifierType.FactoryThroughputFactor,
                         BuildingType.Farm => NationModifierType.FarmThroughputFactor,
-                        BuildingType.Infrastructure => NationModifierType.InfrastructureThroughputFactor
+                        BuildingType.Infrastructure => NationModifierType.InfrastructureThroughputFactor,
+                        BuildingType.PowerPlant => NationModifierType.PowerPlantThroughputFactor
                     });
 
                     @foreach (var item in Model.Building.Province.GetStaticModifiersOfTypes(null, Nationtypestoget, true, false))
@@ -490,6 +514,19 @@
                             <td>@item.BaseStaticModifiersObj.Name</td>
                             <td>+@($"{node.GetValue(state):n3}")</td>
                             <td>@($"{runningtotal * runningtotalforstacking:n3}")</td>
+                        </tr>
+                    }
+
+                    runningtotal *= runningtotalforstacking;
+
+                    runningtotalforstacking = 1;
+                    @if (Model.Building.ThroughputLossFromPowerGrid > 0.0)
+                    {
+                        runningtotal *= (1 - Model.Building.ThroughputLossFromPowerGrid);
+                        <tr>
+                            <td>Power Grid lacks enough power</td>
+                            <td>x@($"{1 - Model.Building.ThroughputLossFromPowerGrid:n2}")</td>
+                            <td>@($"{runningtotal:n3}")x</td>
                         </tr>
                     }
                 }

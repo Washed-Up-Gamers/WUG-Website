@@ -159,7 +159,7 @@ public class Nation
         {
             var change = diff > 6250 ? 6250.0 : -6250.0;
             change += diff * 0.005;
-            BasePopulationFromUsers += diff;
+            BasePopulationFromUsers += change;
         }
         else
             BasePopulationFromUsers += diff;
@@ -218,7 +218,7 @@ public class Nation
         foreach (var staticmodifier in StaticModifiers) {
             foreach (var modifiernode in staticmodifier.BaseStaticModifiersObj.ModifierNodes) {
                 var value = (double)modifiernode.GetValue(value_executionstate, staticmodifier.ScaleBy);
-                UpdateOrAddModifier((NationModifierType)modifiernode.NationModifierType!, value);
+                UpdateOrAddModifier((NationModifierType)modifiernode.nationModifierType!, value);
             }
             if (staticmodifier.BaseStaticModifiersObj.EffectBody is not null)
             {

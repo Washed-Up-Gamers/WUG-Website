@@ -8,6 +8,7 @@ public class BuildingManageModel {
     public string Name { get; set; }
     public string? Description { get; set; }
     public long BuildingId { get; set; }
+    public decimal? SellingPrice { get; set; }
     public string RecipeId { get; set; }
     public CreateBuildingRequestModel createBuildingRequestModel { get; set; }
     public List<SelectListItem> GroupRolesForEmployee { get; set; }

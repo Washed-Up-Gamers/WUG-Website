@@ -17,5 +17,7 @@ public class Infrastructure : ProducingBuilding
     /// </summary>
     public async ValueTask Tick()
     {
+        if (Quantity <= 1)
+            Quantity = 1;
     }
 }

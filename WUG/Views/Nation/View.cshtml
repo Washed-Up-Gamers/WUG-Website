@@ -1,6 +1,7 @@
 @using WUG.Database;
 @using WUG.Database.Models.Nations;
 @using WUG.Blazor.Components;
+@using WUG.Database.Models.PowerGrid;
 @model WUG.Database.Models.Nations.Nation
 
 @{ 
@@ -352,6 +353,27 @@
                     <td colspan="2" class="infobox-subheader">
                         <div>@Model.TitleForState.Pluralize()</div>
                     </td>
+                </tr>
+                @{
+                    var powergrid = DBCache.GetAll<PowerGrid>().FirstOrDefault(x => x.NationIds.Contains(Model.Id));
+                    powergrid.UpdateStats();
+                }
+                <tr>
+                    <td colspan="2" class="infobox-subheader">
+                        <div>@powergrid.Name</div>
+                    </td>
+                </tr>
+                <tr class="mergedrow dividertop">
+                    <th class="infobox-row-name">Generation Capacity</th>
+                    <td class="infobox-row-value">@($"{powergrid.PowerSupply:n0}MW")</td>
+                </tr>
+                <tr class="mergedrow">
+                    <th class="infobox-row-name">Demand</th>
+                    <td class="infobox-row-value">@($"{powergrid.PowerDemand:n0}MW")</td>
+                </tr>
+                <tr class="mergedrow">
+                    <th class="infobox-row-name">Average Price per MWh</th>
+                    <td class="infobox-row-value">@($"${powergrid.AveragePrice:n2}")</td>
                 </tr>
                 @{
                     var _class = "mergedrow fit-to-content dividertop";

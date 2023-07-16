@@ -324,7 +324,6 @@ public abstract class BaseEntity
         return groups;
     }
 
-
     public static async Task<BaseEntity?> FindByApiKey(string apikey, WashedUpDB dbctx)
     {
         BaseEntity? entity = DBCache.GetAll<Group>().FirstOrDefault(x => x.ApiKey == apikey);

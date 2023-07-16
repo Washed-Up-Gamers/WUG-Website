@@ -258,6 +258,33 @@ public class Group : BaseEntity, IHasOwner
         return roles.Max(r => r.Authority);
     }
 
+    public List<BaseEntity> GetOwnershipChain()
+    {
+        List<BaseEntity> ownershipChain = new();
+
+        BaseEntity owner = Owner;
+        if (owner.EntityType == EntityType.User)
+            ownershipChain.Add(owner);
+        else {
+
+            // While the owner is a group
+            while (owner is Group)
+            {
+                ownershipChain.Add(owner);
+
+                // Move up to next layer of ownership
+                owner = BaseEntity.Find(((Group)owner).OwnerId);
+            }
+
+            // At this point the owner must be a user
+            if (owner != null)
+            {
+                ownershipChain.Add(owner);
+            }
+        }
+        return ownershipChain;
+    }
+
     public TaskResult AddEntityToRole(BaseEntity caller, BaseEntity target, GroupRole role, bool force = false)
     {
         // Validate arguments

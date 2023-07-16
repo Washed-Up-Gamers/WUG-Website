@@ -6,6 +6,7 @@ using WUG.Scripting;
 using WUG.Database.Models.Nations;
 using System.Text.Json.Serialization;
 using Shared.Models;
+using WUG.Scripting.Parser;
 
 namespace WUG.Database.Models.Buildings;
 
@@ -16,7 +17,9 @@ public enum BuildingType
     Factory = 1,
     Recruitment_Center = 2,
     Infrastructure = 4,
-    ResearchLab = 5
+    ResearchLab = 5,
+    PowerPlant = 6,
+    Battery = 7
 }
 
 public interface ITickable
@@ -31,6 +34,7 @@ public abstract class BuildingBase : IHasOwner, ITickable
     public string? Name { get; set; }
     public long NationId { get; set; }
     public int Size { get; set; }
+    public string PrevRecipeId { get; set; }
     public string RecipeId { get; set; }
     public abstract BuildingType BuildingType { get; }
     public string LuaBuildingObjId { get; set; }
@@ -54,6 +58,9 @@ public abstract class BuildingBase : IHasOwner, ITickable
     [NotMapped]
     [JsonIgnore]
     public Nation Nation => DBCache.Get<Nation>(NationId)!;
+
+    [NotMapped]
+    public double ThroughputLossFromPowerGrid = 0.0;
 
     public static BuildingBase Find(long? id)
     {
@@ -87,6 +94,7 @@ public class BuildingUpgrade
 [JsonDerivedType(typeof(Mine), typeDiscriminator: 2)]
 [JsonDerivedType(typeof(Farm), typeDiscriminator: 3)]
 [JsonDerivedType(typeof(Infrastructure), typeDiscriminator: 4)]
+[JsonDerivedType(typeof(PowerPlant), typeDiscriminator: 6)]
 public abstract class ProducingBuilding : BuildingBase
 {
     public ProducingBuilding() { }
@@ -172,12 +180,12 @@ public abstract class ProducingBuilding : BuildingBase
             if (BuildingObj.ApplyStackingBonus)
                 basevalue *= 1+Math.Min(Defines.NProduction["STACKING_THROUGHPUT_BONUS"] * Size, Defines.NProduction["MAX_STACKING_THROUGHPUT_BONUS"]);
 
-            if (BuildingType == BuildingType.Factory)
+            if (BuildingType is BuildingType.Factory or BuildingType.PowerPlant)
             {
                 var start = 6.0;
                 var end = 1;
                 var diff = start - end;
-                var startdate = new DateTime(2023, 7, 16);
+                var startdate = new DateTime(2023, 7, 20);
                 var hourstotal = 24 * 7 * 6;
                 var progress = Math.Max(0, (DateTime.UtcNow - startdate).TotalHours);
                 var muit = end + (diff * (1 - (progress / hourstotal)));
@@ -188,7 +196,7 @@ public abstract class ProducingBuilding : BuildingBase
                 var start = 3.0;
                 var end = 1;
                 var diff = start - end;
-                var startdate = new DateTime(2023, 7, 16);
+                var startdate = new DateTime(2023, 7, 20);
                 var hourstotal = 24 * 7 * 6;
                 var progress = Math.Max(0, (DateTime.UtcNow - startdate).TotalHours);
                 var muit = end + (diff * (1 - (progress / hourstotal)));
@@ -205,6 +213,8 @@ public abstract class ProducingBuilding : BuildingBase
             if (EmployeeId is not null)
                 basevalue *= 1.15;
             
+            basevalue *= (1 - ThroughputLossFromPowerGrid);
+            
             return basevalue;
         }
     }
@@ -220,6 +230,7 @@ public abstract class ProducingBuilding : BuildingBase
                 BuildingType.Farm => Nation.GetModifierValue(NationModifierType.FarmQuantityCap),
                 BuildingType.Mine => Nation.GetModifierValue(NationModifierType.MineQuantityCap),
                 BuildingType.Factory => Nation.GetModifierValue(NationModifierType.FactoryQuantityCap),
+                BuildingType.PowerPlant => Nation.GetModifierValue(NationModifierType.PowerPlantQuantityCap),
                 _ => 1
             };
         }
@@ -336,6 +347,13 @@ public abstract class ProducingBuilding : BuildingBase
     public async ValueTask<TaskResult> TickRecipe() {
         UpdateModifiers();
 
+        if (PrevRecipeId != "" && PrevRecipeId != RecipeId)
+            Quantity /= 2.0;
+        PrevRecipeId = RecipeId;
+
+        if (BuildingType is BuildingType.PowerPlant or BuildingType.Battery)
+            return new(true, "");
+
         double rate = GetRateForProduction();
         if (!Recipe.BaseRecipe.Inputcost_Scaleperlevel)
             rate /= Size;
@@ -343,8 +361,23 @@ public abstract class ProducingBuilding : BuildingBase
         SuccessfullyTicked = false;
         foreach (var resourcename in Recipe.Inputs.Keys) {
             double amount = rate_for_input * Recipe.Inputs[resourcename];
-            if (!await Owner.HasEnoughResource(resourcename, amount))
+            if (!await Owner.HasEnoughResource(resourcename, amount)) {
+                var notification = new Notification() {
+                    Id = IdManagers.GeneralIdGenerator.Generate(),
+                    Title = "Building has ran out of resources!",
+                    Content = $"{Owner.Name}'s {Name} ({BuildingObj.PrintableName}) has ran out of {DBCache.Get<ItemDefinition>(resourcename).Name}, and as a result could not produce anything!",
+                    TimeSent = DateTime.UtcNow,
+                    Seen = false,
+                    Button1Text = "View Building",
+                    Button1Link = $"/Building/Managae/{Id}"
+                };
+                if (Owner.EntityType is EntityType.User)
+                    notification.UserId = Owner.Id;
+                else
+                    notification.UserId = ((Group)Owner).GetOwnershipChain().Last().Id;
+                NotificationManager.notificationQueue.Enqueue(notification);
                 return new(false, "Owner lacks enough resources to tick this building");
+            }
         }
         foreach (var resourcename in Recipe.Inputs.Keys) {
             double amount = rate_for_input * Recipe.Inputs[resourcename];

@@ -7,6 +7,7 @@ using WUG.Database.Models.Corporations;
 using WUG.Database.Models.Factories;
 using WUG.Database.Models.Misc;
 using WUG.Database.Models.News;
+using WUG.Database.Models.PowerGrid;
 
 namespace WUG.Database;
 
@@ -35,6 +36,8 @@ public class DBCacheItemAddition
             DBCache.dbctx.Add((SVItemOwnership)Item);
         else if (Type == typeof(Factory))
             DBCache.dbctx.Add((Factory)Item);
+        else if (Type == typeof(PowerPlant))
+            DBCache.dbctx.Add((PowerPlant)Item);
         else if (Type == typeof(Mine))
             DBCache.dbctx.Add((Mine)Item);
         else if (Type == typeof(UBIPolicy))
@@ -71,6 +74,8 @@ public class DBCacheItemAddition
             DBCache.dbctx.Add((CorporationShareClass)Item);
         else if (Type == typeof(Security))
             DBCache.dbctx.Add((Security)Item);
+        else if (Type == typeof(PowerGrid))
+            DBCache.dbctx.Add((PowerGrid)Item);
     }
 }
 
@@ -266,6 +271,12 @@ public static class DBCache
             ProducingBuildingsById[_obj.Id] = _obj;
             Put(_obj.Id, _obj);
         }
+        foreach(PowerPlant _obj in dbctx.PowerPlants) {
+            ProvincesBuildings[_obj.ProvinceId].Add(_obj);
+            if (_obj.StaticModifiers is null) _obj.StaticModifiers = new();
+            ProducingBuildingsById[_obj.Id] = _obj;
+            Put(_obj.Id, _obj);
+        }
         foreach(Farm _obj in dbctx.Farms) {
             ProvincesBuildings[_obj.ProvinceId].Add(_obj);
             if (_obj.StaticModifiers is null) _obj.StaticModifiers = new();
@@ -312,6 +323,8 @@ public static class DBCache
         foreach (var _obj in dbctx.Corporations)
             Put(_obj.Id, _obj);
         foreach (var _obj in dbctx.CorporationShareClasses)
+            Put(_obj.Id, _obj);
+        foreach (var _obj in dbctx.PowerGrids)
             Put(_obj.Id, _obj);
 
         foreach (Nation Nation in GetAll<Nation>())

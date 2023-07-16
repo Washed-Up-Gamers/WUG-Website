@@ -202,6 +202,7 @@ builder.Services.AddHostedService<VoopAIWorker>();
 builder.Services.AddHostedService<StatWorker>();
 builder.Services.AddHostedService<SecurityHistoryWorker>();
 builder.Services.AddHostedService<BuildingRecordWorker>();
+builder.Services.AddHostedService<NotificationWorker>();
 
 builder.Services.AddDataProtection().PersistKeysToDbContext<WashedUpDB>();
 

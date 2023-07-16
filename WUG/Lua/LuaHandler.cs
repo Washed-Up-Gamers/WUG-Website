@@ -234,7 +234,7 @@ public static class LuaHandler
             var node = new SyntaxModifierNode();
             if (levels[0] == "Nation")
             {
-                node.NationModifierType = levels[0] switch
+                node.nationModifierType = levels[0] switch
                 {
                     "Nation" => levels[1] switch
                     {
@@ -362,19 +362,6 @@ public static class LuaHandler
         return dict;
     }
 
-    public static Dictionary<string, long> NationNamesToIds = new() {
-        { "elysian_katonia", 104 },
-        { "lanatia", 105 },
-        { "landing_cove", 106 },
-        { "new_avalon", 108 },
-        { "new_vooperis", 110 },
-        { "novastella", 111 },
-        { "old_king", 112 },
-        { "san_vooperisco", 113 },
-        { "thesonica", 114 },
-        { "voopmont", 115 }
-    };
-
     public static ExpressionNode HandleSyntaxExpression(LuaTable table, string parentname = null, SyntaxNode parent = null)
     {
         var expr = new ExpressionNode();
@@ -447,7 +434,7 @@ public static class LuaHandler
 
                 if (node.scopeType == ScriptScopeType.Nation)
                 {
-                    node.ChangeTo = NationNamesToIds[node.ChangeTo].ToString();
+                    node.ChangeTo = DBCache.GetAll<Nation>().FirstOrDefault(x => x.ScriptName == node.ChangeTo).Id.ToString();
                 }
 
                 if (parentname == "effects")
@@ -636,7 +623,9 @@ public static class LuaHandler
                 Editable = Convert.ToBoolean(table.GetValue("editable") ?? "false"),
                 Inputcost_Scaleperlevel = Convert.ToBoolean(table.GetValue("inputcost_scaleperlevel") ?? "true"),
                 TypeOfBuilding = Enum.Parse<BuildingType>(table.GetValue("buildingtype") ?? "mine", true),
-                AnyWithBaseTypes = new()
+                AnyWithBaseTypes = new(),
+                PowerOutput = Convert.ToDouble(table.GetValue("power_output" ?? "0.0")),
+                PowerDemand = Convert.ToDouble(table.GetValue("power_demand") ?? "0.0")
             };
 
             var inputs = (LuaTable)table["inputs"];

@@ -51,7 +51,7 @@ namespace WUG.Workers
 
                 while (!task.IsCompleted)
                 {
-                    _logger.LogInformation("ITEM TRADE Worker running at: {time}", DateTimeOffset.Now);
+                    //_logger.LogInformation("ITEM TRADE Worker running at: {time}", DateTimeOffset.Now);
                     await Task.Delay(60000);
                 }
 

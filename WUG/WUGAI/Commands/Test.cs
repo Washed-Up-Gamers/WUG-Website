@@ -1,6 +1,7 @@
 using System.Threading.Tasks;
 using IdGen;
 using WUG.Database.Models.Items;
+using WUG.Database.Models.PowerGrid;
 using WUG.Managers;
 
 namespace SV2.WUGAI.Commands;
@@ -11,6 +12,25 @@ class TestCommandsModule : BaseCommandModule
     public async Task Ping(CommandContext ctx)
     {
         ctx.RespondAsync("Pong!");
+    }
+
+    [Command("changepowergrid")]
+    public async Task ChangePowerGrid(CommandContext ctx, long nationid, long powergridid)
+    {
+        if (ctx.User.Id != 259004891148582914)
+        {
+            await ctx.RespondAsync("Only Jacob can use this command!");
+            return;
+        }
+        
+        var nation = DBCache.Get<Nation>(nationid);
+        var prevpowergrid = DBCache.GetAll<PowerGrid>().First(x => x.NationIds.Contains(nation.Id));
+        prevpowergrid.NationIds.Remove(nationid);
+
+        var newpowergrid = DBCache.Get<PowerGrid>(powergridid);
+        newpowergrid.NationIds.Add(nationid);
+
+        await ctx.RespondAsync($"Did");
     }
 
     [Command("provincestartingbalancepayment")]

@@ -8,6 +8,10 @@ recipe_iron_smeltery_base = {
 		iron = 1
 	}
 	perhour = 100
+
+	-- mWh per day at base stats
+	-- aka this will consume 1 mWh per day at size 1
+	power_demand = 2
     editable = false
 }
 
@@ -21,6 +25,7 @@ recipe_copper_smeltery_base = {
 		copper = 1
 	}
 	perhour = 100
+	power_demand = 2
     editable = false
 }
 
@@ -34,6 +39,7 @@ recipe_lead_smeltery_base = {
 		lead = 1
 	}
 	perhour = 50
+	power_demand = 2
     editable = false
 }
 
@@ -47,6 +53,7 @@ recipe_zinc_smeltery_base = {
 		zinc = 1
 	}
 	perhour = 50
+	power_demand = 2
     editable = false
 }
 
@@ -60,6 +67,7 @@ recipe_bauxite_smeltery_base = {
 		aluminium = 0.75
 	}
 	perhour = 50
+	power_demand = 3
     editable = false
 }
 
@@ -73,6 +81,7 @@ recipe_brass_factory_base = {
 		brass = 3
 	}
 	perhour = 7.5
+	power_demand = 2
     editable = false
 }
 
@@ -88,6 +97,7 @@ recipe_steel_factory_base = {
 
 	-- was 16
 	perhour = 20
+	power_demand = 2.5
     editable = false
 }
 
@@ -102,8 +112,23 @@ recipe_tool_factory_base = {
 		tools = 3
 	}
 	perhour = 8
+	power_demand = 1
     editable = false
 }
+
+recipe_silicon_factory_base = {
+	name = "Silicon Production"
+	inputs = {
+		sand = 1
+	}
+	outputs = {
+		silicon = 1
+	}
+	perhour = 30
+	power_demand = 0.75
+    editable = false
+}
+
 
 recipe_plastic_factory_base = {
 	name = "Plastic Production"
@@ -114,6 +139,7 @@ recipe_plastic_factory_base = {
 		plastic = 2
 	}
 	perhour = 40
+	power_demand = 0.75
     editable = false
 }
 
@@ -131,6 +157,7 @@ recipe_simple_components_factory_base = {
 
 	-- was 16
 	perhour = 20
+	power_demand = 1
     editable = false
 }
 
@@ -139,6 +166,7 @@ recipe_advanced_components_factory_base = {
 	inputs = {
 		simple_components = 3
 		steel = 4
+		computer_chips = 1
 	}
 	outputs = {
 		-- was 1
@@ -146,6 +174,21 @@ recipe_advanced_components_factory_base = {
 	}
 	-- was 4 then 7
 	perhour = 14
+	power_demand = 7.5
+    editable = false
+}
+
+recipe_battery_factory_base = {
+	name = "Battery Production"
+	inputs = {
+		cadmium = 1
+		lithium = 5
+	}
+	outputs = {
+		batteries = 3
+	}
+	perhour = 20
+	power_demand = 7.5
     editable = false
 }
 
@@ -158,6 +201,7 @@ recipe_concrete_base = {
 		concrete = 1
 	}
 	perhour = 25
+	power_demand = 2
 	editable = false
 }
 
@@ -173,6 +217,7 @@ recipe_computer_chips_factory_base = {
 	}
 	-- was 1.5
 	perhour = 15
+	power_demand = 7.5
     editable = false
 }
 
@@ -187,6 +232,7 @@ recipe_televisions_factory_base = {
 		televisions = 1
 	}
 	perhour = 15
+	power_demand = 7.5
     editable = false
 }
 
@@ -202,6 +248,7 @@ recipe_cars_factory_base = {
 		cars = 1
 	}
 	perhour = 5
+	power_demand = 7.5
     editable = false
 }
 

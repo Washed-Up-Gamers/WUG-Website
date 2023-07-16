@@ -140,7 +140,7 @@ public class Province
         {
             foreach (var node in modifier.BaseStaticModifiersObj.ModifierNodes)
             {
-                if ((provincetypes.Contains(node.provinceModifierType) && node.provinceModifierType is not null) || (Nationtypes.Contains(node.NationModifierType) && node.NationModifierType is not null))
+                if ((provincetypes.Contains(node.provinceModifierType) && node.provinceModifierType is not null) || (Nationtypes.Contains(node.nationModifierType) && node.nationModifierType is not null))
                 {
                     (string modifiername, double value) item = new()
                     {
@@ -148,7 +148,7 @@ public class Province
                         value = (double)node.GetValue(new(Nation, this, null, (node.provinceModifierType is not null ? ScriptScopeType.Province : ScriptScopeType.Nation)))
                     };
                     if ((provincetypes.Contains(node.provinceModifierType) && node.provinceModifierType is not null && node.provinceModifierType.ToString().Contains("Factor"))
-                        || (Nationtypes.Contains(node.NationModifierType) && node.NationModifierType is not null && node.NationModifierType.ToString().Contains("Factor")))
+                        || (Nationtypes.Contains(node.nationModifierType) && node.nationModifierType is not null && node.nationModifierType.ToString().Contains("Factor")))
                     {
                         item.value += 1;
                     }
@@ -160,7 +160,7 @@ public class Province
         {
             foreach (var node in CurrentDevelopmentStage.ModifierNodes)
             {
-                if ((provincetypes.Contains(node.provinceModifierType) && node.provinceModifierType is not null) || (Nationtypes.Contains(node.NationModifierType) && node.NationModifierType is not null))
+                if ((provincetypes.Contains(node.provinceModifierType) && node.provinceModifierType is not null) || (Nationtypes.Contains(node.nationModifierType) && node.nationModifierType is not null))
                 {
                     (string modifiername, double value) item = new()
                     {
@@ -168,7 +168,7 @@ public class Province
                         value = (double)node.GetValue(new(Nation, this, null, (node.provinceModifierType is not null ? ScriptScopeType.Province : ScriptScopeType.Nation)))
                     };
                     if ((provincetypes.Contains(node.provinceModifierType) && node.provinceModifierType is not null && node.provinceModifierType.ToString().Contains("Factor"))
-                        || (Nationtypes.Contains(node.NationModifierType) && node.NationModifierType is not null && node.NationModifierType.ToString().Contains("Factor")))
+                        || (Nationtypes.Contains(node.nationModifierType) && node.nationModifierType is not null && node.nationModifierType.ToString().Contains("Factor")))
                     {
                         item.value += 1;
                     }
@@ -188,13 +188,13 @@ public class Province
             modifiers.AddRange(Nation.StaticModifiers);
         foreach (var modifier in modifiers) {
             foreach (var node in modifier.BaseStaticModifiersObj.ModifierNodes) {
-                if ((node.provinceModifierType == provincetype && node.provinceModifierType is not null) || (node.NationModifierType == Nationtype && node.NationModifierType is not null)) {
+                if ((node.provinceModifierType == provincetype && node.provinceModifierType is not null) || (node.nationModifierType == Nationtype && node.nationModifierType is not null)) {
                     (string modifiername, double value) item = new() {
                         modifiername = modifier.BaseStaticModifiersObj.Name,
                         value = (double)node.GetValue(new(Nation, this, null, (node.provinceModifierType is not null ? ScriptScopeType.Province : ScriptScopeType.Nation)))
                     }; 
                     if ((node.provinceModifierType == provincetype && node.provinceModifierType is not null && node.provinceModifierType.ToString().Contains("Factor") )
-                        || (node.NationModifierType == Nationtype && node.NationModifierType is not null && node.NationModifierType.ToString().Contains("Factor"))) {
+                        || (node.nationModifierType == Nationtype && node.nationModifierType is not null && node.nationModifierType.ToString().Contains("Factor"))) {
                         item.value += 1;
                     }
                     result.Add(item);
@@ -203,13 +203,13 @@ public class Province
         }
         if (IncludeDevStage && CurrentDevelopmentStage is not null) {
             foreach (var node in CurrentDevelopmentStage.ModifierNodes) {
-                if ((node.provinceModifierType == provincetype && node.provinceModifierType is not null) || (node.NationModifierType == Nationtype && node.NationModifierType is not null)) {
+                if ((node.provinceModifierType == provincetype && node.provinceModifierType is not null) || (node.nationModifierType == Nationtype && node.nationModifierType is not null)) {
                     (string modifiername, double value) item = new() {
                         modifiername = CurrentDevelopmentStage.PrintableName,
                         value = (double)node.GetValue(new(Nation, this, null, (node.provinceModifierType is not null ? ScriptScopeType.Province : ScriptScopeType.Nation)))
                     };
                     if ((node.provinceModifierType == provincetype && node.provinceModifierType is not null && node.provinceModifierType.ToString().Contains("Factor"))
-                        || (node.NationModifierType == Nationtype && node.NationModifierType is not null && node.NationModifierType.ToString().Contains("Factor"))) {
+                        || (node.nationModifierType == Nationtype && node.nationModifierType is not null && node.nationModifierType.ToString().Contains("Factor"))) {
                         item.value += 1;
                     }
                     result.Add(item);

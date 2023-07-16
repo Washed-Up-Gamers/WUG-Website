@@ -22,6 +22,8 @@ public class Recipe : IHasOwner
     public string Name { get; set; }
     public string StringId { get; set; }
     public long OwnerId { get; set; }
+    public double PowerDemand { get; set; }
+    public double PowerOutput { get; set; }
     public long? CustomOutputItemDefinitionId { get; set; }
 
     [NotMapped]
@@ -83,6 +85,7 @@ public class Recipe : IHasOwner
 
     public void UpdateOutputs()
     {
+        PowerOutput = BaseRecipe.PowerOutput;
         Outputs = new();
         if (BaseRecipe.OutputWithCustomItem is not null)
             Outputs[(long)CustomOutputItemDefinitionId] = BaseRecipe.OutputWithCustomItem.Value.Value;
@@ -121,6 +124,7 @@ public class Recipe : IHasOwner
 
     public void UpdateInputs()
     {
+        PowerDemand = BaseRecipe.PowerDemand;
         Inputs = new();
         foreach (var pair in BaseRecipe.Inputs)
         {

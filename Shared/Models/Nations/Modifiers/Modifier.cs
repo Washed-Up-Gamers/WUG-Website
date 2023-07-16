@@ -38,5 +38,7 @@ public enum NationModifierType
     BuildingSlotsExponent,
     OverPopulationModifierExponent,
     InfrastructureThroughputFactor,
-    PopulationGrowthSpeedFactor
+    PopulationGrowthSpeedFactor,
+    PowerPlantThroughputFactor,
+    PowerPlantQuantityCap
 }

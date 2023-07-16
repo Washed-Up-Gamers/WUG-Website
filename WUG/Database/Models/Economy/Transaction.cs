@@ -30,7 +30,9 @@ public enum TransactionType
     ResourceBrought = 14,
     UBI = 15,
     NonTaxedOther = 16,
-    IPO = 17
+    IPO = 17,
+    PowerPlantProducerPayment = 18,
+    PowerPlantConsumerPayment = 19
 }
 
 public class Transaction
@@ -215,6 +217,15 @@ public class Transaction
             FromEntity.TaxAbleBalance -= Amount;
             ToEntity.TaxAbleBalance += Amount;
             ToEntity.IncomeToday += Amount;
+        }
+
+        if (transactionType is TransactionType.PowerPlantProducerPayment) {
+            ToEntity.IncomeToday += Amount;
+            ToEntity.TaxAbleBalance += Amount;
+        }
+
+        if (transactionType is TransactionType.PowerPlantConsumerPayment) {
+            FromEntity.TaxAbleBalance -= Amount;
         }
 
         if (transactionType is TransactionType.DividendPayment

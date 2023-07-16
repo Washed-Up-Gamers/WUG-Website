@@ -19,6 +19,7 @@ using WUG.Database.Models.Misc;
 using WUG.Database.Models.Stats;
 using SV2.Database.Models.Misc;
 using WUG.Database.Models.Economy.Stocks;
+using WUG.Database.Models.PowerGrid;
 
 /*  Valour - A free and secure chat client
  *  Copyright (C) 2021 Vooper Media LLC
@@ -148,12 +149,14 @@ public class WashedUpDB : DbContext, IDataProtectionKeyContext
     public DbSet<ItemDefinition> ItemDefinitions {get; set; }
     public DbSet<SVItemOwnership> SVItemOwnerships { get; set; }
     public DbSet<Factory> Factories { get; set; }
+    public DbSet<PowerPlant> PowerPlants { get; set; }
     public DbSet<Mine> Mines { get; set; }
     public DbSet<UBIPolicy> UBIPolicies { get; set; }
     public DbSet<Transaction> Transactions { get; set; }
     public DbSet<Nation> Nations { get; set; }
     public DbSet<Province> Provinces { get; set; }
     public DbSet<Infrastructure> Infrastructures { get; set; }
+    public DbSet<PowerGrid> PowerGrids { get; set; }
     public DbSet<Farm> Farms { get; set; }
     public DbSet<GroupRole> GroupRoles { get; set; }
     public DbSet<Election> Elections { get; set; }
@@ -213,12 +216,22 @@ public class WashedUpDB : DbContext, IDataProtectionKeyContext
 
         if (DBCache.FindEntity(99) is null)
         {
-            Group UNSE = new Group("United Nations Stock Exchange", 99);
+            Group UNSE = new Group("United Nations Stock Exchange", 100);
             UNSE.Id = 99;
             UNSE.GroupType = GroupTypes.NonProfit;
             UNSE.Money = 0.0m;
             UNSE.Flags.Add(GroupFlag.SeparateEntityFromOwner);
             DBCache.AddNew(UNSE.Id, UNSE);
+        }
+
+        if (DBCache.FindEntity(98) is null)
+        {
+            Group WPGS = new Group("Website Power Grid System", 100);
+            WPGS.Id = 98;
+            WPGS.GroupType = GroupTypes.NonProfit;
+            WPGS.Money = 0.0m;
+            WPGS.Flags.Add(GroupFlag.SeparateEntityFromOwner);
+            DBCache.AddNew(WPGS.Id, WPGS);
         }
 
         List<NationObject> Nations = new() {
@@ -283,6 +296,22 @@ public class WashedUpDB : DbContext, IDataProtectionKeyContext
         foreach (var state in DBCache.GetAll<State>()) {
             if (state.Group.GroupType != GroupTypes.State)
                 state.Group.GroupType = GroupTypes.State;
+        }
+
+        foreach (var nation in DBCache.GetAll<Nation>()) {
+            PowerGrid? powergrid = DBCache.GetAll<PowerGrid>().FirstOrDefault(x => x.NationIds.Contains(nation.Id));
+            if (powergrid is null) {
+                powergrid = new PowerGrid() {
+                    Id = IdManagers.GeneralIdGenerator.Generate(),
+                    Name = $"The {nation.Name} Power Grid",
+                    MainNationId = nation.Id,
+                    NationIds = new() { nation.Id },
+                    PowerDemand = 0.0,
+                    PowerSupply = 0.0,
+                    AveragePrice = 0.0m
+                };
+                DBCache.AddNew(powergrid.Id, powergrid);
+            }
         }
     }
 }

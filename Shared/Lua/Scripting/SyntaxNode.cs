@@ -551,10 +551,10 @@ public class ChangeScopeNode : EffectNode
 
         if (scopeType == ScriptScopeType.Nation)
         {
-            var Nation = await Nation.FindAsync(long.Parse(ChangeTo));
-            if (Nation is null)
+            var nation = await Nation.FindAsync(long.Parse(ChangeTo));
+            if (nation is null)
                 HandleError("Could not find Nation", $"key: {ChangeTo}");
-            newstate.Nation = Nation;
+            newstate.Nation = nation;
             newstate.ParentScopeType = scopeType;
         }
 

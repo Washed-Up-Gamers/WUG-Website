@@ -53,6 +53,32 @@ building_zinc_mine = {
 	type = "Mine"
 }
 
+building_lithium_mine = {
+	recipes = [
+		recipe_lithium_mining_base
+	]
+	buildingcosts = {
+		steel = 2000
+		simple_components = 2000
+		advanced_components = 200
+	}
+    musthaveresource = "Lithium"
+	type = "Mine"
+}
+
+building_cadmium_mine = {
+	recipes = [
+		recipe_cadmium_mining_base
+	]
+	buildingcosts = {
+		steel = 2000
+		simple_components = 2000
+		advanced_components = 200
+	}
+    musthaveresource = "Cadmium"
+	type = "Mine"
+}
+
 building_sand_mine = {
 	recipes = [
 		recipe_sand_mining_base
@@ -128,5 +154,31 @@ building_oil_well = {
 		advanced_components = 500
 	}
     musthaveresource = "Oil"
+	type = "Mine"
+}
+
+building_natural_gas_well = {
+	recipes = [
+		recipe_natural_gas_well_mining_base
+	]
+	buildingcosts = {
+		steel = 4000
+		simple_components = 1000
+		advanced_components = 500
+	}
+    musthaveresource = "Natural_Gas"
+	type = "Mine"
+}
+
+building_potassium_mine = {
+	recipes = [
+		recipe_potassium_mining_base
+	]
+	buildingcosts = {
+		steel = 2000
+		simple_components = 2000
+		advanced_components = 200
+	}
+    musthaveresource = "Potassium"
 	type = "Mine"
 }

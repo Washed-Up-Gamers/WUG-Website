@@ -47,6 +47,14 @@ raw = {
 	}
 	bauxite = {
 	}
+	potassium = {
+	}
+	lithium = {
+	}
+	cadmium = {
+	}
+	natural_gas = {
+	}
 }
 
 building_materials = {
@@ -91,6 +99,10 @@ products = {
 	silicon = {
 	}
 	concrete = {
+	}
+	glass = {
+	}
+	batteries = {
 	}
 }
 
