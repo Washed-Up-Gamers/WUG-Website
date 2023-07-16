@@ -41,7 +41,7 @@ public static class TransactionManager
         string success = "SUCC";
         if (!result.Succeeded) success = "FAIL";
 
-        Console.WriteLine($"[{success}] Processed {tran.Details} for {tran.Amount}. INFO: {result.Info}");
+        Console.WriteLine($"[{success}] Processed {tran.Details} for ${tran.Amount}. INFO: {result.Info}");
 
         TransactionsProcessed += 1;
         if (TransactionsProcessed % 100 == 0)

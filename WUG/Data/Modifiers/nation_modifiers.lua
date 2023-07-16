@@ -1,9 +1,9 @@
 united_corporations_free_market = {
 	name = "Free Market Efficiency"
 	modifiers = {
-		Nation.provinces.buildingslotsfactor = 0.25
-		Nation.provinces.buildingslotsexponent = 0.04
-		Nation.provinces.overpopulationmodifierexponent = -0.01
+		Nation.provinces.buildingslotsfactor = 0.30
+		Nation.provinces.buildingslotsexponent = 0.05
+		Nation.provinces.overpopulationmodifierexponent = -0.025
 	}
 	isgood = true
 	stackable = false

@@ -261,7 +261,7 @@ public class Transaction
 
         dbctx.Transactions.Add(this);
 
-        return new TaskResult(true, $"Successfully sent ¢{Amount} to {ToEntity.Name} with ¢{totaltaxpaid} tax.");
+        return new TaskResult(true, $"Successfully sent ${Amount} to {ToEntity.Name} with ${totaltaxpaid} tax.");
     }
 
     public async Task<TaskResult> OldExecuteFromManager(WashedUpDB dbctx, bool Force = false)

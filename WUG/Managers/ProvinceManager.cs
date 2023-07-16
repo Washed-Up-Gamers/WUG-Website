@@ -211,10 +211,23 @@ public class ProvinceManager
 
         if (createdNewProvinces)
         {
+
+            List<NationObject> Nations = new() {
+                new("United States of Qortos", 101, 3),
+                new("Isurium", 102, 6),
+                new("Archelon Republic", 103, 1),
+                new("The Astarian Egis", 104, 4),
+                new("The Procrastin Nation", 105, 2),
+                new("Oglar", 106, 3),
+                new("Fraisia", 107, 4),
+                new("Arkoros", 108, 1),
+                new("The Sublime State of the Fíkret", 109, 6),
+                new("United Corporations of Adramat", 110, 0)
+            };
             foreach (var nation in DBCache.GetAll<Nation>())
             {
                 nation.Provinces = DBCache.GetAll<Province>().Where(x => x.NationId == nation.Id).ToList();
-                var populationtarget = nation.Citizens.Count() * 2_500_000.0;
+                var populationtarget = Nations.FirstOrDefault(x => x.Id == nation.Id).Citizens * 2_500_000.0;
                 populationtarget += 500_000.0;
                 populationtarget += nation.Provinces.Count() * 10_000;
                 var baseProvincePopulation = populationtarget / nation.Provinces.Count;

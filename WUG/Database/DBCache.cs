@@ -266,12 +266,16 @@ public static class DBCache
             Put(province.Id, province);
         }
         foreach(Factory _obj in dbctx.Factories) {
+            if (!ProvincesBuildings.ContainsKey(_obj.ProvinceId))
+                ProvincesBuildings[_obj.ProvinceId] = new();
             ProvincesBuildings[_obj.ProvinceId].Add(_obj);
             if (_obj.StaticModifiers is null) _obj.StaticModifiers = new();
             ProducingBuildingsById[_obj.Id] = _obj;
             Put(_obj.Id, _obj);
         }
         foreach(PowerPlant _obj in dbctx.PowerPlants) {
+            if (!ProvincesBuildings.ContainsKey(_obj.ProvinceId))
+                ProvincesBuildings[_obj.ProvinceId] = new();
             ProvincesBuildings[_obj.ProvinceId].Add(_obj);
             if (_obj.StaticModifiers is null) _obj.StaticModifiers = new();
             ProducingBuildingsById[_obj.Id] = _obj;

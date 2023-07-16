@@ -266,7 +266,8 @@ public class WashedUpDB : DbContext, IDataProtectionKeyContext
                     Id = item.Id,
                     Name = item.Name,
                     GroupId = nation.Id,
-                    ProvinceSlotsLeft = 0
+                    ProvinceSlotsLeft = 0,
+                    BasePopulationFromUsers = 2_500_000 * item.Citizens
                 };
 
                 nation_object.Modifiers = new();

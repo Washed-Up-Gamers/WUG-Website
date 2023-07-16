@@ -41,19 +41,19 @@ public class Nation : Item
     public string NameForGovernorOfAState => TitleForGovernorOfState is null ? "Governor" : TitleForGovernorOfState;
     public Dictionary<NationModifierType, NationModifier> Modifiers { get; set; }
     public double EconomicScore { get; set; }
+
     public string Color => Name switch
     {
-        "Lanatia" => "F4B7FD",
-        "New Vooperis" => "FEEAB7",
-        "Elysian Katonia" => "B8B7FD",
-        "Ardenti Terra" => "B7BCFC",
-        "Landing Cove" => "FDB7B7",
-        "New Avalon" => "D3FCB6",
-        "Novastella" => "B7FDE5",
-        "Old King" => "C0FDB7",
-        "San Vooperisco" => "FAFDB8",
-        "Thesonica" => "FDD9B7",
-        "Voopmont" => "FFFFFF",
+        "Archelon Republic" => "B7BCFC",
+        "The Astarian Egis" => "B8B7FD",
+        "United States of Qortos" => "FEEAB7",
+        "Isurium" => "F4B7FD",
+        "The Procrastin Nation" => "B7FDE5",
+        "Oglar" => "FDB7B7",
+        "Fraisia" => "D3FCB6",
+        "Arkoros" => "EAB7FC",
+        "United Corporations of Adramat" => "B6EEFD", 
+        "The Sublime State of the Fíkret" => "FAFDB8"
     };
 
     public double GetModifierValue(NationModifierType modifierType)

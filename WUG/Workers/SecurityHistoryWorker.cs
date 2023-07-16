@@ -115,6 +115,7 @@ public class SecurityHistoryWorker : BackgroundService
 
                         await _dbctx.SaveChangesAsync();
 
+                        await Task.Delay(1000);
                         UN.GDP = 0.0m;
                         foreach (var nation in DBCache.GetAll<Nation>()) {
                             nation.GDP = GDPManager.GetGDPOfANation(nation);

@@ -121,12 +121,16 @@ public class Nation
     [NotMapped]
     public string Color => Name switch
     {
-        "Northern Parthenian Republic" => "F4B7FD",
+        "Archelon Republic" => "B7BCFC",
+        "The Astarian Egis" => "B8B7FD",
         "United States of Qortos" => "FEEAB7",
-        "Republic of Caelestis" => "D3FCB6",
-        "Azurite Empire" => "B7FDE5",
-        "Paunas United Provinces" => "FAFDB8",
-        "United Corporations of Adramat" => "FDD9B7",
+        "Isurium" => "F4B7FD",
+        "The Procrastin Nation" => "B7FDE5",
+        "Oglar" => "FDB7B7",
+        "Fraisia" => "D3FCB6",
+        "Arkoros" => "EAB7FC",
+        "United Corporations of Adramat" => "B6EEFD", 
+        "The Sublime State of the Fíkret" => "FAFDB8"
     };
 
     public static Nation Find(long id)
