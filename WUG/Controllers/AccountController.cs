@@ -128,14 +128,14 @@ public class AccountController : SVController {
         if (user is null)
         {
             using var dbctx = WashedUpDB.DbFactory.CreateDbContext();
-            user = new User(member.Nickname, userid);
+            user = new User(member.DisplayName, userid);
             DBCache.AddNew(user.Id, user);
 
             //await dbctx.SaveChangesAsync();
         }
 
         user.ImageUrl = member.AvatarUrl;
-        user.Name = member.Nickname;
+        user.Name = member.DisplayName;
         await user.Create();
 
         HttpContext.Response.Cookies.Append("wugid", user.Id.ToString());
