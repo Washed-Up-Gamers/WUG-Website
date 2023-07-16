@@ -10,7 +10,7 @@ public static class SVClient
     // this is probably why.
 
 #if (!DEBUG)
-    public static string BaseAddress = "https://spookvooper.com/";
+    public static string BaseAddress = "https://wug.superjacobl.com/";
 #else
     public static string BaseAddress = "https://localhost:7186/";
 #endif

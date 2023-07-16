@@ -175,7 +175,7 @@ builder.Services.AddDbContextPool<WashedUpDB>(options =>
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
-    c.SwaggerDoc("v1", new OpenApiInfo { Title = "SpookVooper API", Description = "The official SpookVooper API", Version = "v1.0" });
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "WUG API", Description = "The official WUG API", Version = "v1.0" });
     c.AddSecurityDefinition("Apikey", new OpenApiSecurityScheme()
     {
         Description = "The apikey used for authorizing your account.",
