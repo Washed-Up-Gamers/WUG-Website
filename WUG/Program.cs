@@ -83,7 +83,7 @@ builder.Configuration.GetSection("Database").Get<DBConfig>();
 
 builder.WebHost.ConfigureKestrel((context, options) =>
 {
-    options.Configure(builder.Configuration.GetSection("Kestrel"));
+    //options.Configure(builder.Configuration.GetSection("Kestrel"));
 #if DEBUG
     options.Listen(IPAddress.Any, 7186, listenOptions => {
         listenOptions.Protocols = Microsoft.AspNetCore.Server.Kestrel.Core.HttpProtocols.Http1AndHttp2AndHttp3;
@@ -93,6 +93,8 @@ builder.WebHost.ConfigureKestrel((context, options) =>
     options.Listen(IPAddress.Any, 5002, listenOptions =>
     {
         listenOptions.Protocols = Microsoft.AspNetCore.Server.Kestrel.Core.HttpProtocols.Http1AndHttp2AndHttp3;
+        //listenOptions.Protocols = Microsoft.AspNetCore.Server.Kestrel.Core.HttpProtocols.Http1AndHttp2AndHttp3;
+        listenOptions.UseHttps()
     });
 #endif
 });
