@@ -50,7 +50,7 @@
 
     .building {
         width: 300px;
-        height: 285px;
+        height: 310px;
         border-radius: 18px;
         margin: 8px;
         background-color: rgba(0,0,0,0.3);
@@ -189,7 +189,7 @@
                     </div>
                     <span>Costs to upgrade:</span>
                     <br/>
-                    <div class="buildingcosts" style="height: 75px;">
+                    <div class="buildingcosts" style="height: 100px;">
                         @foreach ((var resource, var amount) in luaupgrade.GetConstructionCost(Model.Building.Owner, Model.Building.Nation, Model.Building.Province, Model.Building, upgrade, 1))
                         {
                             <div class="resource-row">

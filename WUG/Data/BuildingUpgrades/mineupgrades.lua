@@ -4,8 +4,8 @@
         add_locals = {
 			cost_increase = 1.3^upgrade.level
 		}
-		steel = 1000 * get_local("cost_increase")
-		simple_components = 400 * get_local("cost_increase")
+		steel = 500 * get_local("cost_increase")
+		simple_components = 200 * get_local("cost_increase")
 		advanced_components = 50 * get_local("cost_increase")
     }
     modifiers = {
@@ -20,8 +20,8 @@ mine_efficiency_upgrade = {
         add_locals = {
 			cost_increase = 1.4^upgrade.level
 		}
-		simple_components = 1000 * get_local("cost_increase")
-		advanced_components = 100 * get_local("cost_increase")
+		simple_components = 750 * get_local("cost_increase")
+		advanced_components = 75 * get_local("cost_increase")
     }
     modifiers = {
         building.efficiencyfactor = 0.075
