@@ -59,7 +59,7 @@ public class StatWorker : BackgroundService
                             });
                         }
 
-                        await Task.Delay(1000);
+                        await Task.Delay(5000);
                         // do PPI stats
                         _dbctx.PriceStats.Add(PPIManager.UpdatePPI());
 
