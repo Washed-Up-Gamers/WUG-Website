@@ -311,7 +311,7 @@ foreach (var state in DBCache.GetAll<State>())
         if (!state.Group.MembersIds.Contains((long)state.GovernorId))
             state.Group.MembersIds.Add((long)state.GovernorId);
 
-        state.Group.AddEntityToRole(DBCache.Get<Group>(100), entity, state.Group.Roles.First(x => x.Name == "Governor"), true);
+        //state.Group.AddEntityToRole(DBCache.Get<Group>(100), entity, state.Group.Roles.First(x => x.Name == "Governor"), true);
     }
 }
 

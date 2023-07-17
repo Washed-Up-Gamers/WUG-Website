@@ -200,7 +200,7 @@ recipe_concrete_base = {
 	outputs = {
 		concrete = 1
 	}
-	perhour = 25
+	perhour = 100
 	power_demand = 2
 	editable = false
 }
@@ -231,24 +231,24 @@ recipe_televisions_factory_base = {
 	outputs = {
 		televisions = 1
 	}
-	perhour = 15
-	power_demand = 7.5
+	perhour = 12
+	power_demand = 15
     editable = false
 }
 
 recipe_cars_factory_base = {
 	name = "Car Production"
 	inputs = {
-		computer_chips = 8
-		steel = 5
-		plastic = 30
+		computer_chips = 12
+		steel = 8
+		plastic = 40
 		aluminium = 60
 	}
 	outputs = {
 		cars = 1
 	}
-	perhour = 5
-	power_demand = 7.5
+	perhour = 3
+	power_demand = 15
     editable = false
 }
 
