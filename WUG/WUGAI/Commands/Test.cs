@@ -115,7 +115,8 @@ class TestCommandsModule : BaseCommandModule
         BaseEntity? entity = BaseEntity.Find(svid);
         var resources = new Dictionary<string, int>()
         {
-            { "steel", 10000 },
+            { "steel", 5000 },
+            { "concrete", 10000 },
             { "simple_components", 7500 },
             { "advanced_components", 1000 }
         };

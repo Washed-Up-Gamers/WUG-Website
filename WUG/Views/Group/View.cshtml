@@ -139,6 +139,19 @@
                             </div>
                         }
 
+                        if (!Model.Flags.Contains(GroupFlag.CanSetTransactionsExpenseStatus))
+                        {
+                            <div class="p-2 align-self-center" style="text-align:center">
+                                <a asp-action="AddFlag" asp-controller="Group" asp-route-groupid="@Model.Id" asp-route-flag="CanSetTransactionsExpenseStatus" class="btn btn-outline-warning">Add CanSetTransactionsExpenseStatus Flag</a>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="p-2 align-self-center" style="text-align:center">
+                                <a asp-action="RemoveFlag" asp-controller="Group" asp-route-groupid="@Model.Id" asp-route-flag="CanSetTransactionsExpenseStatus" class="btn btn-outline-warning">Remove CanSetTransactionsExpenseStatus Flag</a>
+                            </div>
+                        }
+
                         if (!Model.Flags.Contains(GroupFlag.SeparateEntityFromOwner))
                         {
                             <div class="p-2 align-self-center" style="text-align:center">

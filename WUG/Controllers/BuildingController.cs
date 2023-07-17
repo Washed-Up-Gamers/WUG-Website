@@ -60,14 +60,14 @@ public class BuildingController : SVController
                     var Nation = DBCache.Get<Nation>(groupowner.Id);
                     if (Nation is not null)
                     {
-                        if (Nation.Name != "New Vooperis")
+                        if (Nation.Name != "United States of Qortos")
                             continue;
                     }
 
                     var state = DBCache.Get<State>(groupowner.Id);
                     if (state is not null)
                     {
-                        if (state.Nation.Name != "New Vooperis")
+                        if (state.Nation.Name != "United States of Qortos")
                         {
                             if (state.GovernorId is not null && state.Governor.EntityType == EntityType.Group)
                             {
