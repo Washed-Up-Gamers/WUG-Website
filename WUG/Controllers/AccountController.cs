@@ -137,6 +137,7 @@ public class AccountController : SVController {
         user.ImageUrl = member.AvatarUrl;
         user.Name = member.DisplayName;
         await user.Create();
+        user.Money = 25_000.0m;
 
         HttpContext.Response.Cookies.Append("wugid", user.Id.ToString());
         return Redirect("/");
