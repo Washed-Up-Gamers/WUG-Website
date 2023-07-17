@@ -721,6 +721,8 @@ public static class LuaHandler
                 }
                 else
                 {
+                    recipe.PowerDemand = baserecipe.PowerDemand;
+                    recipe.PowerOutput = baserecipe.PowerOutput;
                     recipe.PerHour = baserecipe.PerHour;
                 }
             }

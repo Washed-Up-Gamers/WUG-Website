@@ -22,12 +22,25 @@ public static class PriceManager
         // temporary for testing
         Dictionary<string, decimal> _resourceprices = new();
         string data = """
-        iron_ore:0.4
-        iron:1
-        copper_ore:0.6
-        copper:1.4
-        coal:1.75
-        steel:2.75
+        televisions:75.31
+        cars:498.13
+        coal:1.2
+        iron_ore:0.1
+        copper_ore:0.15
+        sand:0.3
+        oil:5.02
+        bauxite:1.0
+        simple_components:1.97
+        advanced_components:6.47
+        steel:3.0
+        iron:0.2
+        copper:0.4
+        aluminium:1.79
+        gold:4.0
+        tools:7.55
+        computer_chips:3.08
+        plastic:1.01
+        concrete:1.08
         """;
         foreach (var stringpair in data.Split("\n")) {
             Console.WriteLine(stringpair);
