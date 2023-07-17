@@ -6,7 +6,7 @@ recipe_oil_power_plant_base = {
 	outputs = {
 	}
 	-- in MW then is multiplied by per hour 
-	power_output = 10
+	power_output = 5
 	perhour = 8
     editable = false
 }
@@ -18,7 +18,7 @@ recipe_coal_power_plant_base = {
 	}
 	outputs = {
 	}
-	power_output = 2
+	power_output = 1
 	perhour = 24
     editable = false
 }
@@ -30,7 +30,7 @@ recipe_natural_gas_power_plant_base = {
 	}
 	outputs = {
 	}
-	power_output = 11
+	power_output = 5.5
 	perhour = 10
     editable = false
 }

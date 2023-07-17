@@ -665,7 +665,8 @@ public class GroupController : SVController
                 Description = ""
             };
 
-            DBCache.AddNew(security.Id, security);
+            DBCache.Put(security.Id, security);
+            DBCache.dbctx.Securities.Add(security);
             DBCache.SecuritiesByTicker.TryAdd(security.Ticker, security);
 
             while (DBCache.ItemQueue.Any(x => x.Type == typeof(Security) && ((Security)x.Item).Id == security.Id)) {
@@ -680,8 +681,7 @@ public class GroupController : SVController
                 Amount = model.Keep
             };
 
-            _dbctx.SecurityOwnerships.Add(ownership);
-            await _dbctx.SaveChangesAsync();
+            DBCache.dbctx.SecurityOwnerships.Add(ownership);
 
             StatusMessage = $"Successfully issued {amount} ${model.Ticker}";
 
