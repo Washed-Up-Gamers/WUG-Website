@@ -682,6 +682,25 @@ public class GroupController : SVController
             };
 
             DBCache.dbctx.SecurityOwnerships.Add(ownership);
+            
+            var history = new SecurityHistory()
+            {
+                Id = IdManagers.SecurityHistoryIdGenerator.Generate(),
+                SecurityId = security.Id,
+                Balance = (long)security.Balance,
+                Shares = security.Shares,
+                OpenShares = security.OpenShares,
+                Price = security.Price,
+                SellVolumeThisHour = security.SellVolumeThisHour,
+                BuyVolumeThisHour = security.BuyVolumeThisHour,
+                SellWorthTradedThisHour = security.SellWorthTradedThisHour,
+                BuyWorthTradedThisHour = security.BuyWorthTradedThisHour,
+                Time = DateTime.UtcNow,
+                HistoryType = HistoryType.Hour
+            };
+
+            _dbctx.SecurityHistories.Add(history);
+            await _dbctx.SaveChangesAsync();
 
             StatusMessage = $"Successfully issued {amount} ${model.Ticker}";
 

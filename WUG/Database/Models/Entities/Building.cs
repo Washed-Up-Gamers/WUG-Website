@@ -347,7 +347,7 @@ public abstract class ProducingBuilding : BuildingBase
     public async ValueTask<TaskResult> TickRecipe() {
         UpdateModifiers();
 
-        if (PrevRecipeId != "" && PrevRecipeId != RecipeId)
+        if (PrevRecipeId != "" && PrevRecipeId is not null && PrevRecipeId != RecipeId)
             Quantity /= 2.0;
         PrevRecipeId = RecipeId;
 

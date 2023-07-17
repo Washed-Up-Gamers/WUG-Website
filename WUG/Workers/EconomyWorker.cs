@@ -125,7 +125,7 @@ namespace WUG.Workers
                                         }
                                         rate *= increase+1;
                                     }
-                                    rate = policy.Rate * 5.0m;
+                                    rate = policy.Rate * 20.0m;
                                     var tran = new Transaction(BaseEntity.Find(fromId), BaseEntity.Find(user.Id), rate/24.0m, TransactionType.UBI, $"UBI for rank {policy.ApplicableRank.ToString()}");
                                     tran.NonAsyncExecute();
                                 }
