@@ -60,7 +60,7 @@ public class ExchangeController : SVController
         return View(new ExchangeIndexModel()
         {
             ChosenAccount = chosenEntity,
-            AccountId = chosenEntity.Id,
+            AccountId = chosenEntity?.Id ?? 0,
             Sort = sort,
             Page = page
         });

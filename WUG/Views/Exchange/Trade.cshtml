@@ -135,7 +135,7 @@
 
 <script>
     var ticker = "@Model.Security.Ticker";
-    var accountid = "@Model.Chosen_Account.Id";
+    var accountid = "@($"{Model.Chosen_Account?.Id ?? 0}")";
     var graphsetting = "Minutes"
 
     PrepSignalR();
