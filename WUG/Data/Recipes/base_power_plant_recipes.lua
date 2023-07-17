@@ -14,12 +14,12 @@ recipe_oil_power_plant_base = {
 recipe_coal_power_plant_base = {
 	name = "Coal Power"
 	inputs = {
-		coal = 1.25
+		coal = 1.75
 	}
 	outputs = {
 	}
-	power_output = 6
-	perhour = 8
+	power_output = 2
+	perhour = 24
     editable = false
 }
 
