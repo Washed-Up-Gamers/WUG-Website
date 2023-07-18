@@ -17,9 +17,10 @@
             </style>
             @foreach (Province province in Provinces)
             {
-                <path d="@province.Metadata.Path" id="@province.Id" style="fill:#@province.MapColor;stroke: black !important;" class="province">
-
-                </path>
+                @if (province.NationId != 100) {
+                    <path d="@province.Metadata.Path" id="@province.Id" style="fill:#@province.MapColor;stroke: black !important;" class="province">
+                    </path>
+                }
             }
         </svg>
     </div>

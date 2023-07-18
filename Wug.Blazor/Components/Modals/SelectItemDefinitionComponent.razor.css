@@ -1,1 +1,17 @@
-﻿
+﻿.list-item {
+    border-width: 1px;
+    border-style: solid;
+    border-color: rgb(255, 255, 255);
+    padding: 5px;
+    border-radius: 8px;
+}
+
+.item-list {
+    max-height: 275px;
+    overflow-y: auto;
+    margin-top: 12px;
+}
+
+.selected {
+    background-color: rgba(0, 255, 0, 0.1);
+}

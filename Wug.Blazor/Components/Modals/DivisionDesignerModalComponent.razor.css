@@ -33,14 +33,14 @@
 }
 
 .left-side {
-    width: 45%;
+    width: 40%;
     border-right: solid white;
     height: 500px;
     padding: 16px;
 }
 
 .right-side {
-    width: 55%;
+    width: 60%;
     padding: 16px;
 }
 
@@ -52,6 +52,7 @@
 }
 
 .edit-holder {
+    display: inline-block;
 }
 
 .edit-button-div {

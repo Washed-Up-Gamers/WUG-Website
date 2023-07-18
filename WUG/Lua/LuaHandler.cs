@@ -661,7 +661,7 @@ public static class LuaHandler
                 else
                 {
                     var itemdef = DBCache.GetAll<ItemDefinition>().FirstOrDefault(x => x.OwnerId == 100 && x.Name.ToLower().Replace(" ", "_") == output);
-                    if (itemdef is null)
+                    if (itemdef is null || baserecipe.Editable)
                     {
                         baserecipe.OutputWithCustomItem = new(output, Convert.ToDouble(outputs[output]));
                     }

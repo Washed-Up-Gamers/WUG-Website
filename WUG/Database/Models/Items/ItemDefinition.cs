@@ -40,7 +40,7 @@ public class ItemDefinition : IHasOwner
     public bool Transferable { get; set; }
 
     [NotMapped]
-    public string? BaseItemName => BaseItemDefinitionId is null ? null : DBCache.Get<ItemDefinition>(BaseItemDefinitionId).Name;
+    public string? BaseItemName => BaseItemDefinitionId is null ? null : DBCache.Get<ItemDefinition>(BaseItemDefinitionId).Name.ToLower().Replace(" ", "_");
 
     [NotMapped]
     [JsonIgnore]
@@ -70,7 +70,7 @@ public class ItemDefinition : IHasOwner
                 {
                     { ItemModifierType.Attack, 0.75}
                 },
-                "Crystallite Infused Ammo" => new()
+                "Pothium Infused Ammo" => new()
                 {
                     { ItemModifierType.Attack, 1.5 },
                     { ItemModifierType.AttackFactor, 0.25 }

@@ -74,6 +74,7 @@ public class RecipeAPI : BaseAPI
         recipe.HasBeenUsed = false;
 
         var itemdef = new ItemDefinition(recipe.OwnerId, recipe.OutputItemName);
+        itemdef.BaseItemDefinitionId = GameDataManager.ResourcesToItemDefinitions[recipe.BaseRecipe.OutputWithCustomItem.Value.Key].Id;
         itemdef.Transferable = true;
         DBCache.AddNew(itemdef.Id, itemdef);
 

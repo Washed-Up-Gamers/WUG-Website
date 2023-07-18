@@ -14,7 +14,8 @@ public enum DivisionModifierType
 {
     Attack = 0,
     Health = 1,
-    Speed = 2
+    Speed = 2,
+    AttackFactor = 3
 }
 public class DivisionTemplate
 {
@@ -25,6 +26,13 @@ public class DivisionTemplate
 
     [NotMapped]
     public Dictionary<DivisionModifierType, double> Modifiers { get; set; }
+
+    public double GetModifierValue(DivisionModifierType modifierType)
+    {
+        if (!Modifiers.ContainsKey(modifierType))
+            return 0;
+        return Modifiers[modifierType];
+    }
 
     public void UpdateOrAddModifier(DivisionModifierType type, double value)
     {
@@ -40,15 +48,24 @@ public class DivisionTemplate
 
         foreach (var regiment in RegimentsTemplates)
         {
+            await regiment.UpdateModifiers();
             foreach (var pair in regiment.Modifiers)
                 UpdateOrAddModifier(pair.Key, pair.Value);
         }
+    }
+
+    public int GetSoldierCount() {
+        var total = 0;
+        foreach (var regiment in RegimentsTemplates)
+            total += regiment.GetSoldierCount();
+        return total;
     }
 }
 
 public class RegimentTemplate
 {
     public long Id { get; set; }
+    public string Name { get; set; }
     public RegimentType Type { get; set; }
 
     // number of things in this regiment
@@ -65,6 +82,19 @@ public class RegimentTemplate
     public async ValueTask<ItemDefinition> GetWeaponItemDefinitionAsync() => await ItemDefinition.FindAsync(WeaponItemDefinitionId);
     public async ValueTask<ItemDefinition> GetAmmoItemDefinitionAsync() => await ItemDefinition.FindAsync(AmmoItemDefinitionId);
 
+    public double GetModifierValue(DivisionModifierType modifierType)
+    {
+        if (!Modifiers.ContainsKey(modifierType))
+            return 0;
+        return Modifiers[modifierType];
+    }
+
+    public int GetSoldierCount() {
+        if (Type is RegimentType.Infantry)
+            return Count * 1000;
+        return Count;
+    }
+
     public void UpdateOrAddModifier(DivisionModifierType type, double value)
     {
         if (!Modifiers.ContainsKey(type))
@@ -75,7 +105,8 @@ public class RegimentTemplate
 
     public static Dictionary<ItemModifierType, DivisionModifierType> ConvertItemModifierToDivisionModifier = new()
     {
-        { ItemModifierType.Attack, DivisionModifierType.Attack }
+        { ItemModifierType.Attack, DivisionModifierType.Attack },
+        { ItemModifierType.AttackFactor, DivisionModifierType.AttackFactor}
     };
 
     public async ValueTask UpdateModifiers()
@@ -83,14 +114,24 @@ public class RegimentTemplate
         Modifiers = new();
         if (WeaponItemDefinitionId != 0)
         {
-            foreach (var pair in (await GetWeaponItemDefinitionAsync())!.Modifiers)
-                UpdateOrAddModifier(ConvertItemModifierToDivisionModifier[pair.Key], pair.Value * Count);
+            foreach (var pair in (await GetWeaponItemDefinitionAsync())!.Modifiers) {
+                var key = ConvertItemModifierToDivisionModifier[pair.Key];
+                if (key.ToString().Contains("Factor"))
+                    UpdateOrAddModifier(key, pair.Value);
+                else
+                    UpdateOrAddModifier(key, pair.Value * Count);
+            }
         }
 
         if (AmmoItemDefinitionId != 0)
         {
-            foreach (var pair in (await GetAmmoItemDefinitionAsync())!.Modifiers)
-                UpdateOrAddModifier(ConvertItemModifierToDivisionModifier[pair.Key], pair.Value * Count);
+            foreach (var pair in (await GetAmmoItemDefinitionAsync())!.Modifiers) {
+                var key = ConvertItemModifierToDivisionModifier[pair.Key];
+                if (key.ToString().Contains("Factor"))
+                    UpdateOrAddModifier(key, pair.Value);
+                else
+                    UpdateOrAddModifier(key, pair.Value * Count);
+            }
         }
     }
 }

@@ -28,14 +28,10 @@ else if (Loaded) {
                     <button class="btn btn-outline-primary" style="width: 100%;" @onclick="ClickedNewRegiment">
                         New Regiment
                     </button>
-                    @{
-                        int CurrentNumOfInfantry = 0;
-                    }
                     @foreach (var regiment in Template.RegimentsTemplates)
                     {
-                        if (regiment.Type == RegimentType.Infantry) CurrentNumOfInfantry += 1;
-                        <div class='regiment-list-item @(regiment == CurrentlyEdittingRegimentTemplate ? "selected" : "")'>
-                            <h5 style="display: inline-block; padding:5px">Infrantry Regiment #@CurrentNumOfInfantry</h5>
+                        <div class='regiment-list-item @(regiment.Id == CurrentlyEdittingRegimentTemplate.Id ? "selected" : "")' @onclick="async () => { await Select(regiment); }">
+                            <h5 style="display: inline-block; padding:5px">@regiment.Name</h5>
                         </div>
                     }
                 </div>
@@ -46,21 +42,108 @@ else if (Loaded) {
                 </div>
             </div>
             <div class="right-side">
-                <div class="container">
+                <div class="container" style="padding: 0px;">
                     <div class="edit-regiment-div">
+                        <div style="">
+                            @{
+                                var weaponBaseItemName = "";
+                                var ammoBaseItemName = "";
+                            }
+                            @if (CurrentlyEdittingRegimentTemplate is not null)
+                            {
+                                @if (CurrentlyEdittingRegimentTemplate.Type is RegimentType.Infantry) {
+                                    weaponBaseItemName = "rifle";
+                                    ammoBaseItemName = "ammo";
+                                    <button class='btn @(DisplaySelectItemComponentForWeapon ? "btn-primary" : "btn-outline-primary")' @onclick="ClickedSelectWeapon">
+                                        Select Rifle Item
+                                    </button>
+                                    <button class='btn @(DisplaySelectItemComponentForAmmo ? "btn-primary" : "btn-outline-primary")' @onclick="ClickedSelectAmmo">
+                                        Select Ammo Item
+                                    </button>
+                                }
+                            }
+                        </div>
                         @if (DisplaySelectItemComponentForWeapon)
                         {
-                            
+                            <SelectItemDefinitionComponent CurrentlySelected="@WeaponDefinition" BaseItemNameNeeded="@weaponBaseItemName" WeaponOrAmmo="true">
+                            </SelectItemDefinitionComponent>
                         }
                         else if (DisplaySelectItemComponentForAmmo)
                         {
-                            
+                            <SelectItemDefinitionComponent CurrentlySelected="@AmmoDefinition" BaseItemNameNeeded="@ammoBaseItemName" WeaponOrAmmo="false">
+                            </SelectItemDefinitionComponent>
                         }
                         else if (CurrentlyEdittingRegimentTemplate is not null)
                         {
                             <div class="form-group">
-                                <label>Current Selected Rifle: @WeaponDefinition.Name</label>
-                                
+                                @if (WeaponDefinition is null)
+                                {
+                                    <label>You have not selected a Rifle!</label>
+                                }
+                                else
+                                {
+                                    <label>Current Selected Rifle: @WeaponDefinition.Name</label>
+                                }
+                            </div>
+                            <div class="form-group">
+                                @if (AmmoDefinition is null)
+                                {
+                                    <label>You have not selected a type of Ammo!</label>
+                                }
+                                else
+                                {
+                                    <label>Current Selected Ammo: @AmmoDefinition.Name</label>
+                                }
+                            </div>
+                            <div class="edit-buttons-div">
+                                <div class="edit-holder">
+                                    <span>Count (+/- 1k)</span>
+                                    <div class="edit-button-div">
+                                        <button class="edit-button btn" @onclick="async () => { await DecreaseCount(1);}" style="margin-right: 4px;">-</button>
+                                        <button class="edit-button btn" @onclick="async () => {await IncreaseCount(1);}" style="margin-left: 4px;">+</button>
+                                    </div>
+                                </div>
+                                <div class="edit-holder" style="margin-left: 10px;">
+                                    <span>Count (+/- 10k)</span>
+                                    <div class="edit-button-div">
+                                        <button class="edit-button btn" @onclick="async () => { await DecreaseCount(10);}" style="margin-right: 4px;">-</button>
+                                        <button class="edit-button btn" @onclick="async () => {await IncreaseCount(10);}" style="margin-left: 4px;">+</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="Name">Regiment's Name</label>
+                                <input asp-for="Name" class="form-control" @bind-value="CurrentlyEdittingRegimentTemplate.Name" />
+                                <span asp-validation-for="Name" class="text-danger"></span>
+                            </div>
+                            <center>
+                                <span>Regiment Stats</span>
+                            </center>
+                            <div class="bottom-container">
+                                <div class="row">
+                                    <div class="col-sm">
+                                        Basic Info
+                                    </div>
+                                    <div class="col-sm">
+                                        Combat Stats
+                                    </div>
+                                    <div class="col-sm">
+                                        Misc. Stats
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm">Soldier Count: @($"{CurrentlyEdittingRegimentTemplate.GetSoldierCount():n0}")</div>
+                                    <div class="col-sm">Attack: @Math.Round(CurrentlyEdittingRegimentTemplate.GetModifierValue(DivisionModifierType.Attack) * (1 + CurrentlyEdittingRegimentTemplate.GetModifierValue(DivisionModifierType.AttackFactor)),0)</div>
+                                    <div class="col-sm"></div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm"></div>
+                                    @{
+                                        var totalattack = CurrentlyEdittingRegimentTemplate.GetModifierValue(DivisionModifierType.Attack) * (1 + CurrentlyEdittingRegimentTemplate.GetModifierValue(DivisionModifierType.AttackFactor));
+                                    }
+                                    <div class="col-sm">Atk Per 1k: @Math.Round(totalattack/CurrentlyEdittingRegimentTemplate.Count,1)</div>
+                                    <div class="col-sm"></div>
+                                </div>
                             </div>
                         }
                         else
@@ -80,9 +163,16 @@ else if (Loaded) {
                         <div class="col-sm">
                             Misc. Stats
                         </div>
-                        <div class="col-sm">
-                            Inputs
-                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm">Soldier Count: @($"{Template.GetSoldierCount():n0}")</div>
+                        <div class="col-sm">Attack: @Math.Round(Template.GetModifierValue(DivisionModifierType.Attack) * (1 + Template.GetModifierValue(DivisionModifierType.AttackFactor)),0)</div>
+                        <div class="col-sm"></div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm"></div>
+                        <div class="col-sm"></div>
+                        <div class="col-sm"></div>
                     </div>
                 </div>
             </div>
@@ -117,11 +207,24 @@ else
 
     }
 
+    public async Task ClickedSelectWeapon()
+    {
+        DisplaySelectItemComponentForAmmo = false;
+        DisplaySelectItemComponentForWeapon = true;
+    }
+
+    public async Task ClickedSelectAmmo()
+    {
+        DisplaySelectItemComponentForAmmo = true;
+        DisplaySelectItemComponentForWeapon = false;
+    }
+
     public async Task ClickedNewRegiment()
     {
         CurrentlyEdittingRegimentTemplate = new()
         {
-            Id = 0,
+            Id = Template.RegimentsTemplates.Count() + 1,
+            Name = $"Infrantry Regiment #{Template.RegimentsTemplates.Count() + 1}",
             Type = RegimentType.Infantry,
             Count = 0,
             WeaponItemDefinitionId = 0,
@@ -129,8 +232,24 @@ else
             Modifiers = new(),
         };
 
+        WeaponDefinition = null;
+        AmmoDefinition = null;
         Template.RegimentsTemplates.Add(CurrentlyEdittingRegimentTemplate);
     }
+
+    private async Task IncreaseCount(int amount)
+    {
+        CurrentlyEdittingRegimentTemplate.Count += amount;
+        await Template.UpdateModifiers();
+    }
+
+    private async Task DecreaseCount(int amount)
+    {
+        if (CurrentlyEdittingRegimentTemplate.Count > 0)
+            CurrentlyEdittingRegimentTemplate.Count -= amount;
+        await Template.UpdateModifiers();
+    }
+
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -166,6 +285,14 @@ else
 
     public async Task Refresh()
     {
+        await Template.UpdateModifiers();
         StateHasChanged();
+    }
+
+    public async Task Select(RegimentTemplate template)
+    {
+        CurrentlyEdittingRegimentTemplate = template;
+        WeaponDefinition = await CurrentlyEdittingRegimentTemplate.GetWeaponItemDefinitionAsync();
+        AmmoDefinition = await CurrentlyEdittingRegimentTemplate.GetAmmoItemDefinitionAsync();
     }
 }

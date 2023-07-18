@@ -4,23 +4,23 @@
 @if (Loaded)
 {
     <div>
-        @foreach (var itemdef in ItemDefinitions) {
-            <div class='list-item @(itemdef == CurrentlySelected ? "selected" : "")' @onclick="async () => { await Select(itemdef); }">
-                <h5 style="display: inline-block; padding:5px">@itemdef.Name</h5>
-                <div class="modifiers">
-                    @HtmlForModifiers[itemdef.Id]
+        <div class="item-list">
+            @foreach (var itemdef in ItemDefinitions) {
+                <div class='list-item @(itemdef.Id == (CurrentlySelected?.Id ?? 0) ? "selected" : "")' @onclick="async () => { await Select(itemdef); }">
+                    <h5 style="display: inline-block; padding:5px;padding-bottom:0px;">@itemdef.Name</h5>
+                    <div class="modifiers">
+                        @HtmlForModifiers[itemdef.Id]
+                    </div>
                 </div>
-            </div>
-        }
-        <button class="btn btn-outline-primary" @onclick="ClickedSave">
+            }
+        </div>
+        <button class="btn btn-outline-primary" @onclick="ClickedSave" style="margin-top: 12px;">
             Save
         </button>
     </div>
 }
 @code {
     public bool Loaded = false;
-
-    [Parameter]
     public List<ItemDefinition> ItemDefinitions { get; set; }
 
     [Parameter]
@@ -36,6 +36,10 @@
 
     protected override async Task OnInitializedAsync()
     {
+        ItemDefinitions = (await SVClient.GetJsonAsync<List<ItemDefinition>>($"api/itemdefinitions/all")).Data;
+        ItemDefinitions = ItemDefinitions
+            .Where(x => x.BaseItemName == BaseItemNameNeeded || (x.OwnerId == 100 && x.Name.ToLower().Replace(" ", "_").Contains(BaseItemNameNeeded) && x.Name != "Rifle"))
+            .ToList();
         foreach (var itemdef in ItemDefinitions)
         {
             string currenthtml = "";
@@ -51,19 +55,26 @@
             }
             HtmlForModifiers[itemdef.Id] = (MarkupString)currenthtml;
         }
+        Loaded = true;
     }
 
     public async Task ClickedSave()
     {
-        //ClientData.DivisionDesignerModal;
+        ClientData.DivisionDesignerModal.DisplaySelectItemComponentForWeapon = false;
+        ClientData.DivisionDesignerModal.DisplaySelectItemComponentForAmmo = false;
+        await ClientData.DivisionDesignerModal.Refresh();
     }
 
     public async Task Select(ItemDefinition itemdef)
     {
-        if (WeaponOrAmmo)
+        if (WeaponOrAmmo) {
             ClientData.DivisionDesignerModal.WeaponDefinition = itemdef;
-        else
+            ClientData.DivisionDesignerModal.CurrentlyEdittingRegimentTemplate.WeaponItemDefinitionId = itemdef.Id;
+        }
+        else {
             ClientData.DivisionDesignerModal.AmmoDefinition = itemdef;
+            ClientData.DivisionDesignerModal.CurrentlyEdittingRegimentTemplate.AmmoItemDefinitionId = itemdef.Id;
+        }
 
         await ClientData.DivisionDesignerModal.Refresh();
     }

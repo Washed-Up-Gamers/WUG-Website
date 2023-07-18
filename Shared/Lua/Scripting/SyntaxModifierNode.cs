@@ -55,6 +55,7 @@ public class SyntaxModifierNode : SyntaxNode
             return itemModifierType switch
             {
                 ItemModifierType.Attack => "Attack",
+                ItemModifierType.AttackFactor => "Attack Factor",
                 _ => "[No Loc]"
             };
         }
@@ -99,6 +100,7 @@ public class SyntaxModifierNode : SyntaxNode
             return itemModifierType switch
             {
                 ItemModifierType.Attack => GetColorClass(false, value),
+                ItemModifierType.AttackFactor => GetColorClass(false, value),
                 _ => "modifier-tooltip-modifier-listitem-neutral"
             };
         }
@@ -123,7 +125,8 @@ public class SyntaxModifierNode : SyntaxNode
         string valuestring = "";
         if (nationModifierType is not null && nationModifierType.ToString().Contains("Factor")
             || provinceModifierType is not null && provinceModifierType.ToString().Contains("Factor")
-            || entityModifierType is not null && entityModifierType.ToString().Contains("Factor"))
+            || entityModifierType is not null && entityModifierType.ToString().Contains("Factor")
+            || itemModifierType is not null && itemModifierType.ToString().Contains("Factor"))
             valuestring = $"{value * 100:n2}%";
         else
             valuestring = $"{value:n3}";

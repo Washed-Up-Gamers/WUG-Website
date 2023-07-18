@@ -24,6 +24,6 @@ public class NationAPI : BaseAPI
 
     private static async Task GetAllProvincesAsync(HttpContext ctx)
     {
-        await ctx.Response.WriteAsJsonAsync(DBCache.GetAll<Province>().ToList());
+        await ctx.Response.WriteAsJsonAsync(DBCache.GetAll<Province>().Where(x => x.NationId != 100).ToList());
     }
 }

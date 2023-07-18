@@ -199,8 +199,8 @@ recipe_concrete_base = {
 	outputs = {
 		concrete = 1
 	}
-	perhour = 100
-	power_demand = 2
+	perhour = 200
+	power_demand = 5
 	editable = false
 }
 
@@ -352,7 +352,7 @@ recipe_rifle_factory_base = {
 		steel = 0
 	}
 	outputs = {
-		small_arms = 1
+		rifle = 1
 	}
 	perhour = 1
 	editable = true

@@ -117,6 +117,8 @@ military = {
 	}
 	arms = {
 	}
+	rifle = {
+	}
 }
 
 research_points = {
