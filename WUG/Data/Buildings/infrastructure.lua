@@ -11,13 +11,13 @@ building_infrastructure = {
 			}
 		}
 		steel = {
-			base = 1000 * get_local("cost_increase")
+			base = 750 * get_local("cost_increase")
 		}
 		simple_components = {
-			base = 250 * get_local("cost_increase")
+			base = 175 * get_local("cost_increase")
 		}
 		advanced_components = {
-			base = 20 * get_local("cost_increase")
+			base = 30 * get_local("cost_increase")
 		}
 	}
 
