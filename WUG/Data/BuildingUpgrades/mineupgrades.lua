@@ -9,7 +9,7 @@
 		advanced_components = 50 * get_local("cost_increase")
     }
     modifiers = {
-        building.throughputfactor = 0.175
+        building.throughputfactor = 0.2
 		building.efficiencyfactor = -0.05
     }
 }

@@ -3,7 +3,7 @@
     numid = 0
     costs = {
         add_locals = {
-			cost_increase = 1.275^upgrade.level
+			cost_increase = 1.25^upgrade.level
 		}
 		steel = 1000 * get_local("cost_increase")
         concrete = 2000 * get_local("cost_increase")
@@ -11,7 +11,7 @@
 		advanced_components = 150 * get_local("cost_increase")
     }
     modifiers = {
-        building.throughputfactor = 0.175
+        building.throughputfactor = 0.2
 		building.efficiencyfactor = -0.03
     }
 }

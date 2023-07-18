@@ -9,8 +9,7 @@ recipe_iron_smeltery_base = {
 	}
 	perhour = 100
 
-	-- mWh per day at base stats
-	-- aka this will consume 1 mWh per day at size 1
+	-- this will consume 2 MW at size 1 with 1.00x throughput
 	power_demand = 2
     editable = false
 }
@@ -96,7 +95,7 @@ recipe_steel_factory_base = {
 	}
 
 	-- was 16
-	perhour = 20
+	perhour = 24
 	power_demand = 2.5
     editable = false
 }
@@ -152,11 +151,11 @@ recipe_simple_components_factory_base = {
 		plastic = 1
 	}
 	outputs = {
-		simple_components = 1.25
+		simple_components = 1.65
 	}
 
 	-- was 16
-	perhour = 20
+	perhour = 24
 	power_demand = 1
     editable = false
 }
