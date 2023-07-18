@@ -12,7 +12,7 @@ public class LuaBuildingUpgrade
     public DictNode Costs { get; set; }
     public List<SyntaxModifierNode> ModifierNodes { get; set; }
 
-    public Dictionary<string, double> GetConstructionCost(BaseEntity entity, Nation Nation, Province province, ProducingBuilding? building, BuildingUpgrade? upgrade, int levels, bool decreaseupgradelevel = false)
+    public Dictionary<string, double> GetConstructionCost(BaseEntity entity, Nation Nation, Province province, ProducingBuilding? building, BuildingUpgrade? upgrade, int levels, bool decreaseupgradelevel = false, bool ignoreBuildingSize = false)
     {
         Dictionary<string, double> totalresources = new();
         Dictionary<string, decimal> changesystemvarsby = new Dictionary<string, decimal>() {
@@ -26,7 +26,7 @@ public class LuaBuildingUpgrade
             {
                 if (!totalresources.ContainsKey(resource))
                     totalresources[resource] = 0;
-                if (building is not null)
+                if (building is not null && !ignoreBuildingSize)
                     totalresources[resource] += (double)amount*building.Size;
                 else
                     totalresources[resource] += (double)amount;
