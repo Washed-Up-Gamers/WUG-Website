@@ -129,12 +129,13 @@ public class PowerGrid
         }
 
         if (PowerDemand > PowerSupply) {
+            var loss = Math.Min(0.75, PowerSupply / PowerDemand);
             foreach(var nationid in NationIds)
             {
                 foreach (var province in DBCache.Get<Nation>(nationid).Provinces)
                 {
                     foreach (var building in province.GetBuildings().Where(x => x.Recipe.PowerDemand > 0.1)) {
-                        building.ThroughputLossFromPowerGrid = 0.75;
+                        building.ThroughputLossFromPowerGrid = loss;
                     }
                 }
             }
