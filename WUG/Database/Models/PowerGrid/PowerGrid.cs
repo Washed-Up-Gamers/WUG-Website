@@ -129,7 +129,12 @@ public class PowerGrid
         }
 
         if (PowerDemand > PowerSupply) {
-            var loss = Math.Min(0.75, PowerSupply / PowerDemand);
+            double loss = 0.15;
+            if (PowerDemand <= 0.001)
+                loss = 0.15;
+            else {
+                loss = Math.Min(0.75, PowerSupply / PowerDemand);
+            } 
             foreach(var nationid in NationIds)
             {
                 foreach (var province in DBCache.Get<Nation>(nationid).Provinces)
