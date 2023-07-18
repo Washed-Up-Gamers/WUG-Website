@@ -458,7 +458,9 @@ public class Province
         PopulationGrowth *= (Math.Max(0, ratio - 0.3) * 0.75) + 1;
 
         if (Nation.CapitalProvinceId == Id)
-            PopulationGrowth *= 2.5;
+            PopulationGrowth *= 3;
+        else
+            PopulationGrowth *= 1.2;
 
        return new(PopulationGrowth, consumerGoodsData);
     }

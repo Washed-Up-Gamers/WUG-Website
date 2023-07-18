@@ -319,12 +319,12 @@ public class Group : BaseEntity, IHasOwner
         if (!validate.Succeeded) { return validate; }
 
         if (!force) {
-            if (OwnerId == 100 && role.Name == "Governor") {
+            if (OwnerId == 100 && role.Name == "Governor" && target.Id == caller.Id) {
                 return new(false, "You can not remove the governor role from yourself!!");
             }
             // Authority check
-            if (role.Authority > GetAuthority(target))
-                return new TaskResult(false, $"{role.Name} has more authority than you!");
+            if (role.Authority >= GetAuthority(target))
+                return new TaskResult(false, $"You can not remove an entity who has the same or greater authority than you do!");
 
             if (role is null)
                 return new TaskResult(false, "Error: The role value was empty.");

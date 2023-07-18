@@ -367,6 +367,9 @@ public class GroupController : SVController
         if (model.Salary < 0.0m)
             return RedirectBack("A role's salary can not be under 0!");
 
+        if (model.Authority >= group.GetAuthority(user))
+            return RedirectBack("You can not create a role with a higher or equal authority than you have!");
+
         long permcode = 0;
 
         if (model.CreateRole) { permcode |= GroupPermissions.CreateRole.Value; }
