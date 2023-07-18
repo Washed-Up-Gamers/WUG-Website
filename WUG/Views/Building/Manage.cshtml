@@ -304,7 +304,7 @@
                 else {
                     <tr class="mergedrow">
                         <th class="infobox-row-name">Power Consumption</th>
-                        <td class="infobox-row-value">@($"{Model.Building.GetRateForProduction() / Model.Building.Recipe.PerHour * Model.Building.Recipe.PowerDemand * ( 1.0 / (1.0 - Model.Building.ThroughputLossFromPowerGrid)):n0}MW")</td>
+                        <td class="infobox-row-value">@($"{Model.Building.GetRateForProduction() / Model.Building.Recipe.PerHour * Model.Building.Recipe.PowerDemand * ( 1.0 / (1.0 - Model.Building.ThroughputLossFromPowerGrid)):n1}MW")</td>
                     </tr>
                 }
                 <tr class="mergedrow dividertop">

@@ -7,6 +7,7 @@ recipe_iron_mining_base = {
 		iron_ore = 1
 	}
 	perhour = 20
+	power_demand = 0.5
     editable = false
 }
 
@@ -19,6 +20,8 @@ recipe_copper_mining_base = {
 		copper_ore = 1
 	}
 	perhour = 7.5
+	power_demand = 0.5
+
     editable = false
 }
 
@@ -31,6 +34,7 @@ recipe_lead_mining_base = {
 		lead_ore = 1
 	}
 	perhour = 15
+	power_demand = 0.5
     editable = false
 }
 
@@ -43,6 +47,7 @@ recipe_zinc_mining_base = {
 		zinc_ore = 1
 	}
 	perhour = 10
+	power_demand = 0.5
     editable = false
 }
 
@@ -55,6 +60,7 @@ recipe_sand_mining_base = {
 		sand = 1
 	}
 	perhour = 25
+	power_demand = 0.5
     editable = false
 }
 
@@ -67,6 +73,7 @@ recipe_bauxite_mining_base = {
 		bauxite = 1
 	}
 	perhour = 10
+	power_demand = 0.5
     editable = false
 }
 
@@ -79,6 +86,7 @@ recipe_coal_mining_base = {
 		coal = 1
 	}
 	perhour = 25
+	power_demand = 0.5
     editable = false
 }
 
@@ -91,6 +99,7 @@ recipe_lithium_mining_base = {
 		lithium = 1
 	}
 	perhour = 20
+	power_demand = 0.5
     editable = false
 }
 
@@ -103,6 +112,7 @@ recipe_cadmium_mining_base = {
 		cadmium = 1
 	}
 	perhour = 5
+	power_demand = 0.5
     editable = false
 }
 
@@ -115,6 +125,7 @@ recipe_gold_mining_base = {
 		gold = 1
 	}
 	perhour = 7.5
+	power_demand = 0.75
     editable = false
 }
 
@@ -127,6 +138,7 @@ recipe_potassium_mining_base = {
 		potassium = 1
 	}
 	perhour = 10
+	power_demand = 0.5
     editable = false
 }
 
@@ -139,6 +151,7 @@ recipe_pothium_mining_base = {
 		pothium = 1
 	}
 	perhour = 0.9
+	power_demand = 2
     editable = false
 }
 
@@ -151,6 +164,7 @@ recipe_oil_well_mining_base = {
 		oil = 1
 	}
 	perhour = 18
+	power_demand = 1
     editable = false
 }
 
@@ -163,5 +177,6 @@ recipe_natural_gas_well_mining_base = {
 		natural_gas = 1
 	}
 	perhour = 75
+	power_demand = 1
     editable = false
 }
