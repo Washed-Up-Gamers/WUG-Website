@@ -125,11 +125,11 @@
                 </tr>
                 <tr class="mergedrow dividertop">
                     <th class="infobox-row-name">Base Property Tax</th>
-                    <td class="infobox-row-value">@($"¢{Model.BasePropertyTax ?? 0:n0}")</td>
+                    <td class="infobox-row-value">@($"${Model.BasePropertyTax ?? 0:n0}")</td>
                 </tr>
                 <tr class="mergedrow">
                     <th class="infobox-row-name">Property Tax per Building Size</th>
-                    <td class="infobox-row-value">@($"¢{Model.PropertyTaxPerSize ?? 0:n0}")</td>
+                    <td class="infobox-row-value">@($"${Model.PropertyTaxPerSize ?? 0:n0}")</td>
                 </tr>
                 <tr class="mergedrow dividertop">
                     <th class="infobox-row-name">@Model.Nation.NameForProvince.Pluralize()</th>

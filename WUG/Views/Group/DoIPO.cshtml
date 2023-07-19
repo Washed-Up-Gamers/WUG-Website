@@ -90,7 +90,7 @@
       var price = stockbalance / shares * 5
       if (price < 1 && shares != 0 && stockbalance != 0) {
           var el = document.getElementById("shareswarning")
-          el.innerHTML = `The price is under ¢1, either lower the amount of shares or increase the stockbalance amount!`
+          el.innerHTML = `The price is under $1, either lower the amount of shares or increase the stockbalance amount!`
         }
       else {
         var el = document.getElementById("shareswarning")

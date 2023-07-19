@@ -227,7 +227,7 @@
         $.get('/Exchange/GetCurrentData?id=@Model.Security.Ticker', function (out) {
             var value = parseFloat(out);
             var rvalue = Math.round((value + Number.EPSILON) * 100) / 100;
-            $('#priceText').html('¢' + rvalue);
+            $('#priceText').html('$' + rvalue);
             chart.data.datasets[0].data[59] = value;
             chart.update();
             console.log(value);

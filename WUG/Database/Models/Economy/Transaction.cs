@@ -116,7 +116,7 @@ public class Transaction
             return new TaskResult(false, $"An entity cannot send credits to itself.");
 
         if (!Force && (FromEntity.Money) < Amount)
-            return new TaskResult(false, $"{FromEntity.Name} cannot afford to send ¢{Amount}");
+            return new TaskResult(false, $"{FromEntity.Name} cannot afford to send ${Amount}");
 
         decimal totaltaxpaid = 0.0m;
 
@@ -298,7 +298,7 @@ public class Transaction
         {
             TransactionManager.ActiveSvids.Remove(FromId);
             TransactionManager.ActiveSvids.Remove(ToId);
-            return new TaskResult(false, $"{fromEntity.Name} cannot afford to send ¢{Amount}");
+            return new TaskResult(false, $"{fromEntity.Name} cannot afford to send ${Amount}");
         }
 
         decimal totaltaxpaid = 0.0m;
@@ -427,7 +427,7 @@ public class Transaction
         TransactionManager.ActiveSvids.Remove(FromId);
         TransactionManager.ActiveSvids.Remove(ToId);
 
-        return new TaskResult(true, $"Successfully sent ¢{Amount} to {toEntity.Name} with ¢{totaltaxpaid} tax.");
+        return new TaskResult(true, $"Successfully sent ${Amount} to {toEntity.Name} with ${totaltaxpaid} tax.");
 
     }
 }

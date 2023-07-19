@@ -87,7 +87,7 @@ public class TaxPolicy : Item
     public string GetHumanReadableRate()
     {
         if (taxType == TaxType.ResourceMined)
-            return $"¢{Math.Round(Rate, 2)} per {Target} mined";
+            return $"${Math.Round(Rate, 2)} per {Target} mined";
         return $"{Math.Round(Rate, 2)}%";
     }
 

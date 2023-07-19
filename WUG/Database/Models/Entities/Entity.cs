@@ -230,7 +230,7 @@ public abstract class BaseEntity
             }
             if (totaldue > 0.1m)
             {
-                var taxtrans = new Transaction(this, BaseEntity.Find((long)NationId), totaldue, TransactionType.TaxPayment, $"Income Tax Payment for ¢{TaxAbleBalance - taxablebalance30dago} of income.");
+                var taxtrans = new Transaction(this, BaseEntity.Find((long)NationId), totaldue, TransactionType.TaxPayment, $"Income Tax Payment for ${TaxAbleBalance - taxablebalance30dago} of income.");
                 taxtrans.NonAsyncExecute(true);
             }
 
@@ -257,7 +257,7 @@ public abstract class BaseEntity
                 break;
         }
         if (totaldue > 0.1m) {
-            Transaction taxtrans = new Transaction(this, BaseEntity.Find(100), totaldue, TransactionType.TaxPayment, $"Income Tax Payment for ¢{TaxAbleBalance - taxablebalance30dago} of income.");
+            Transaction taxtrans = new Transaction(this, BaseEntity.Find(100), totaldue, TransactionType.TaxPayment, $"Income Tax Payment for ${TaxAbleBalance - taxablebalance30dago} of income.");
             taxtrans.NonAsyncExecute(true);
         }
 

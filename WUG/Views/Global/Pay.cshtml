@@ -47,14 +47,14 @@
         GetHtmlNonJson(url).then(data => {
             e = document.getElementById("sender-balance")
             data = parseFloat(data)
-            e.innerHTML = `Sender's Balance: ¢${data.toFixed(2)}`
+            e.innerHTML = `Sender's Balance: $${data.toFixed(2)}`
         })
     }
     var url = `/api/entity/@Model.CanSendAs.First().Value/credits`
     GetHtmlNonJson(url).then(data => {
         e = document.getElementById("sender-balance")
         data = parseFloat(data)
-        e.innerHTML = `Sender's Balance: ¢${data.toFixed(2)}`
+        e.innerHTML = `Sender's Balance: $${data.toFixed(2)}`
     })
     $('#user-input').on("change keyup paste", OnInput);
     var box = $('#user-input');
@@ -92,7 +92,7 @@
                             GetHtmlNonJson(url).then(data => {
                                 e = document.getElementById("receiver-balance")
                                 data = parseFloat(data)
-                                e.innerHTML = `Receiver's Balance: ¢${data.toFixed(2)}`
+                                e.innerHTML = `Receiver's Balance: $${data.toFixed(2)}`
                             })
                         });
                     }

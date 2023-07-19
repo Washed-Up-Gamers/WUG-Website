@@ -70,7 +70,7 @@ public class AccountCommandsModule : BaseCommandModule
         // get the user's Nation's UBI
         ubi += DBCache.GetAll<UBIPolicy>().Where(x => x.NationId == user.NationId && (x.ApplicableRank == user.Rank || x.ApplicableRank == null)).Sum(x => x.Rate);
 
-        embed.AddField("Daily UBI", $"¢{Math.Round(ubi)}");
+        embed.AddField("Daily UBI", $"${Math.Round(ubi)}");
         await ctx.RespondAsync(embed);
     }
 }

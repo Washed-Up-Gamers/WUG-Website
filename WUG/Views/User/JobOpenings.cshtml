@@ -39,7 +39,7 @@
                         {
                             <td>Advanced Factory</td>
                         }
-                        <td>@($"¢{offer.Role.Salary*24*365:n0}")</td>
+                        <td>@($"${offer.Role.Salary*24*365:n0}")</td>
                         <td>
                             @if (offer.JobApplication is null)
                             {

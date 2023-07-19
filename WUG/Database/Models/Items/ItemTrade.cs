@@ -100,12 +100,12 @@ public class ItemTrade
         SVItemOwnership? toitem = DBCache.GetAll<SVItemOwnership>().FirstOrDefault(x => x.OwnerId == ToId && x.DefinitionId == DefinitionId);
 
         if (fromitem is null && TradeType != ItemTradeType.Server) {
-            return new TaskResult(false, $"{fromEntity.Name} lacks any {Definition.Name} to give {Amount} to ¢{toEntity.Name}");
+            return new TaskResult(false, $"{fromEntity.Name} lacks any {Definition.Name} to give {Amount} to {toEntity.Name}");
         }
 
         if (!Force && fromitem.Amount < Amount)
         {
-            return new TaskResult(false, $"{fromEntity.Name} lacks the enough of {Definition.Name} to give {Amount} to ¢{toEntity.Name}");
+            return new TaskResult(false, $"{fromEntity.Name} lacks the enough of {Definition.Name} to give {Amount} to {toEntity.Name}");
         }
 
         // check if the entity we are sending already has this TradeItem        
