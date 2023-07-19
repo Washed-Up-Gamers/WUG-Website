@@ -294,8 +294,8 @@ public class Group : BaseEntity, IHasOwner
         if (!force) {
 
             // Authority check
-            if (role.Authority > GetAuthority(caller))
-                return new TaskResult(false, $"{role.Name} has more authority than you!");
+            if (role.Authority >= GetAuthority(caller))
+                return new TaskResult(false, $"{role.Name}'s authority is either more or the same as your authority!");
 
             if (role is null)
                 return new TaskResult(false, "Error: The role value was empty.");
@@ -323,8 +323,8 @@ public class Group : BaseEntity, IHasOwner
                 return new(false, "You can not remove the governor role from yourself!!");
             }
             // Authority check
-            if (role.Authority >= GetAuthority(target))
-                return new TaskResult(false, $"You can not remove an entity who has the same or greater authority than you do!");
+            if (role.Authority >= GetAuthority(caller))
+                return new TaskResult(false, $"{role.Name}'s authority is either more or the same as your authority!");
 
             if (role is null)
                 return new TaskResult(false, "Error: The role value was empty.");
