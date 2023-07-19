@@ -68,6 +68,8 @@ building_materials = {
 	}
 	steel = {
 	}
+	solar_pv_cells = {
+	}
 }
 
 metals = {

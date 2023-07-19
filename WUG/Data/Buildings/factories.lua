@@ -8,6 +8,7 @@ building_simple_factory = {
 		recipe_simple_components_factory_base
 		recipe_plastic_factory_base
 		recipe_concrete_base
+		recipe_silicon_factory_base
 	]
 	buildingcosts = {
 		steel = 5000

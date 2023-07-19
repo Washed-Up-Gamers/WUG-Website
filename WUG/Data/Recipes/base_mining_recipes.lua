@@ -6,7 +6,7 @@ recipe_iron_mining_base = {
     outputs = {
 		iron_ore = 1
 	}
-	perhour = 20
+	perhour = 40
 	power_demand = 0.5
     editable = false
 }
@@ -19,8 +19,8 @@ recipe_copper_mining_base = {
 	outputs = {
 		copper_ore = 1
 	}
-	perhour = 7.5
-	power_demand = 0.5
+	perhour = 20
+	power_demand = 1
 
     editable = false
 }
@@ -46,8 +46,8 @@ recipe_zinc_mining_base = {
 	outputs = {
 		zinc_ore = 1
 	}
-	perhour = 10
-	power_demand = 0.5
+	perhour = 20
+	power_demand = 1
     editable = false
 }
 
@@ -59,8 +59,8 @@ recipe_sand_mining_base = {
 	outputs = {
 		sand = 1
 	}
-	perhour = 25
-	power_demand = 0.5
+	perhour = 50
+	power_demand = 1
     editable = false
 }
 
@@ -124,8 +124,8 @@ recipe_gold_mining_base = {
 	outputs = {
 		gold = 1
 	}
-	perhour = 7.5
-	power_demand = 0.75
+	perhour = 10
+	power_demand = 1.5
     editable = false
 }
 
@@ -150,8 +150,8 @@ recipe_pothium_mining_base = {
 	outputs = {
 		pothium = 1
 	}
-	perhour = 0.9
-	power_demand = 2
+	perhour = 1.2
+	power_demand = 2.5
     editable = false
 }
 

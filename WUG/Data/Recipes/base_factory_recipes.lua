@@ -95,8 +95,8 @@ recipe_steel_factory_base = {
 	}
 
 	-- was 16
-	perhour = 24
-	power_demand = 2.5
+	perhour = 28
+	power_demand = 3
     editable = false
 }
 
@@ -173,6 +173,21 @@ recipe_advanced_components_factory_base = {
 	}
 	-- was 4 then 7
 	perhour = 14
+	power_demand = 7.5
+    editable = false
+}
+
+recipe_solar_pv_cell_factory_base = {
+	name = "Solar PV Cell Production"
+	inputs = {
+		cadmium = 1
+		silicon = 10
+		computer_chips = 1
+	}
+	outputs = {
+		solar_pv_cells = 20
+	}
+	perhour = 7.5
 	power_demand = 7.5
     editable = false
 }
