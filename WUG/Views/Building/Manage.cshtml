@@ -358,20 +358,20 @@
                         trclass = "mergedrow";
                     }
                 }
-                @{
+                @if (Model.Building.BuildingType is not BuildingType.Infrastructure) {
                     var province = Model.Building.Province;
                     var totalbase = (province.BasePropertyTax ?? 0) + (province.State is not null ? province.State.BasePropertyTax ?? 0 : 0) + (province.Nation.BasePropertyTax ?? 0);
                     var totalpersize = (province.PropertyTaxPerSize ?? 0) + (province.State is not null ? province.State.PropertyTaxPerSize ?? 0 : 0) + (province.Nation.PropertyTaxPerSize ?? 0);
-                    totalpersize *= Model.Building.Size * Model.Building.GetThroughputFromUpgrades();
+                        totalpersize *= Model.Building.Size * Model.Building.GetThroughputFromUpgrades();
+                    <tr class="mergedrow dividertop">
+                        <th class="infobox-row-name">Base Property Tax</th>
+                        <td class="infobox-row-value">@($"${totalbase:n0}")</td>
+                    </tr>
+                    <tr class="mergedrow">
+                        <th class="infobox-row-name">Property Tax From Building's' Size</th>
+                        <td class="infobox-row-value">@($"${totalpersize:n0}")</td>
+                    </tr>
                 }
-                <tr class="mergedrow dividertop">
-                    <th class="infobox-row-name">Base Property Tax</th>
-                    <td class="infobox-row-value">@($"${totalbase:n0}")</td>
-                </tr>
-                <tr class="mergedrow">
-                    <th class="infobox-row-name">Property Tax From Building's' Size</th>
-                    <td class="infobox-row-value">@($"${totalpersize:n0}")</td>
-                </tr>
             </tbody>
         </table>
     </div>

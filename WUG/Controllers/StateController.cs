@@ -117,10 +117,10 @@ public class StateController : SVController
         if (!oldstate.CanEdit(user))
             return RedirectBack("You lack permission to edit this state!");
 
-        if (newstate.BasePropertyTax > 1000)
-            return RedirectBack("Base Property Tax must be 1,000 or less!");
-        if (newstate.PropertyTaxPerSize > 1000)
-            return RedirectBack("Property Tax per size must be 1,000 or less!");
+        if (newstate.BasePropertyTax > 2000)
+            return RedirectBack("Base Property Tax must be 2,000 or less!");
+        if (newstate.PropertyTaxPerSize > 2000)
+            return RedirectBack("Property Tax per size must be 2,000 or less!");
 
         oldstate.Name = newstate.Name;
         oldstate.Description = newstate.Description;
