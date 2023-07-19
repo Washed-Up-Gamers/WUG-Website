@@ -20,5 +20,7 @@ public class Mine : ProducingBuilding
         {
             Quantity += QuantityHourlyGrowth;
         }
+        if (Quantity > QuantityCap)
+            Quantity = QuantityCap;
     }
 }

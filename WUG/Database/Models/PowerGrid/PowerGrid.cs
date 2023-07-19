@@ -133,7 +133,7 @@ public class PowerGrid
             if (PowerDemand <= 0.001)
                 loss = 0.15;
             else {
-                loss = Math.Min(0.75, PowerSupply / PowerDemand);
+                loss = Math.Min(0.75, 1.0 - (PowerSupply / PowerDemand));
             } 
             foreach(var nationid in NationIds)
             {

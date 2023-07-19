@@ -24,5 +24,7 @@ public class Factory : ProducingBuilding
         {
             Quantity += QuantityHourlyGrowth;
         }
+        if (Quantity > QuantityCap)
+            Quantity = QuantityCap;
     }
 }

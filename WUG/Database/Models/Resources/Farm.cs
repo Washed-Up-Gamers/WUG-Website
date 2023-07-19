@@ -24,5 +24,7 @@ public class Farm : ProducingBuilding
         {
             Quantity += QuantityHourlyGrowth;
         }
+        if (Quantity > QuantityCap)
+            Quantity = QuantityCap;
     }
 }

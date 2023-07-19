@@ -49,6 +49,8 @@ public class PowerPlant : ProducingBuilding, IPowerProducingBuilding
         {
             Quantity += QuantityHourlyGrowth;
         }
+        if (Quantity > QuantityCap)
+            Quantity = QuantityCap;
         
         double rate = GetRateForProduction();
         double rate_for_input = rate * (1/Efficiency);

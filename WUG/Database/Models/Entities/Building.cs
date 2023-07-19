@@ -347,8 +347,9 @@ public abstract class ProducingBuilding : BuildingBase
     public async ValueTask<TaskResult> TickRecipe() {
         UpdateModifiers();
 
-        if (PrevRecipeId != "" && PrevRecipeId is not null && PrevRecipeId != RecipeId)
+        if (PrevRecipeId != "" && PrevRecipeId is not null && PrevRecipeId != RecipeId && PrevRecipeId != BuildingObj.Recipes.FirstOrDefault()?.Id)
             Quantity /= 2.0;
+
         PrevRecipeId = RecipeId;
 
         if (BuildingType is BuildingType.PowerPlant or BuildingType.Battery)
