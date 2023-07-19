@@ -126,7 +126,6 @@ public class VoopAI
     public static async Task UpdateRanks()
     {
         Console.WriteLine("Doing rank job");
-        return;
 
         using var dbctx = WashedUpDB.DbFactory.CreateDbContext();
 
