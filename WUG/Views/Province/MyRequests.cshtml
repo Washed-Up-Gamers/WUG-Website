@@ -100,10 +100,10 @@
                             <br>
                             <div class="buildingcosts">
                                 @{
-                                    ProducingBuilding building = DBCache.GetAllProducingBuildings().FirstOrDefault(x => Model.AlreadyExistingBuildingId == x.Id);
+                                    ProducingBuilding building = DBCache.GetAllProducingBuildings().FirstOrDefault(x => request.BuildingId == x.Id);
                                 }
                                 @if (building is not null) {
-                                    @foreach ((var resource, var amount) in Model.LuaBuildingObj.GetConstructionCost(BaseEntity.Find(Model.RequesterId), Model.Province.Nation, Model.Province, building, 1))
+                                    @foreach ((var resource, var amount) in request.BuildingLuaObj.GetConstructionCost(BaseEntity.Find(request.RequesterId), request.Province.Nation, request.Province, building, 1))
                                     {
                                         <div class="resource-row">
                                             <span style="align-self: flex-start">@resource.Replace("_", " ")</span>
