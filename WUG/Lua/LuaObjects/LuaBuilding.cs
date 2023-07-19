@@ -102,8 +102,8 @@ public class LuaBuilding
         var vouchersWeCanUse = 0;
 
         VoucherBuildingType buildingtypetofind = VoucherBuildingType.Mine;
-        if (building.BuildingObj.type is BuildingType.Mine) buildingtypetofind = VoucherBuildingType.Mine;
-        if (building.BuildingObj.type is BuildingType.Factory) buildingtypetofind = VoucherBuildingType.Factory;
+        if (type is BuildingType.Mine) buildingtypetofind = VoucherBuildingType.Mine;
+        if (type is BuildingType.Factory) buildingtypetofind = VoucherBuildingType.Factory;
 
         List<BuildingVoucher> vouchersUsed = new();
         if (DBCache.VouchersByEntityId.ContainsKey(buildas.Id)) {
