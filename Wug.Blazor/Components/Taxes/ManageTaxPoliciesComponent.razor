@@ -64,7 +64,7 @@
                 }
                 else
                 {
-                    <label>The amount between the two above boxes will be taxed at (¢)</label>
+                    <label>The amount between the two above boxes will be taxed at ($)</label>
                 }
                 <input @bind-value="@CurrentlyEditingTaxPolicy.Rate" class="form-control" />
             </div>
@@ -131,13 +131,13 @@
                             {
                                 @if (policy.taxType is TaxType.CorporateIncome or TaxType.PersonalIncome or TaxType.GroupIncome)
                                 {
-                                    <td>¢@($"{policy.Minimum * 365:n0}")</td>
-                                    <td>¢@($"{policy.Maximum * 365:n0}")</td>
+                                    <td>$@($"{policy.Minimum * 365:n0}")</td>
+                                    <td>$@($"{policy.Maximum * 365:n0}")</td>
                                 }
                                 else
                                 {
-                                    <td>¢@($"{policy.Minimum:n2}")</td>
-                                    <td>¢@($"{policy.Maximum:n2}")</td>
+                                    <td>$@($"{policy.Minimum:n2}")</td>
+                                    <td>$@($"{policy.Maximum:n2}")</td>
                                 }
                             }
                             else
@@ -145,7 +145,7 @@
                                 <td>@Math.Round(policy.Minimum, 0)</td>
                                 <td>@Math.Round(policy.Maximum, 0)</td>
                             }
-                            <td>¢@($"{policy.Collected:n2}")</td>
+                            <td>$@($"{policy.Collected:n2}")</td>
                             @if (IsGovernor)
                             {
                                 <td><button class="btn btn-outline-primary" @onclick="() => ClickedEdit(policy)">Edit</button></td>

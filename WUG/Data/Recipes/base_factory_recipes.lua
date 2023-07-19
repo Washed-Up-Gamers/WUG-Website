@@ -155,8 +155,8 @@ recipe_simple_components_factory_base = {
 	}
 
 	-- was 16
-	perhour = 24
-	power_demand = 1
+	perhour = 30
+	power_demand = 1.5
     editable = false
 }
 
