@@ -163,8 +163,8 @@ recipe_oil_well_mining_base = {
 	outputs = {
 		oil = 1
 	}
-	perhour = 18
-	power_demand = 1
+	perhour = 14
+	power_demand = 2
     editable = false
 }
 
@@ -176,7 +176,7 @@ recipe_natural_gas_well_mining_base = {
 	outputs = {
 		natural_gas = 1
 	}
-	perhour = 30
-	power_demand = 1
+	perhour = 25
+	power_demand = 2
     editable = false
 }
