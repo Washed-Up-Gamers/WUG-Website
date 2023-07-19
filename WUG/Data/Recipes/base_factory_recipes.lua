@@ -123,7 +123,7 @@ recipe_silicon_factory_base = {
 	outputs = {
 		silicon = 1
 	}
-	perhour = 30
+	perhour = 50
 	power_demand = 0.75
     editable = false
 }
@@ -151,12 +151,12 @@ recipe_simple_components_factory_base = {
 		plastic = 1
 	}
 	outputs = {
-		simple_components = 1.65
+		simple_components = 1.75
 	}
 
 	-- was 16
-	perhour = 30
-	power_demand = 1.5
+	perhour = 34
+	power_demand = 2
     editable = false
 }
 
@@ -214,8 +214,8 @@ recipe_concrete_base = {
 	outputs = {
 		concrete = 1
 	}
-	perhour = 200
-	power_demand = 5
+	perhour = 500
+	power_demand = 7.5
 	editable = false
 }
 
