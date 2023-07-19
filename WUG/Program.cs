@@ -327,4 +327,6 @@ foreach (var recipe in DBCache.GetAll<Recipe>())
     }
 }
 
+Console.WriteLine("test");
+
 app.Run();
