@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using WUG.Extensions;
 using WUG.Helpers;
 
 namespace WUG.Controllers;
@@ -17,5 +18,11 @@ public class MiscController : SVController
     public async Task<IActionResult> BlazorMapTest()
     {
         return View();
+    }
+
+    [UserRequired]
+    public async Task<IActionResult> GiveVouchers()
+    {
+        return Redirect($"/Group/View");
     }
 }

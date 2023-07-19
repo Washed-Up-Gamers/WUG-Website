@@ -5,6 +5,7 @@ using WUG.Scripting;
 using WUG.Scripting.Parser;
 using System.Text.Json.Serialization;
 using Shared.Models;
+using WUG.Database.Models.Resources;
 
 namespace WUG.Scripting.LuaObjects;
 
@@ -100,11 +101,12 @@ public class LuaBuilding
     public async ValueTask<TaskResult<ProducingBuilding>> Build(BaseEntity buildas, BaseEntity caller, Nation Nation, Province province, int levels, ProducingBuilding? building = null) {
         var vouchersWeCanUse = 0;
 
+        VoucherBuildingType buildingtypetofind = VoucherBuildingType.Mine;
+        if (building.BuildingObj.type is BuildingType.Mine) buildingtypetofind = VoucherBuildingType.Mine;
+        if (building.BuildingObj.type is BuildingType.Factory) buildingtypetofind = VoucherBuildingType.Factory;
+
         List<BuildingVoucher> vouchersUsed = new();
         if (DBCache.VouchersByEntityId.ContainsKey(buildas.Id)) {
-            VoucherBuildingType buildingtypetofind = VoucherBuildingType.Mine;
-            if (building.BuildingObj.type is BuildingType.Mine) buildingtypetofind = VoucherBuildingType.Mine;
-            if (building.BuildingObj.type is BuildingType.Factory) buildingtypetofind = VoucherBuildingType.Factory;
             foreach (var voucher in DBCache.VouchersByEntityId[buildas.Id].Where(x => x.BuildingType == buildingtypetofind)) {
                 vouchersWeCanUse += voucher.AmountGiven - voucher.AmountUsed;
                 vouchersUsed.Add(voucher);
@@ -135,9 +137,9 @@ public class LuaBuilding
             voucher.AmountUsed += diff;
             if (voucher.AmountGiven - voucher.AmountUsed == 0) {
                 voucher.UsedAll = true;
-                DBCache.Remove<BuildingVoucher>(voucher.Id);
                 DBCache.VouchersByEntityId[buildas.Id].Remove(voucher);
             }
+            vouchersleft -= diff;
         }
 
         if (building is null) {
@@ -217,6 +219,9 @@ public class LuaBuilding
 
         Nation.UpdateModifiers();
 
-        return new(true, $"Successfully built {levels} levels of {PrintableName}.", building);
+        if (levels - levelsleftover > 0)
+            return new(true, $"Successfully built {levels} levels of {PrintableName} and used {levels - levelsleftover} {buildingtypetofind} Voucher(s).", building);
+        else
+            return new(true, $"Successfully built {levels} levels of {PrintableName}.", building);
     }
 }

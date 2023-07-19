@@ -8,6 +8,7 @@ using WUG.Database.Models.Factories;
 using WUG.Database.Models.Misc;
 using WUG.Database.Models.News;
 using WUG.Database.Models.PowerGrid;
+using WUG.Database.Models.Resources;
 
 namespace WUG.Database;
 
@@ -90,7 +91,7 @@ public static class DBCache
 
     public static ConcurrentQueue<DBCacheItemAddition> ItemQueue = new();
     public static ConcurrentDictionary<string, Recipe> Recipes = new();
-    public static ConcurrentDictionary<long, List<BuildingVoucher> VouchersByEntityId = new():
+    public static ConcurrentDictionary<long, List<BuildingVoucher>> VouchersByEntityId = new();
 
     public static WashedUpDB dbctx { get; set; }
 
@@ -305,8 +306,8 @@ public static class DBCache
         foreach(UBIPolicy policy in dbctx.UBIPolicies) {
             Put(policy.Id, policy);
         }
-        foreach (var _obj in dbctx.BuildingsVouchers) {
-            Put(_obj.Id, _obj)
+        foreach (var _obj in dbctx.BuildingsVouchers.Where(x => !x.UsedAll)) {
+            Put(_obj.Id, _obj);
             if (!VouchersByEntityId.ContainsKey(_obj.EntityId))
                 VouchersByEntityId[_obj.EntityId] = new();
             VouchersByEntityId[_obj.EntityId].Add(_obj);
