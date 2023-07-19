@@ -158,7 +158,7 @@ recipe_pothium_mining_base = {
 recipe_oil_well_mining_base = {
 	name = "Oil Production"
     inputs = {
-        tools = 0.05
+        tools = 0.2
     }
 	outputs = {
 		oil = 1
@@ -171,12 +171,12 @@ recipe_oil_well_mining_base = {
 recipe_natural_gas_well_mining_base = {
 	name = "Natural Gas Production"
     inputs = {
-        tools = 0.025
+        tools = 0.2
     }
 	outputs = {
 		natural_gas = 1
 	}
-	perhour = 75
+	perhour = 30
 	power_demand = 1
     editable = false
 }

@@ -30,7 +30,7 @@ recipe_natural_gas_power_plant_base = {
 	}
 	outputs = {
 	}
-	power_output = 5.5
-	perhour = 11
+	power_output = 2.25
+	perhour = 22
     editable = false
 }

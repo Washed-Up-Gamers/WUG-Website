@@ -135,9 +135,9 @@ recipe_plastic_factory_base = {
 		oil = 1
 	}
 	outputs = {
-		plastic = 5
+		plastic = 7.5
 	}
-	perhour = 40
+	perhour = 50
 	power_demand = 0.75
     editable = false
 }
