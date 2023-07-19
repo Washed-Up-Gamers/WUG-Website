@@ -90,24 +90,24 @@ public class VoopAI
     {
         if (rank is null)
         {
-            return "ffffff";
+            return "#ffffff";
         }
         switch (rank)
         {
             case Rank.WashedUp:
-                return "414aff";
+                return "#414aff";
             case Rank.Expert:
-                return "e05151";
+                return "#e05151";
             case Rank.Enjoyer:
-                return "00ff23";
+                return "#00ff23";
             case Rank.Fan:
-                return "b400ff";
+                return "#b400ff";
             case Rank.Noob:
-                return "f1ff00";
+                return "#f1ff00";
             case Rank.Unranked:
-                return "ffffff";
+                return "#ffffff";
         }
-        return "ffffff";
+        return "#ffffff";
     }
 
     /// <summary>
