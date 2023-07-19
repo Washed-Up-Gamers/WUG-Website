@@ -17,6 +17,7 @@ using WUG.Database.Models.News;
 using WUG.Database.Models.Corporations;
 using WUG.Database.Models.Misc;
 using WUG.Database.Models.Stats;
+using WUG.Database.Models.Resources;
 using SV2.Database.Models.Misc;
 using WUG.Database.Models.Economy.Stocks;
 using WUG.Database.Models.PowerGrid;
