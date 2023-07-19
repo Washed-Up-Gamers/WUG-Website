@@ -69,22 +69,26 @@ public class LuaBuilding
         return totalresources;
     }
 
-    public async ValueTask<TaskResult> CanBuild(BaseEntity buildas, BaseEntity caller, Nation Nation, Province province, ProducingBuilding? building, int levels) {
+    public async ValueTask<TaskResult> CanBuild(BaseEntity buildas, BaseEntity caller, Nation Nation, Province province, ProducingBuilding? building, int levels, int voucherLevels = 0) {
         if (levels <= 0)
             return new(false, "The amount of levels you wish to build must be greater than 0!");
 
         if (OnlyGovernorCanBuild && !province.CanManageBuildingRequests(caller))
             return new(false, $"Only the Governor of {province.Name} can build this building!");
 
-        var costs = GetConstructionCost(buildas, Nation, province, building, levels);
+        var levelsleftover = levels - voucherLevels;
+        if (levelsleftover < 0) levelsleftover = 0;
 
-        // check for resources
-        foreach ((var resource, var amount) in costs) {
-            if (!await buildas.HasEnoughResource(resource, amount)) {
-                return new(false, $"{buildas.Name} lack enough {resource}! About {(amount - (await buildas.GetOwnershipOfResource(resource))):n0} more is required");
+        if (levelsleftover > 0) {
+            var costs = GetConstructionCost(buildas, Nation, province, building, levelsleftover);
+
+            // check for resources
+            foreach ((var resource, var amount) in costs) {
+                if (!await buildas.HasEnoughResource(resource, amount)) {
+                    return new(false, $"{buildas.Name} lack enough {resource}! About {(amount - (await buildas.GetOwnershipOfResource(resource))):n0} more is required");
+                }
             }
         }
-
         // check for building slots
         int slotsleftover = province.BuildingSlots - (province.BuildingSlotsUsed + levels);
         if (slotsleftover < 0 && UseBuildingSlots)
@@ -94,13 +98,46 @@ public class LuaBuilding
     }
 
     public async ValueTask<TaskResult<ProducingBuilding>> Build(BaseEntity buildas, BaseEntity caller, Nation Nation, Province province, int levels, ProducingBuilding? building = null) {
-        var canbuild = await CanBuild(buildas, caller, Nation, province, building, levels);
+        var vouchersWeCanUse = 0;
+
+        List<BuildingVoucher> vouchersUsed = new();
+        if (DBCache.VouchersByEntityId.ContainsKey(buildas.Id)) {
+            VoucherBuildingType buildingtypetofind = VoucherBuildingType.Mine;
+            if (building.BuildingObj.type is BuildingType.Mine) buildingtypetofind = VoucherBuildingType.Mine;
+            if (building.BuildingObj.type is BuildingType.Factory) buildingtypetofind = VoucherBuildingType.Factory;
+            foreach (var voucher in DBCache.VouchersByEntityId[buildas.Id].Where(x => x.BuildingType == buildingtypetofind)) {
+                vouchersWeCanUse += voucher.AmountGiven - voucher.AmountUsed;
+                vouchersUsed.Add(voucher);
+                if (vouchersWeCanUse >= levels)
+                    break;
+            }
+        }
+        
+        var canbuild = await CanBuild(buildas, caller, Nation, province, building, levels, vouchersWeCanUse);
         if (!canbuild.Success)
             return new(false, canbuild.Message);
 
-        var costs = GetConstructionCost(buildas, Nation, province, building, levels);
-        foreach ((var resource, var amount) in costs) {
-            await buildas.ChangeResourceAmount(resource, -amount, "Construction");
+        var levelsleftover = levels - vouchersWeCanUse;
+        if (levelsleftover < 0) levelsleftover = 0;
+
+        if (levelsleftover > 0) {
+            var costs = GetConstructionCost(buildas, Nation, province, building, levelsleftover);
+            foreach ((var resource, var amount) in costs) {
+                await buildas.ChangeResourceAmount(resource, -amount, "Construction");
+            }
+        }
+
+        var vouchersleft = vouchersWeCanUse;
+        foreach (var voucher in vouchersUsed) {
+            var diff = vouchersleft;
+            if (diff > (voucher.AmountGiven - voucher.AmountUsed))
+                diff = voucher.AmountGiven - voucher.AmountUsed;
+            voucher.AmountUsed += diff;
+            if (voucher.AmountGiven - voucher.AmountUsed == 0) {
+                voucher.UsedAll = true;
+                DBCache.Remove<BuildingVoucher>(voucher.Id);
+                DBCache.VouchersByEntityId[buildas.Id].Remove(voucher);
+            }
         }
 
         if (building is null) {

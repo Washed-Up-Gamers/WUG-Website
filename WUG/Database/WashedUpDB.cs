@@ -178,6 +178,7 @@ public class WashedUpDB : DbContext, IDataProtectionKeyContext
     public DbSet<BuildingRequest> BuildingRequests { get; set; }
     public DbSet<EntityBalanceRecord> EntityBalanceRecords { get; set; }
     public DbSet<State> States { get; set; }
+    public DbSet<BuildingVoucher> BuildingsVouchers { get; set; }
 
     public DbSet<OauthApp> OauthApps { get; set; }
     public DbSet<AuthToken> AuthTokens { get; set; }

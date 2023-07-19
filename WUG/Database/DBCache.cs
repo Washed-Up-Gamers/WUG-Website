@@ -76,6 +76,8 @@ public class DBCacheItemAddition
             DBCache.dbctx.Add((Security)Item);
         else if (Type == typeof(PowerGrid))
             DBCache.dbctx.Add((PowerGrid)Item);
+        else if (Type == typeof(BuildingVoucher))
+            DBCache.dbctx.Add((BuildingVoucher)Item);
     }
 }
 
@@ -88,6 +90,7 @@ public static class DBCache
 
     public static ConcurrentQueue<DBCacheItemAddition> ItemQueue = new();
     public static ConcurrentDictionary<string, Recipe> Recipes = new();
+    public static ConcurrentDictionary<long, List<BuildingVoucher> VouchersByEntityId = new():
 
     public static WashedUpDB dbctx { get; set; }
 
@@ -301,6 +304,12 @@ public static class DBCache
         }
         foreach(UBIPolicy policy in dbctx.UBIPolicies) {
             Put(policy.Id, policy);
+        }
+        foreach (var _obj in dbctx.BuildingsVouchers) {
+            Put(_obj.Id, _obj)
+            if (!VouchersByEntityId.ContainsKey(_obj.EntityId))
+                VouchersByEntityId[_obj.EntityId] = new();
+            VouchersByEntityId[_obj.EntityId].Add(_obj);
         }
         foreach(GroupRole role in dbctx.GroupRoles) {
             Put(role.Id, role);

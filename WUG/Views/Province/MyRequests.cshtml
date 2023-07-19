@@ -99,16 +99,26 @@
                             <span>Costs to build per level</span>
                             <br>
                             <div class="buildingcosts">
-                                @foreach ((var resource, var amount) in buildingobj.BuildingCosts.Evaluate(new ExecutionState(request.Province.Nation, request.Province)))
-                                {
-                                    <div class="resource-row">
-                                        <span style="align-self: flex-start">@resource.Replace("_", " ")</span>
-                                        <span style="align-self: flex-end">
-                                            @(
-                                    $"{amount:n0}"
-                                    )
-                                        </span>
-                                    </div>
+                                @{
+                                    ProducingBuilding building = DBCache.GetAllProducingBuildings().FirstOrDefault(x => Model.AlreadyExistingBuildingId == x.Id);
+                                }
+                                @if (building is not null) {
+                                    @foreach ((var resource, var amount) in Model.LuaBuildingObj.GetConstructionCost(BaseEntity.Find(Model.RequesterId), Model.Province.Nation, Model.Province, building, 1))
+                                    {
+                                        <div class="resource-row">
+                                            <span style="align-self: flex-start">@resource.Replace("_", " ")</span>
+                                            <span style="align-self: flex-end">@($"{amount:n0}")</span>
+                                        </div>
+                                    }
+                                }
+                                else {
+                                    @foreach ((var resource, var amount) in buildingobj.BuildingCosts.Evaluate(new ExecutionState(request.Province.Nation, request.Province)))
+                                    {
+                                        <div class="resource-row">
+                                            <span style="align-self: flex-start">@resource.Replace("_", " ")</span>
+                                            <span style="align-self: flex-end">@($"{amount:n0}")</span>
+                                        </div>
+                                    }
                                 }
                             </div>
                             <br>
