@@ -238,28 +238,30 @@ public class User : BaseEntity
             }
         }
 
-        if (IsCouncilMember())
-        {
-            var vooperia = (Group)BaseEntity.Find(100);
-            if (!vooperia.MembersIds.Contains(Id))
+        if (false) {
+            if (IsCouncilMember())
             {
-                vooperia.MembersIds.Add(Id);
-                vooperia.AddEntityToRole(vooperia, this, vooperia.Roles.First(x => x.Name == "Imperial Senator"), true);
+                var vooperia = (Group)BaseEntity.Find(100);
+                if (!vooperia.MembersIds.Contains(Id))
+                {
+                    vooperia.MembersIds.Add(Id);
+                    vooperia.AddEntityToRole(vooperia, this, vooperia.Roles.First(x => x.Name == "Imperial Senator"), true);
+                }
             }
-        }
-        else
-        {
-            var vooperia = (Group)BaseEntity.Find(100);
-            if (vooperia.MembersIds.Contains(Id))
+            else
             {
-                vooperia.RemoveEntityFromRole(vooperia, this, vooperia.Roles.First(x => x.Name == "Imperial Senator"), true);
+                var vooperia = (Group)BaseEntity.Find(100);
+                if (vooperia.MembersIds.Contains(Id))
+                {
+                    vooperia.RemoveEntityFromRole(vooperia, this, vooperia.Roles.First(x => x.Name == "Imperial Senator"), true);
+                }
             }
-        }
 
-        if (member.Roles.Any(x => x.Name == "Council Member") && !IsCouncilMember())
-            await member.GrantRoleAsync(member.Roles.First(x => x.Name == "Council Member"));
-        if (!member.Roles.Any(x => x.Name == "Council Member") && IsCouncilMember())
-            await member.GrantRoleAsync(VoopAI.Server.Roles.Values.First(x => x.Name == "Council Member"));
+            if (member.Roles.Any(x => x.Name == "Council Member") && !IsCouncilMember())
+                await member.GrantRoleAsync(member.Roles.First(x => x.Name == "Council Member"));
+            if (!member.Roles.Any(x => x.Name == "Council Member") && IsCouncilMember())
+                await member.GrantRoleAsync(VoopAI.Server.Roles.Values.First(x => x.Name == "Council Member"));
+        }
     }
 
     public async ValueTask<string> GetPfpRingColor()
