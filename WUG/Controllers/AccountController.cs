@@ -130,14 +130,14 @@ public class AccountController : SVController {
             using var dbctx = WashedUpDB.DbFactory.CreateDbContext();
             user = new User(member.DisplayName, userid);
             DBCache.AddNew(user.Id, user);
+            await user.Create();
+            user.Money = 25_000.0m;
 
             //await dbctx.SaveChangesAsync();
         }
 
         user.ImageUrl = member.AvatarUrl;
         user.Name = member.DisplayName;
-        await user.Create();
-        user.Money = 25_000.0m;
 
         HttpContext.Response.Cookies.Append("wugid", user.Id.ToString());
         return Redirect("/");
