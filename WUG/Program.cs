@@ -45,6 +45,7 @@ using WUG.Web;
 using SV2.Hubs;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Options;
+using System.Security.Cryptography.X509Certificates;
 
 //LuaParser parser = new();
 
@@ -80,24 +81,32 @@ var config = new ConfigurationBuilder()
 builder.Configuration.GetSection("Discord").Get<DiscordConfig>();
 builder.Configuration.GetSection("Database").Get<DBConfig>();
 
-
+#if DEBUG
 builder.WebHost.ConfigureKestrel((context, options) =>
 {
-    //options.Configure(builder.Configuration.GetSection("Kestrel"));
-#if DEBUG
-    options.Listen(IPAddress.Any, 7186, listenOptions => {
-        listenOptions.Protocols = Microsoft.AspNetCore.Server.Kestrel.Core.HttpProtocols.Http1AndHttp2AndHttp3;
-        listenOptions.UseHttps();
-    });
-#else
-    options.Listen(IPAddress.Any, 5002, listenOptions =>
+    options.Listen(IPAddress.Any, 7186, listenOptions =>
     {
         listenOptions.Protocols = Microsoft.AspNetCore.Server.Kestrel.Core.HttpProtocols.Http1AndHttp2AndHttp3;
-        //listenOptions.Protocols = Microsoft.AspNetCore.Server.Kestrel.Core.HttpProtocols.Http1AndHttp2AndHttp3;
         listenOptions.UseHttps();
     });
-#endif
 });
+#else
+var certificate = X509Certificate2.CreateFromPemFile("/etc/nginx/sites-available/cert.pem", "/etc/nginx/sites-available/key.key");
+builder.WebHost.ConfigureKestrel((context, options) =>
+{
+	//new IPAddress(new byte[] { 192, 168, 0, 157 }
+	options.ConfigureHttpsDefaults(adapterOptions =>
+	{
+		adapterOptions.ServerCertificate = certificate;
+	});
+	options.Listen(IPAddress.Any, 5002, listenOptions =>
+	{
+		listenOptions.Protocols = Microsoft.AspNetCore.Server.Kestrel.Core.HttpProtocols.Http1AndHttp2AndHttp3;
+		listenOptions.UseHttps();
+	});
+});
+#endif
+
 
 //builder.Services.AddMvc(options =>
 //{
